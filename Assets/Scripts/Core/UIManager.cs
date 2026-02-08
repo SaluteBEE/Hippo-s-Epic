@@ -59,7 +59,8 @@ public class UIManager : MonoBehaviour
             return;
         }
         Instance = this;
-        DontDestroyOnLoad(gameObject);
+        // Unity: DontDestroyOnLoad only works for root GameObjects or components on root GameObjects.
+        // DontDestroyOnLoad(gameObject);
 
         if (rootCanvas == null)
         {
