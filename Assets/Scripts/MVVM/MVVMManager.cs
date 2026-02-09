@@ -16,18 +16,18 @@ public static class MVVMManager
         }
     }
     
-    private static Transform viewsParent;
-    public static Transform ViewsParent
+    private static Transform viewsGameObjectParent;
+    public static Transform ViewsGameObjectParent
     {
         get
         {
-            if (viewsParent == null)
+            if (viewsGameObjectParent == null)
             {
                 throw new System.Exception("MVVMManager.ViewsParent is not set. Please set it before accessing.");
             }
-            return viewsParent;
+            return viewsGameObjectParent;
         }
-        private set { viewsParent = value; }
+        private set { viewsGameObjectParent = value; }
     }
 
     public static void Initialize()
@@ -36,8 +36,8 @@ public static class MVVMManager
         Initialize(viewsParentGO.transform);
     }
 
-    public static void Initialize(Transform viewsParent)
+    public static void Initialize(Transform viewsGameObjectParent)
     {
-        ViewsParent = viewsParent;
+        ViewsGameObjectParent = viewsGameObjectParent;
     }
 }
