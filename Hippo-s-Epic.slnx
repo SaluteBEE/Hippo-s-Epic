@@ -1,3 +1,6 @@
 ﻿<Solution>
+  <Project Path="Aesthete.MVVM.csproj" />
   <Project Path="Assembly-CSharp.csproj" />
+  <Project Path="Aesthete.MVVM.Editor.Tests.csproj" />
+  <Project Path="MVVM.csproj" />
 </Solution>
