@@ -1,8 +1,0 @@
-﻿<Solution>
-  <Project Path="Aesthete.MVVM.csproj" />
-  <Project Path="Assembly-CSharp.csproj" />
-  <Project Path="Aesthete.MVVM.Editor.Tests.csproj" />
-  <Project Path="Level.csproj" />
-  <Project Path="Map.csproj" />
-  <Project Path="MVVM.csproj" />
-</Solution>
