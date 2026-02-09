@@ -9,6 +9,14 @@ public class MapBehaviour : MonoBehaviour
 
     public event Action<MapTeleportContext> MapTeleported;
 
+    public void Teleport(MapTeleportContext context)
+    {
+        if (MapTeleported != null)
+        {
+            MapTeleported.Invoke(context);
+        }
+    }
+
     public void Initialize()
     {
         // Initialize the map and its objects here
@@ -26,7 +34,7 @@ public class MapBehaviour : MonoBehaviour
             OnMapEntered();
             return;
         }
-        throw new System.Exception("Map has already been entered. Multiple entries are not allowed.");
+        throw new Exception("Map has already been entered. Multiple entries are not allowed.");
     }
 
     public void ExitMap()
@@ -38,7 +46,7 @@ public class MapBehaviour : MonoBehaviour
             OnMapExited();
             return;
         }
-        throw new System.Exception("Map has not been entered yet. Cannot exit.");
+        throw new Exception("Map has not been entered yet. Cannot exit.");
     }
 
     private void OnMapEntered()
