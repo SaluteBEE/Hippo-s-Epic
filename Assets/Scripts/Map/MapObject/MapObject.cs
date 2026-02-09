@@ -1,8 +1,11 @@
 using UnityEngine;
 
-public abstract class MapObject : MonoBehaviour
+namespace Map
 {
-    public abstract void OnMapEntered();
-    public abstract void OnMapExited();
+    public abstract class MapObject : MonoBehaviour
+    {
+        public abstract void OnMapEntered();
+        public abstract void OnMapExited();
     
+    }
 }

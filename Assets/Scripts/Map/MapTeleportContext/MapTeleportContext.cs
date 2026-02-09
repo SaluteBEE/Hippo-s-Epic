@@ -1,11 +1,14 @@
-using System;
-
 namespace Map
 {
-    public struct MapTeleportContext
+    public readonly struct MapTeleportContext
     {
-        public int TargetMapIndex;
-        public int TargetMapTeleportPositionIndex;
-        // public PlayerContext
+        public int TargetMapIndex { get; }
+        public int TargetMapTeleportPositionIndex { get; }
+
+        public MapTeleportContext(int targetMapIndex, int targetMapTeleportPositionIndex)
+        {
+            TargetMapIndex = targetMapIndex;
+            TargetMapTeleportPositionIndex = targetMapTeleportPositionIndex;
+        }
     }
 }
