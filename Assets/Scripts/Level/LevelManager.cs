@@ -24,7 +24,7 @@ public static class LevelManager
 
     public static bool SetLevel(Level level)
     {
-        if (Level != null)
+        if (level != null)
         {
             throw new System.Exception("LevelManager.Level is already set. Multiple assignments are not allowed.");
         }
