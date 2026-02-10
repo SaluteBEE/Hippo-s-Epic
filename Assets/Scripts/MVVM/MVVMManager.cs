@@ -16,28 +16,44 @@ public static class MVVMManager
         }
     }
     
-    private static Transform viewsParent;
-    public static Transform ViewsParent
+    private static Transform viewsGameObjectParent;
+    public static Transform ViewsGameObjectParent
     {
         get
         {
-            if (viewsParent == null)
+            if (viewsGameObjectParent == null)
             {
-                throw new System.Exception("MVVMManager.ViewsParent is not set. Please set it before accessing.");
+                throw new System.Exception("MVVMManager.ViewsGameObjectParent is not set. Please set it before accessing.");
             }
-            return viewsParent;
+            return viewsGameObjectParent;
         }
-        private set { viewsParent = value; }
+        private set { viewsGameObjectParent = value; }
     }
 
     public static void Initialize()
     {
+        if (IsInitialized)
+        {
+            throw new System.Exception("MVVMManager is already initialized. Multiple initializations are not allowed.");
+        }
+
         GameObject viewsParentGO = new GameObject("MVVM_Views");
         Initialize(viewsParentGO.transform);
     }
 
-    public static void Initialize(Transform viewsParent)
+    public static void Initialize(Transform viewsGameObjectParent)
     {
-        ViewsParent = viewsParent;
+        if (viewsGameObjectParent == null)
+        {
+            throw new System.ArgumentNullException(nameof(viewsGameObjectParent), "viewsGameObjectParent cannot be null.");
+        }
+
+        if (IsInitialized)
+        {
+            throw new System.Exception("MVVMManager is already initialized. Multiple initializations are not allowed.");
+        }
+
+        ViewsGameObjectParent = viewsGameObjectParent;
+        IsInitialized = true;
     }
 }
