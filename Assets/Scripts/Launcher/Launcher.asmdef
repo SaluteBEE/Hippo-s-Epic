@@ -1,0 +1,16 @@
+{
+    "name": "Launcher",
+    "rootNamespace": "",
+    "references": [
+        "GUID:892709926582be74c9c10fec1ed59a51"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
