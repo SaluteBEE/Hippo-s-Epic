@@ -62,6 +62,11 @@ public partial class Level : MonoBehaviour
 
         Vector2 moveDirection = new Vector2(horizontal, vertical);
 
+        // 归一化对角线移动，避免对角线移动速度大于单轴移动
+        if (moveDirection.sqrMagnitude > 1f)
+        {
+            moveDirection = moveDirection.normalized;
+        }
         // 将输入转换为PlayerCharacter的速度命令
         // TODO: 添加移动速度配置
         playerCharacter.SetVelocity(moveDirection);
