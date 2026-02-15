@@ -1,7 +1,30 @@
 using UnityEngine;
 
+/// <summary>
+/// 所有关卡对象的抽象基类。
+/// 提供统一的位置和运动控制接口。
+/// </summary>
+/// <remarks>
+/// 2D物理在X-Y平面直接运作，Z轴作为独立高度层（用于渲染排序等）。
+/// 摄像机采用俯视视角模拟侧视卷轴效果。
+/// </remarks>
 public abstract class LevelObject : MonoBehaviour
 {
+    /// <summary>
+    /// 2D刚体组件，用于物理计算。
+    /// </summary>
+    protected Rigidbody2D rb2D;
+
+    /// <summary>
+    /// 缓存的Transform引用，避免重复访问。
+    /// </summary>
+    protected Transform cachedTransform;
+
+    /// <summary>
+    /// 当前高度（Z轴），独立于X-Y物理平面。
+    /// </summary>
+    protected float currentHeight;
+
     /// <summary>
     /// 初始化关卡对象。
     /// </summary>
@@ -16,5 +39,50 @@ public abstract class LevelObject : MonoBehaviour
     /// 如需保留基类行为，请在重写方法中显式调用 <c>base.Initialize()</c>。
     /// </para>
     /// </remarks>
-    public virtual void Initialize() { }
+    public virtual void Initialize()
+    {
+        rb2D = GetComponent<Rigidbody2D>();
+        cachedTransform = transform;
+
+        // 初始化高度为当前Z位置
+        currentHeight = cachedTransform.position.z;
+    }
+
+    /// <summary>
+    /// 设置物体在X-Y平面的位置，以及独立的Z轴高度。
+    /// </summary>
+    /// <param name="position">X-Y平面位置（2D物理平面，用户空间：+Y=向上）</param>
+    /// <param name="height">Z轴高度（独立于物理平面），默认0.0f</param>
+    public void SetPosition(Vector2 position, float height = 0.0f)
+    {
+        currentHeight = height;
+
+        // Y轴反向：用户空间 → Unity空间
+        // 用户期望+Y是「向上」，但Unity俯视角中需要-Y才能实现向上移动
+        cachedTransform.position = new Vector3(
+            position.x,    // X: 水平位置
+            -position.y,   // Y: 纵向位置（反向以适配俯视角）
+            height         // Z: 独立高度层
+        );
+
+        // 同步Rigidbody2D位置（同样需要Y轴反向）
+        if (rb2D != null)
+        {
+            rb2D.position = new Vector2(position.x, -position.y);
+        }
+    }
+
+    /// <summary>
+    /// 设置物体速度（X-Y平面）。
+    /// </summary>
+    /// <param name="velocity">X-Y平面速度（用户空间：+Y=向上）</param>
+    public void SetVelocity(Vector2 velocity)
+    {
+        if (rb2D != null)
+        {
+            // Y轴反向：用户空间 → Unity空间
+            // 用户按W键期望+Y速度（向上），但Unity俯视角需要-Y速度
+            rb2D.velocity = new Vector2(velocity.x, -velocity.y);
+        }
+    }
 }
