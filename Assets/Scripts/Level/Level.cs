@@ -2,9 +2,12 @@ using System;
 using UnityEngine;
 using Map;
 
-public class Level : MonoBehaviour
+public partial class Level : MonoBehaviour
 {
+    [SerializeField]
     private MapBehaviour currentMap;
+    [SerializeField]
+    private PlayerCharacter playerCharacter;
     private void OnMapTeleported(MapTeleportContext context)
     {
         // Handle the map teleportation logic here, such as loading the target map and positioning the player

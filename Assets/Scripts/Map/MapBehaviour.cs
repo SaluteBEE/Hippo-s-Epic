@@ -17,6 +17,11 @@ public class MapBehaviour : MonoBehaviour
         }
     }
 
+    public void OnLevelInitialized()
+    {
+        Initialize();
+    }
+
     public void Initialize()
     {
         // Initialize the map and its objects here
