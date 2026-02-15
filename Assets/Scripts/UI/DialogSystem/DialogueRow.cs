@@ -1,13 +1,19 @@
-using System;
+public enum DialogueType
+{
+    普通,
+    选项,
+    结束
+}
 
 public sealed class DialogueRow
 {
-    public char Flag;          // '#' 普通对白, '&' 选项行
-    public int Id;             // ID
-    public string Character;   // 人物
-    public string Position;    // 位置：左/右
-    public string Content;     // 内容
-    public int? Jump;          // 跳转（可能为空）
-    public string Effect;      // 效果（可能为空）
-    public string Target;      // 目标（可能为空）
+    public int Id;
+    public DialogueType Type;
+    public string Speaker;        // 说话人
+    public string Text;           // 对话文本
+    public string Condition;      // 条件（预留）
+    public int? Jump;             // 跳转（可空）
+    public string Emotion;        // 表情（预留）
+    public string Background;     // 背景变化（预留）
+    public string GainItem;       // 获得道具（预留 + UI显示）
 }

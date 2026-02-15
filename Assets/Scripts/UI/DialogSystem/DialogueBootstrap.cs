@@ -24,7 +24,7 @@ public sealed class DialogueBootstrap : MonoBehaviour
         _view = new DialogueView(chatContent, leftBubbleLeftPrefab, rightBubbleLeftPrefab, chatBubbleOptionPrefab);
         _view.Bind();
 
-        _view.VM.Initialize(dialogueCsv, startId: 0);
+        _view.VM.Initialize(dialogueCsv, startId: 1);
         _view.VM.Advance();
     }
 

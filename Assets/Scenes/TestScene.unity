@@ -305,7 +305,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6f75e164c34d9134eb28f180dab83b07, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dialogueCsv: {fileID: 4900000, guid: ebc22c19651bac044b62002ce47c97dc, type: 3}
+  dialogueCsv: {fileID: 4900000, guid: 423a5361653a8b048bd1b7b10336afb1, type: 3}
   chatContent: {fileID: 1597928240}
   leftBubbleLeftPrefab: {fileID: 2078431082266119376, guid: ab105f16188c31b4a8edfcd8de2fe12f, type: 3}
   rightBubbleLeftPrefab: {fileID: 2701169778038989980, guid: cbba89dd17a70de4e83ec9117ea420e3, type: 3}
@@ -1477,7 +1477,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2555643453132918300, guid: cbba89dd17a70de4e83ec9117ea420e3, type: 3}
       propertyPath: m_Padding.m_Bottom
-      value: 71
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2632503118772636822, guid: cbba89dd17a70de4e83ec9117ea420e3, type: 3}
       propertyPath: m_Pivot.x
@@ -1509,7 +1509,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2632503118772636822, guid: cbba89dd17a70de4e83ec9117ea420e3, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 513.6
+      value: 442.6
       objectReference: {fileID: 0}
     - target: {fileID: 2632503118772636822, guid: cbba89dd17a70de4e83ec9117ea420e3, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1545,7 +1545,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2632503118772636822, guid: cbba89dd17a70de4e83ec9117ea420e3, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -256.8
+      value: -221.3
       objectReference: {fileID: 0}
     - target: {fileID: 2632503118772636822, guid: cbba89dd17a70de4e83ec9117ea420e3, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -1578,6 +1578,14 @@ PrefabInstance:
     - target: {fileID: 4932283111988435654, guid: cbba89dd17a70de4e83ec9117ea420e3, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: -204.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 6708315634771085994, guid: cbba89dd17a70de4e83ec9117ea420e3, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -34.99739
+      objectReference: {fileID: 0}
+    - target: {fileID: 6708315634771085994, guid: cbba89dd17a70de4e83ec9117ea420e3, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -13.124023
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

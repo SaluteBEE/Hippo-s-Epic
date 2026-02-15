@@ -65,13 +65,15 @@ public sealed class DialogueView : View
         {
             var bubble = UnityEngine.Object.Instantiate(leftBubblePrefab, _content);
             bubble.SetText(msg.Text);
+            LayoutRebuilder.ForceRebuildLayoutImmediate(bubble.GetComponent<RectTransform>());
+            
         }
         else if (msg.Side == SpeakerSide.Right)
         {
             var bubble = UnityEngine.Object.Instantiate(rightBubblePrefab, _content);
-            bubble.SetText(msg.Text);
+            bubble.SetText(msg.Text, msg.GainItemText);
+            LayoutRebuilder.ForceRebuildLayoutImmediate(bubble.GetComponent<RectTransform>());
         }
-
         LayoutRebuilder.ForceRebuildLayoutImmediate(_content);
     }
 
@@ -84,5 +86,6 @@ public sealed class DialogueView : View
             VM.ChooseOption(index);
             UnityEngine.Object.Destroy(opBubble.gameObject);
         });
+        LayoutRebuilder.ForceRebuildLayoutImmediate(_content);
     }
 }

@@ -4,11 +4,22 @@ using UnityEngine.UI;
 
 public sealed class ChatBubbleRightView : MonoBehaviour
 {
-    [Header("Refs")]
-    [SerializeField] private TMP_Text text;              // 气泡内文字
+    [SerializeField] private TMP_Text mainText;
 
-    public void SetText(string message)
+    [Header("Gain Item Box")]
+    [SerializeField] private GameObject itemBoxRoot;
+    [SerializeField] private TMP_Text itemText;
+
+    public void SetText(string text, string gainItemText = null)
     {
-        text.text = message;
+        bool hasMain = !string.IsNullOrWhiteSpace(text);
+        mainText.gameObject.SetActive(hasMain);
+        if (hasMain) mainText.text = text;
+
+        bool hasItem = !string.IsNullOrWhiteSpace(gainItemText);
+        itemBoxRoot.SetActive(hasItem);
+        if (hasItem) itemText.text = gainItemText;
+
+        LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform)transform);
     }
 }

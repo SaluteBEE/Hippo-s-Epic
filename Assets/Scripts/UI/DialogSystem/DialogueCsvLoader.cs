@@ -9,35 +9,46 @@ public static class DialogueCsvLoader
     {
         if (csv == null) throw new ArgumentNullException(nameof(csv));
 
-        var dict = new Dictionary<int, DialogueRow>();
         var lines = csv.text.Split(new[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+        if (lines.Length <= 1) return new Dictionary<int, DialogueRow>();
 
-        // 第 0 行是表头：标志,ID,人物,位置,内容,跳转,效果,目标
+        // 解析表头
+        var header = SplitCsvLine(lines[0].TrimStart('\uFEFF'));
+        var col = BuildHeaderIndex(header);
+
+        int Idx(string name) => col.TryGetValue(name, out var i) ? i : -1;
+        string Get(string[] cols, string name)
+        {
+            int i = Idx(name);
+            return (i >= 0 && i < cols.Length) ? cols[i].Trim() : "";
+        }
+
+        var dict = new Dictionary<int, DialogueRow>();
+
         for (int i = 1; i < lines.Length; i++)
         {
-            var line = lines[i];
+            var cols = SplitCsvLine(lines[i]);
+            if (!int.TryParse(Get(cols, "对话ID"), out var id)) continue;
 
-            // 处理 UTF-8 BOM（只可能出现在文件开头，但稳妥起见）
-            if (i == 1) line = line.TrimStart('\uFEFF');
-
-            var cols = SplitCsvLine(line);
-            if (cols.Length < 2) continue;
-
-            string flagStr = GetCol(cols, 0);
-            if (string.IsNullOrWhiteSpace(flagStr)) continue;
-
-            if (!int.TryParse(GetCol(cols, 1), out int id)) continue;
+            var typeStr = Get(cols, "对话类型");
+            if (!Enum.TryParse(typeStr, out DialogueType type))
+            {
+                // 若 CSV 写的是“普通/选项/结束”中文枚举名，上面可直接 Parse；
+                // 若你后续改成英文，可在此做映射。
+                continue;
+            }
 
             var row = new DialogueRow
             {
-                Flag = flagStr.Trim()[0],
                 Id = id,
-                Character = GetCol(cols, 2),
-                Position  = GetCol(cols, 3),
-                Content   = GetCol(cols, 4),
-                Jump      = TryParseInt(GetCol(cols, 5)),
-                Effect    = GetCol(cols, 6),
-                Target    = GetCol(cols, 7),
+                Type = type,
+                Speaker = Get(cols, "说话人"),
+                Text = Get(cols, "对话文本"),
+                Condition = Get(cols, "条件"),
+                Jump = TryParseInt(Get(cols, "跳转")),
+                Emotion = Get(cols, "表情"),
+                Background = Get(cols, "背景变化"),
+                GainItem = Get(cols, "获得道具"),
             };
 
             dict[id] = row;
@@ -46,13 +57,21 @@ public static class DialogueCsvLoader
         return dict;
     }
 
-    private static int? TryParseInt(string s)
-        => int.TryParse(s, out var v) ? v : (int?)null;
+    private static int? TryParseInt(string s) => int.TryParse(s, out var v) ? v : (int?)null;
 
-    private static string GetCol(string[] cols, int index)
-        => index >= 0 && index < cols.Length ? cols[index].Trim() : "";
+    private static Dictionary<string, int> BuildHeaderIndex(string[] header)
+    {
+        var map = new Dictionary<string, int>();
+        for (int i = 0; i < header.Length; i++)
+        {
+            var key = header[i].Trim();
+            if (!string.IsNullOrEmpty(key) && !map.ContainsKey(key))
+                map[key] = i;
+        }
+        return map;
+    }
 
-    // 简单但可靠的 CSV 行解析（支持引号与逗号内容）
+    // 支持引号与逗号内容
     private static string[] SplitCsvLine(string line)
     {
         var result = new List<string>();
@@ -65,26 +84,19 @@ public static class DialogueCsvLoader
 
             if (c == '"')
             {
-                // 处理 "" 转义为 "
                 if (inQuotes && i + 1 < line.Length && line[i + 1] == '"')
                 {
                     sb.Append('"');
                     i++;
                 }
-                else
-                {
-                    inQuotes = !inQuotes;
-                }
+                else inQuotes = !inQuotes;
             }
             else if (c == ',' && !inQuotes)
             {
                 result.Add(sb.ToString());
                 sb.Clear();
             }
-            else
-            {
-                sb.Append(c);
-            }
+            else sb.Append(c);
         }
 
         result.Add(sb.ToString());
