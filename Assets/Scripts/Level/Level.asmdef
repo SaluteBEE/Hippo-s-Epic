@@ -1,9 +1,7 @@
 {
     "name": "Level",
     "rootNamespace": "",
-    "references": [
-        "Map"
-    ],
+    "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,

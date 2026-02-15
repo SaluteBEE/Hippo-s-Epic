@@ -1,5 +1,4 @@
 using System;
-using Map;
 using UnityEngine;
 
 public class MapBehaviour : MonoBehaviour

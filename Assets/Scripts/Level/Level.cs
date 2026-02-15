@@ -1,6 +1,5 @@
 using System;
 using UnityEngine;
-using Map;
 
 public partial class Level : MonoBehaviour
 {
