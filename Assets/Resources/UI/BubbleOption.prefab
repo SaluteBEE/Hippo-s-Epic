@@ -135,6 +135,7 @@ GameObject:
   - component: {fileID: 3295542183311122682}
   - component: {fileID: 7881641703123738056}
   - component: {fileID: 4484761057056695814}
+  - component: {fileID: 1344573508688578130}
   m_Layer: 5
   m_Name: BubbleOption
   m_TagString: Untagged
@@ -260,6 +261,20 @@ MonoBehaviour:
   op1Text: {fileID: 8983801473170935902}
   op2Text: {fileID: 333333384109205884}
   op3Text: {fileID: 4370798683084851797}
+--- !u!114 &1344573508688578130
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 792435845803747672}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84df4591e2cbfe34eafedc3cc6680372, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  includeTexts: 0
+  dimColor: {r: 0.75, g: 0.75, b: 0.75, a: 1}
 --- !u!1 &1818650893195538466
 GameObject:
   m_ObjectHideFlags: 0

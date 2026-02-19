@@ -13,6 +13,7 @@ public sealed class DialogueBootstrap : MonoBehaviour
     [SerializeField] private ChatBubbleLeftView leftBubbleLeftPrefab;
     [SerializeField] private ChatBubbleRightView rightBubbleLeftPrefab;
     [SerializeField] private ChatBubbleOptionView chatBubbleOptionPrefab;
+    [SerializeField] private BackgroundView backgroundView;
 
     private DialogueView _view;
 
@@ -21,7 +22,7 @@ public sealed class DialogueBootstrap : MonoBehaviour
 
     private void Start()
     {
-        _view = new DialogueView(chatContent, leftBubbleLeftPrefab, rightBubbleLeftPrefab, chatBubbleOptionPrefab);
+        _view = new DialogueView(chatContent, leftBubbleLeftPrefab, rightBubbleLeftPrefab, chatBubbleOptionPrefab, backgroundView);
         _view.Bind();
 
         _view.VM.Initialize(dialogueCsv, startId: 1);

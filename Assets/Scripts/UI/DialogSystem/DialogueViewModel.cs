@@ -27,11 +27,17 @@ public sealed class DummyDialogueGameState : IDialogueGameState
 
     public bool EvaluateCondition(string condition) => true;
 }
+public sealed class BackgroundChange
+{
+    public string Name { get; }
+    public BackgroundChange(string name) => Name = name;
+}
 
 public sealed class DialogueViewModel : ViewModel
 {
     public Property<ChatMessage> OnMessagePushed { get; } = new Property<ChatMessage>();
     public Property<OptionMessage> OnOpMessagePushed { get; } = new Property<OptionMessage>();
+    public Property<BackgroundChange> OnBackgroundChanged { get; } = new Property<BackgroundChange>();
 
     private Dictionary<int, DialogueRow> _table;
     private List<int> _sortedIds;
@@ -97,6 +103,7 @@ public sealed class DialogueViewModel : ViewModel
 
         if (row.Type == DialogueType.普通)
         {
+            TryTriggerBackground(row.Background);
             var side = ResolveSide(row.Speaker);
 
             // 输出对白（若本句在右侧且有获得道具，则一次性带上 gainItemText，避免重复输出）
@@ -123,6 +130,8 @@ public sealed class DialogueViewModel : ViewModel
 
         if (row.Type == DialogueType.选项)
         {
+            TryTriggerBackground(row.Background);
+            
             _currentOptions.Clear();
 
             int id = _currentId;
@@ -187,6 +196,14 @@ public sealed class DialogueViewModel : ViewModel
     {
         _currentId = row.Jump ?? GetNextId(_currentId);
         if (_currentId == -1) _ended = true;
+    }
+    private void TryTriggerBackground(string bg)
+    {
+        if (string.IsNullOrWhiteSpace(bg)) return;
+
+        // 约定：CSV 里用 “下水道.入口” 表示层级路径，下方会转换为 Resources 路径 “下水道/入口”
+        var normalized = bg.Trim().Replace('.', '/');
+        OnBackgroundChanged.Value = new BackgroundChange(normalized);
     }
 
     private int GetNextId(int id)
