@@ -1,3 +1,4 @@
+using Core.Level2D.Maps;
 using UnityEngine;
 
 namespace Core.Level2D.LevelObjects
@@ -17,6 +18,23 @@ namespace Core.Level2D.LevelObjects
             Vector3 position = transform.position;
             Vector2 position2D = new Vector2(position.x, position.y);
             transform.position = new Vector3(position2D.x, position2D.y, position2D.y);
+
+            // Interaction Check
+
+            Vector2 vector2 = new Vector2(transform.position.x, transform.position.y);
+
+            Collider2D collider2D = Physics2D.OverlapPoint(vector2);
+            if (collider2D != null)
+            {
+                if (collider2D.TryGetComponent(out InteractionCollider interactionCollider))
+                {
+                    interactionCollider.OnPlayerStay();
+                    if (Input.GetKeyDown(KeyCode.E))
+                    {
+                        interactionCollider.OnPlayerExecute();
+                    }
+                }
+            }
         }
     }
 }
