@@ -1,0 +1,15 @@
+# 运行时状态
+state.json
+plan.md
+report.md
+
+# 子任务结果
+subtasks/*.md
+
+# 上下文缓存
+context/*
+
+# 保留模板
+!.gitignore
+!memory/knowledge.json
+!README.md
