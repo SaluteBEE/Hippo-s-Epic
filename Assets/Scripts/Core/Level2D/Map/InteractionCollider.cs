@@ -7,8 +7,8 @@ namespace Core.Level2D.Maps
     /// </summary>
     public abstract class InteractionCollider : MonoBehaviour
     {
-        // public abstract void OnPlayerEnter();
-        // public abstract void OnPlayerExit();
+        public abstract void OnPlayerEnter();
+        public abstract void OnPlayerExit();
         public abstract void OnPlayerStay();
         public abstract void OnPlayerExecute();
     }

@@ -60,7 +60,7 @@ namespace Core.Level2D
 
             if (Input.GetKeyDown(KeyCode.E))
             {
-                levelInput.isPlayerInteractionTriggered = true;
+                _playerCharacter.PlayerExecute();
             }
 
         }

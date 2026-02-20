@@ -8,6 +8,10 @@ namespace Core.Level2D.LevelObjects
     {
         public new Rigidbody2D rigidbody2D;
         public float MoveSpeed = 2.5f;
+
+        public LayerMask interactionLayerMask;
+
+        private InteractionCollider _currentInteractionCollider;
         public void SetMoveInput(Vector2 vector2)
         {
             rigidbody2D.velocity = vector2 * MoveSpeed;
@@ -23,16 +27,29 @@ namespace Core.Level2D.LevelObjects
 
             Vector2 vector2 = new Vector2(transform.position.x, transform.position.y);
 
-            Collider2D collider2D = Physics2D.OverlapPoint(vector2);
+            Collider2D collider2D = Physics2D.OverlapPoint(vector2, interactionLayerMask);
             if (collider2D != null)
             {
                 if (collider2D.TryGetComponent(out InteractionCollider interactionCollider))
                 {
-                    interactionCollider.OnPlayerStay();
-                    if (Input.GetKeyDown(KeyCode.E))
+                    if (interactionCollider != _currentInteractionCollider)
                     {
-                        interactionCollider.OnPlayerExecute();
+                        _currentInteractionCollider?.OnPlayerExit();
+                        _currentInteractionCollider = interactionCollider;
+                        _currentInteractionCollider.OnPlayerEnter();
                     }
+                }
+            }
+        }
+
+        public void PlayerExecute()
+        {
+            Collider2D collider2D = Physics2D.OverlapPoint(new Vector2(transform.position.x, transform.position.y), interactionLayerMask);
+            if (collider2D != null)
+            {
+                if (collider2D.TryGetComponent(out InteractionCollider interactionCollider))
+                {
+                    interactionCollider.OnPlayerExecute();
                 }
             }
         }
