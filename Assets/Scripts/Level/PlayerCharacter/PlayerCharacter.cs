@@ -90,12 +90,12 @@ public class PlayerCharacter : LevelObject
             currentComposition = composition;
             
             // 调试日志
-            Debug.Log($"PlayerCharacter.SetVelocity: velocity={velocity}, sqrMagnitude={velocity.sqrMagnitude:F4}, composition={composition} (切换)");
+            // Debug.Log($"PlayerCharacter.SetVelocity: velocity={velocity}, sqrMagnitude={velocity.sqrMagnitude:F4}, composition={composition} (切换)");
         }
         else
         {
             // 调试日志：组合未变化
-            Debug.Log($"PlayerCharacter.SetVelocity: velocity={velocity}, sqrMagnitude={velocity.sqrMagnitude:F4}, composition={composition} (未变化)");
+            // Debug.Log($"PlayerCharacter.SetVelocity: velocity={velocity}, sqrMagnitude={velocity.sqrMagnitude:F4}, composition={composition} (未变化)");
         }
     }
 }
