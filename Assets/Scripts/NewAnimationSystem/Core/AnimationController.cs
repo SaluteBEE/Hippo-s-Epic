@@ -44,6 +44,8 @@ public class AnimationController : MonoBehaviour
             {
                 Initialize();
             }
+            
+            Debug.Log($"AnimationController.Awake: autoInitialize={autoInitialize}, config={(config != null ? "assigned" : "null")}, skeletonAnimation={(skeletonAnimation != null ? "assigned" : "null")}");
         }
         catch (System.Exception e)
         {
@@ -76,6 +78,7 @@ public class AnimationController : MonoBehaviour
     {
         try
         {
+            Debug.Log($"AnimationController.Initialize开始: config={(config != null ? config.name : "null")}, skeletonAnimation={(skeletonAnimation != null ? "assigned" : "null")}");
             if (isInitialized)
             {
                 if (debugLog) Debug.LogWarning("AnimationController already initialized.");
