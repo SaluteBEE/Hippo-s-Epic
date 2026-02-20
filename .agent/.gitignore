@@ -8,7 +8,7 @@ subtasks/*.md
 
 # 上下文缓存
 context/*
-memory/
+memory/*
 
 # 保留模板
 !.gitignore
