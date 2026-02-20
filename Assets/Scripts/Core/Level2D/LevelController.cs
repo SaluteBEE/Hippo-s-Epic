@@ -73,7 +73,7 @@ namespace Core.Level2D
 
                 return;
             }
-            Debug.Log("Level2D: ");
+            Debug.Log("Level2D: Set Player Character failed.");
         }
 
         /// <summary>
