@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4701996983941035718}
   - component: {fileID: 4387540049032865800}
+  - component: {fileID: 4373482819133495662}
   m_Layer: 0
   m_Name: PlayerCharacter
   m_TagString: Untagged
@@ -45,6 +46,34 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 52ebbfc7e1913214384b828437564efe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  animationController: {fileID: 8534891851780940480}
+--- !u!50 &4373482819133495662
+Rigidbody2D:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1754565774573401170}
+  m_BodyType: 0
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDrag: 0
+  m_AngularDrag: 0.05
+  m_GravityScale: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 0
 --- !u!1 &4135022551924287287
 GameObject:
   m_ObjectHideFlags: 0
@@ -57,6 +86,8 @@ GameObject:
   - component: {fileID: 7289102330721474731}
   - component: {fileID: 4535413860524124792}
   - component: {fileID: 4926513826052559705}
+  - component: {fileID: 8534891851780940480}
+  - component: {fileID: 7790136815564482156}
   m_Layer: 0
   m_Name: "\u73A9\u5BB6\u5360\u4F4D\u7B26"
   m_TagString: Untagged
@@ -127,7 +158,7 @@ MeshRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 1
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!114 &4926513826052559705
 MonoBehaviour:
@@ -166,6 +197,51 @@ MonoBehaviour:
   _animationName: 
   loop: 0
   timeScale: 1
+--- !u!114 &8534891851780940480
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4135022551924287287}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 60ee02cbe6949d7408cd1459d1dfa416, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  config: {fileID: 11400000, guid: 4c7488dbe2807b74eb1e37ff9741b0d5, type: 2}
+  debugLog: 0
+  autoInitialize: 1
+  slotManager: {fileID: 7790136815564482156}
+  controlSlotsWithLayers: 1
+--- !u!114 &7790136815564482156
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4135022551924287287}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 40723bdd15ad63c4f862094415255653, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  skeletonAnimation: {fileID: 4926513826052559705}
+  skeletonGraphic: {fileID: 0}
+  autoInitialize: 1
+  debugLog: 0
+  managedSlots:
+  - slotName: "\u5934"
+    defaultAttachment: "\u5934"
+    visibleOnStart: 1
+    defaultAlpha: 1
+    fadeDuration: 0
+  - slotName: "\u53F3\u624B"
+    defaultAttachment: "\u53F3\u624B"
+    visibleOnStart: 1
+    defaultAlpha: 1
+    fadeDuration: 0
+  slotGroups: []
 --- !u!1 &4317591256414687368
 GameObject:
   m_ObjectHideFlags: 0

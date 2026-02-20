@@ -1,7 +1,7 @@
 {
     "name": "Level",
     "rootNamespace": "",
-    "references": [],
+    "references": ["NewAnimationSystem"],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,

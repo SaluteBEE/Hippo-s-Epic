@@ -898,7 +898,7 @@ public class AnimationConfigEditor : Editor
     
     private void LoadExampleAnimationsFromHippoFolder()
     {
-        string hippoFolderPath = "Assets/Configs/Animations/Hippo/";
+        string hippoFolderPath = "Assets/Resources/spine/河马/ReferenceAssets/";
         
         if (!AssetDatabase.IsValidFolder(hippoFolderPath))
         {

@@ -34,7 +34,7 @@ public class SetupTestAnimation : MonoBehaviour
         }
         
         // 设置骨骼数据
-        string skeletonDataPath = "Assets/Resources/spine/河马_SkeletonData.asset";
+        string skeletonDataPath = "Assets/Resources/spine/河马/河马_SkeletonData.asset";
         var skeletonData = AssetDatabase.LoadAssetAtPath<SkeletonDataAsset>(skeletonDataPath);
         if (skeletonData != null)
         {

@@ -38,13 +38,33 @@ MonoBehaviour:
     speed: 1
     loop: 1
     type: 2
+  - name: body-headhit
+    animation: {fileID: 11400000, guid: 9b84f85899b71a6478af597d42faca57, type: 2}
+    animationName: body-headhit
+    speed: 1
+    loop: 1
+    type: 1
+  - name: head-headhit
+    animation: {fileID: 11400000, guid: c515892e66e5d8140884e831580bce8d, type: 2}
+    animationName: head-headhit
+    speed: 1
+    loop: 1
+    type: 0
+  - name: head-idle
+    animation: {fileID: 11400000, guid: a6b4587307e939841b788c2017ab9fbf, type: 2}
+    animationName: head-idle
+    speed: 1
+    loop: 1
+    type: 0
   layers:
   - name: Base
     trackIndex: 0
     defaultWeight: 1
     additive: 0
     slotNames: []
-    availableClipNames: []
+    availableClipNames:
+    - head-idle
+    - head-headhit
   - name: UpperBody
     trackIndex: 1
     defaultWeight: 1
@@ -53,6 +73,7 @@ MonoBehaviour:
     availableClipNames:
     - body-idle
     - body-walk
+    - body-headhit
   - name: LowerBody
     trackIndex: 2
     defaultWeight: 1
@@ -75,7 +96,12 @@ MonoBehaviour:
       weight: 1
       transitionTime: 0.1
       delay: 0
-  - name: Walk
+    - layerName: Base
+      clipName: head-idle
+      weight: 1
+      transitionTime: 0.1
+      delay: 0
+  - name: walk
     description: "\u884C\u8D70\u72B6\u6001"
     layers:
     - layerName: UpperBody
@@ -85,6 +111,11 @@ MonoBehaviour:
       delay: 0
     - layerName: LowerBody
       clipName: leg-walk
+      weight: 1
+      transitionTime: 0.1
+      delay: 0
+    - layerName: Base
+      clipName: head-idle
       weight: 1
       transitionTime: 0.1
       delay: 0

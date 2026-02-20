@@ -29,18 +29,26 @@ public class AnimationController : MonoBehaviour
     
     private void Awake()
     {
-        skeletonAnimation = GetComponent<SkeletonAnimation>();
-        animationState = skeletonAnimation.AnimationState;
-        
-        // 自动获取 SlotManager
-        if (slotManager == null)
+        try
         {
-            slotManager = GetComponent<SlotManager>();
+            skeletonAnimation = GetComponent<SkeletonAnimation>();
+            animationState = skeletonAnimation.AnimationState;
+            
+            // 自动获取 SlotManager
+            if (slotManager == null)
+            {
+                slotManager = GetComponent<SlotManager>();
+            }
+            
+            if (autoInitialize)
+            {
+                Initialize();
+            }
         }
-        
-        if (autoInitialize)
+        catch (System.Exception e)
         {
-            Initialize();
+            Debug.LogError($"AnimationController.Awake 异常: {e.GetType().Name}: {e.Message}\n堆栈: {e.StackTrace}");
+            throw;
         }
     }
     
@@ -66,47 +74,69 @@ public class AnimationController : MonoBehaviour
     
     public void Initialize()
     {
-        if (isInitialized)
+        try
         {
-            if (debugLog) Debug.LogWarning("AnimationController already initialized.");
-            return;
-        }
-        
-        if (config == null)
-        {
-            // 尝试加载默认配置（仅在编辑器中）
-            if (!TryLoadDefaultConfig())
+            if (isInitialized)
             {
-                Debug.LogError($"AnimationController on {gameObject.name} has no AnimationConfig assigned. " +
-                              "Please assign an AnimationConfig asset in the inspector or create one using the editor tools.");
+                if (debugLog) Debug.LogWarning("AnimationController already initialized.");
                 return;
             }
+            
+            // 编辑器模式下确保组件引用已获取
+#if UNITY_EDITOR
+            if (!UnityEngine.Application.isPlaying)
+            {
+                if (skeletonAnimation == null)
+                    skeletonAnimation = GetComponent<SkeletonAnimation>();
+                if (skeletonAnimation != null)
+                    animationState = skeletonAnimation.AnimationState;
+                if (slotManager == null)
+                    slotManager = GetComponent<SlotManager>();
+            }
+#endif
+            
+            if (config == null)
+            {
+                // 尝试加载默认配置（仅在编辑器中）
+                if (!TryLoadDefaultConfig())
+                {
+                    Debug.LogError($"AnimationController on {gameObject.name} has no AnimationConfig assigned. " +
+                                  "Please assign an AnimationConfig asset in the inspector or create one using the editor tools.");
+                    return;
+                }
+            }
+            
+            // 验证配置
+            config.ValidateConfig();
+            
+            // 验证骨骼数据匹配
+            if (config.skeletonData != null && skeletonAnimation != null && 
+                config.skeletonData != skeletonAnimation.SkeletonDataAsset)
+            {
+                Debug.LogWarning($"AnimationConfig skeleton data doesn't match SkeletonAnimation on {gameObject.name}");
+            }
+            
+            // 初始化层级
+            InitializeLayers();
+            
+            // 播放默认组合
+            if (!string.IsNullOrEmpty(config.defaultComposition) && 
+                config.HasComposition(config.defaultComposition))
+            {
+                PlayComposition(config.defaultComposition);
+            }
+            
+            isInitialized = true;
+            
+            if (debugLog)
+            {
+                Debug.Log($"AnimationController initialized on {gameObject.name} with {layers.Count} layers.");
+            }
         }
-        
-        // 验证配置
-        config.ValidateConfig();
-        
-        // 验证骨骼数据匹配
-        if (config.skeletonData != null && config.skeletonData != skeletonAnimation.SkeletonDataAsset)
+        catch (System.Exception e)
         {
-            Debug.LogWarning($"AnimationConfig skeleton data doesn't match SkeletonAnimation on {gameObject.name}");
-        }
-        
-        // 初始化层级
-        InitializeLayers();
-        
-        // 播放默认组合
-        if (!string.IsNullOrEmpty(config.defaultComposition) && 
-            config.HasComposition(config.defaultComposition))
-        {
-            PlayComposition(config.defaultComposition);
-        }
-        
-        isInitialized = true;
-        
-        if (debugLog)
-        {
-            Debug.Log($"AnimationController initialized on {gameObject.name} with {layers.Count} layers.");
+            Debug.LogError($"AnimationController.Initialize 异常: {e.GetType().Name}: {e.Message}\n堆栈: {e.StackTrace}");
+            throw;
         }
     }
     
@@ -213,14 +243,32 @@ public class AnimationController : MonoBehaviour
         var composition = config.GetComposition(compositionName);
         if (composition != null)
         {
+            if (debugLog)
+            {
+                Debug.Log($"开始播放组合动画: {compositionName} (包含 {composition.layers.Count} 个层级)");
+            }
+            
             foreach (var compLayer in composition.layers)
             {
+                if (debugLog)
+                {
+                    Debug.Log($"  组合层: {compLayer.layerName} -> {compLayer.clipName} (权重: {compLayer.weight}, 过渡: {compLayer.transitionTime}s)");
+                }
+                
                 PlayClip(compLayer.layerName, compLayer.clipName, compLayer.transitionTime);
                 
                 if (compLayer.delay > 0)
                 {
-                    // 延迟设置权重
-                    StartCoroutine(DelayedSetWeight(compLayer.layerName, compLayer.weight, compLayer.delay));
+                    // 延迟设置权重（仅在播放模式下使用协程）
+                    if (Application.isPlaying)
+                    {
+                        StartCoroutine(DelayedSetWeight(compLayer.layerName, compLayer.weight, compLayer.delay));
+                    }
+                    else
+                    {
+                        // 编辑器模式下直接设置权重
+                        SetLayerWeight(compLayer.layerName, compLayer.weight);
+                    }
                 }
                 else
                 {
@@ -230,7 +278,7 @@ public class AnimationController : MonoBehaviour
             
             if (debugLog)
             {
-                Debug.Log($"Playing composition: {compositionName}");
+                Debug.Log($"组合动画播放完成: {compositionName}");
             }
         }
         else
@@ -418,7 +466,7 @@ public class AnimationController : MonoBehaviour
         {
             this.config = config;
             this.skeletonAnimation = skeletonAnimation;
-            this.animationState = skeletonAnimation.AnimationState;
+            this.animationState = skeletonAnimation != null ? skeletonAnimation.AnimationState : null;
             this.animationConfig = animationConfig;
             this.slotManager = slotManager;
             this.currentWeight = config != null ? config.defaultWeight : 1.0f;
@@ -426,6 +474,13 @@ public class AnimationController : MonoBehaviour
         
         public void PlayClip(string clipName, float transitionTime)
         {
+            // 编辑器模式下提前返回
+            if (animationState == null)
+            {
+                Debug.LogWarning($"Cannot play animation in editor mode: {clipName}");
+                return;
+            }
+            
             // 尝试从配置获取动画
             var clip = animationConfig.GetClip(clipName);
             Spine.Animation animation = null;
@@ -446,10 +501,18 @@ public class AnimationController : MonoBehaviour
                     Debug.LogWarning($"Clip {clipName} is not available for layer {config.name}");
                     return;
                 }
+                
+                Debug.Log($"播放动画: {clipName} (循环: {loop}, 速度: {speed}, 轨道: {config.trackIndex})");
             }
             else
             {
                 // 尝试直接从骨骼数据获取动画
+                if (skeletonAnimation == null)
+                {
+                    Debug.LogWarning($"No skeleton animation available");
+                    return;
+                }
+                
                 var skeleton = skeletonAnimation.Skeleton;
                 if (skeleton != null && skeleton.Data != null)
                 {
@@ -465,10 +528,16 @@ public class AnimationController : MonoBehaviour
                     Debug.LogWarning($"No skeleton data available");
                     return;
                 }
+                
+                Debug.Log($"播放动画(直接查找): {clipName} (循环: {loop}, 速度: {speed}, 轨道: {config.trackIndex})");
             }
             
             if (animation != null)
             {
+                // 调试信息：动画时长
+                float animationDuration = animation.Duration;
+                Debug.Log($"动画 '{clipName}' 时长: {animationDuration:F2}秒 ({animationDuration * 30:F0}帧)");
+                
                 currentTrack = animationState.SetAnimation(
                     config.trackIndex,
                     animation,
@@ -494,6 +563,9 @@ public class AnimationController : MonoBehaviour
                 
                 // 控制插槽
                 ControlSlots(true, transitionTime);
+                
+                // 调试信息：轨道状态
+                Debug.Log($"轨道设置完成: 轨道{config.trackIndex}, Alpha={currentTrack.Alpha:F2}, TimeScale={currentTrack.TimeScale:F2}, MixDuration={currentTrack.MixDuration:F2}, Loop={loop}");
             }
         }
         
@@ -541,7 +613,10 @@ public class AnimationController : MonoBehaviour
                 // 停止时隐藏插槽
                 ControlSlots(false, 0.1f);
                 
-                animationState.ClearTrack(config.trackIndex);
+                if (animationState != null)
+                {
+                    animationState.ClearTrack(config.trackIndex);
+                }
                 currentTrack = null;
                 currentClip = null;
             }
