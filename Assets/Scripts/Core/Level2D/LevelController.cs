@@ -7,6 +7,10 @@ namespace Core.Level2D
     {
         [SerializeField]
         private PlayerCharacter _playerCharacter;
+        public PlayerCharacter PlayerCharacter
+        {
+            get => _playerCharacter;
+        }
 
         private void Update()
         {
@@ -65,6 +69,11 @@ namespace Core.Level2D
 
         }
 
+        /// <summary>
+        /// 用于通过脚本挂载玩家角色，建议在实例化关卡后实例化玩家角色并挂载，同时执行其初始化脚本（基于存档或 Level Flag 计算玩家状态）
+        /// TODO: 实现方法
+        /// </summary>
+        /// <param name="playerCharacter"></param>
         public void SetPlayerCharacter(PlayerCharacter playerCharacter)
         {
             if (_playerCharacter == null && playerCharacter != null)

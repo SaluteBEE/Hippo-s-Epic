@@ -5,6 +5,10 @@ namespace Core.Level2D
     public static class LevelManager
     {
         private static LevelController _levelController;
+        public static LevelController LevelController
+        {
+            get => _levelController;
+        }
 
         public static void InstantiateLevelController()
         {
