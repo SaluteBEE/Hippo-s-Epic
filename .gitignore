@@ -99,3 +99,9 @@ InitTestScene*.unity*
 /[Aa]ssets/[Ii]nit[Tt]est[Ss]cene*.unity*
 
 .idea
+
+# OpenCode相关文件
+opencode.json
+.agent/
+.opencode/
+AGENTS.md
