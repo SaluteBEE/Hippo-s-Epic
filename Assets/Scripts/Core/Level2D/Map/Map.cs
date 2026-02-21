@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Core.Level2D.Maps
 {
-    public class Map : MonoBehaviour
+    public sealed class Map : MonoBehaviour
     {
         public Vector2 mainEntrance;
 
