@@ -60,7 +60,9 @@ namespace GGJ2026
         {
             if (state == GameState.MainMenu)
             {
+                #pragma warning disable CS0618
                 UIManager.Instance.Open<MainMenuPanel>("UI/MainMenuPanel");
+                #pragma warning restore CS0618
                
             }
             else if (state == GameState.Playing)

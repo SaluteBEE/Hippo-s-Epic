@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 /// <summary>
@@ -5,6 +6,15 @@ using UnityEngine;
 /// </summary>
 public class PlayerCharacter : LevelObject
 {
+
+    /// <summary>
+    /// 动画组件
+    /// </summary>
+    [SerializeField]
+    private AnimationController animationController;
+    
+    private string currentComposition;
+    
     /// <summary>
     /// 控制是否启用。
     /// </summary>
@@ -45,5 +55,47 @@ public class PlayerCharacter : LevelObject
     {
         base.Initialize();
         isControlEnabled = true;
+    }
+
+    /// <summary>
+    /// 驱动动画
+    /// </summary>
+    /// <param name="velocity"></param>
+    public override void SetVelocity(Vector2 velocity)
+    {
+        base.SetVelocity(velocity);
+        if (animationController == null)
+        {
+            animationController = GetComponentInChildren<AnimationController>();
+        }
+
+        if (animationController == null)
+        {
+            return;
+        }
+
+        if ( velocity.x != 0)
+        {
+            animationController.gameObject.transform.localScale = new Vector3(velocity.x > 0 ? -1 : 1, 1, 1);    
+        }
+        
+        // 使用速度阈值避免频繁切换
+        float speedThreshold = 0.01f;
+        string composition = velocity.sqrMagnitude > speedThreshold ? "walk" : "Idle";
+        
+        // 只有组合发生变化时才播放
+        if (composition != currentComposition)
+        {
+            animationController.PlayComposition(composition);
+            currentComposition = composition;
+            
+            // 调试日志
+            // Debug.Log($"PlayerCharacter.SetVelocity: velocity={velocity}, sqrMagnitude={velocity.sqrMagnitude:F4}, composition={composition} (切换)");
+        }
+        else
+        {
+            // 调试日志：组合未变化
+            // Debug.Log($"PlayerCharacter.SetVelocity: velocity={velocity}, sqrMagnitude={velocity.sqrMagnitude:F4}, composition={composition} (未变化)");
+        }
     }
 }

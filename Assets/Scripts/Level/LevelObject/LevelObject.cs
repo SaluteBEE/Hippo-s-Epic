@@ -76,7 +76,7 @@ public abstract class LevelObject : MonoBehaviour
     /// 设置物体速度（X-Y平面）。
     /// </summary>
     /// <param name="velocity">X-Y平面速度（用户空间：+Y=向上）</param>
-    public void SetVelocity(Vector2 velocity)
+    public virtual void SetVelocity(Vector2 velocity)
     {
         if (rb2D != null)
         {
