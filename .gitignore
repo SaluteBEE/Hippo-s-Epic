@@ -105,3 +105,6 @@ opencode.json
 .agent/
 .opencode/
 AGENTS.md
+
+# VSCode相关文件
+.vscode/
