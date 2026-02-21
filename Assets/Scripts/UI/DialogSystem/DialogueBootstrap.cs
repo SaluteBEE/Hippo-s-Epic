@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 public sealed class DialogueBootstrap : MonoBehaviour
@@ -12,6 +13,7 @@ public sealed class DialogueBootstrap : MonoBehaviour
     [SerializeField] private RectTransform chatContent;
     [SerializeField] private ChatBubbleLeftView leftBubbleLeftPrefab;
     [SerializeField] private ChatBubbleRightView rightBubbleLeftPrefab;
+    [SerializeField] private ChatBubbleMiddleView middleBubblePrefab;
     [SerializeField] private ChatBubbleOptionView chatBubbleOptionPrefab;
     [SerializeField] private BackgroundView backgroundView;
 
@@ -22,7 +24,7 @@ public sealed class DialogueBootstrap : MonoBehaviour
 
     private void Start()
     {
-        _view = new DialogueView(chatContent, leftBubbleLeftPrefab, rightBubbleLeftPrefab, chatBubbleOptionPrefab, backgroundView);
+        _view = new DialogueView(chatContent, leftBubbleLeftPrefab,middleBubblePrefab,rightBubbleLeftPrefab, chatBubbleOptionPrefab, backgroundView);
         _view.Bind();
 
         _view.VM.Initialize(dialogueCsv, startId: 1);

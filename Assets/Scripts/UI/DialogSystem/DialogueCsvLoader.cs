@@ -44,6 +44,7 @@ public static class DialogueCsvLoader
                 Type = type,
                 Speaker = Get(cols, "说话人"),
                 Text = Get(cols, "对话文本"),
+                Text2 = Get(cols, "对话文本2"),
                 Condition = Get(cols, "条件"),
                 Jump = TryParseInt(Get(cols, "跳转")),
                 Emotion = Get(cols, "表情"),

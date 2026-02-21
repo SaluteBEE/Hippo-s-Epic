@@ -75,10 +75,12 @@ public sealed class DialogueViewModel : ViewModel
     /// <summary>
     /// 规则：河马永远在左侧，其它都在右侧
     /// </summary>
-    public SpeakerSide ResolveSide(string speaker)
+    public SpeakerSide ResolveSide(DialogueRow row)
     {
-        var s = speaker?.Trim();
-        return s == "河马" ? SpeakerSide.Left : SpeakerSide.Right;
+        var s = row.Speaker?.Trim();
+        if (s == "河马") return SpeakerSide.Left;
+        if (s == "旁白"||row.Text2!="") return SpeakerSide.Middle;
+        return SpeakerSide.Right;
     }
 
     public void Advance()
@@ -104,10 +106,16 @@ public sealed class DialogueViewModel : ViewModel
         if (row.Type == DialogueType.普通)
         {
             TryTriggerBackground(row.Background);
-            var side = ResolveSide(row.Speaker);
+            
+            var side = ResolveSide(row);
 
+            //旁白文字
+            if (side == SpeakerSide.Middle)
+            {
+                PushMiddle(row.Text);
+            }
             // 输出对白（若本句在右侧且有获得道具，则一次性带上 gainItemText，避免重复输出）
-            if (side == SpeakerSide.Right)
+            else if (side == SpeakerSide.Right)
             {
                 var gain = string.IsNullOrWhiteSpace(row.GainItem) ? null : row.GainItem;
                 PushRight(row.Text, gainItemText: gain);
@@ -148,8 +156,12 @@ public sealed class DialogueViewModel : ViewModel
             string t1 = _currentOptions.Count > 0 ? _currentOptions[0].Text : "";
             string t2 = _currentOptions.Count > 1 ? _currentOptions[1].Text : "";
             string t3 = _currentOptions.Count > 2 ? _currentOptions[2].Text : "";
+            
+            string e1 = _currentOptions.Count > 0 ? _currentOptions[0].Text2 : "";
+            string e2 = _currentOptions.Count > 1 ? _currentOptions[1].Text2 : "";
+            string e3 = _currentOptions.Count > 2 ? _currentOptions[2].Text2 : "";
 
-            PushOption(t1, t2, t3);
+            PushOption(t1,e1,t2,e2,t3,e3);
             _waitingOption = true;
             return;
         }
@@ -166,16 +178,25 @@ public sealed class DialogueViewModel : ViewModel
         if (index < 0 || index >= _currentOptions.Count) return;
 
         var chosen = _currentOptions[index];
-
-        // 点击选项后生成对应内容的左侧气泡（你的需求）
-        PushLeft(chosen.Text);
-
-        // 若该选项也能获得道具（表格里填了），同样预留并显示
-        if (!string.IsNullOrWhiteSpace(chosen.GainItem))
+        if (chosen.Text2 != "")
         {
-            _state.AddItem(chosen.GainItem);
-            PushRight("", gainItemText: chosen.GainItem);
+            PushMiddle(chosen.Text2);
         }
+        else
+        {
+            PushLeft(chosen.Text);
+        }
+        
+        // 点击选项后生成对应内容的左侧气泡（你的需求）
+        
+        
+
+        // // 若该选项也能获得道具（表格里填了），同样预留并显示
+        // if (!string.IsNullOrWhiteSpace(chosen.GainItem))
+        // {
+        //     _state.AddItem(chosen.GainItem);
+        //     PushRight("", gainItemText: chosen.GainItem);
+        // }
 
         _currentId = chosen.Jump ?? GetNextId(chosen.Id);
         if (_currentId == -1) _ended = true;
@@ -188,9 +209,11 @@ public sealed class DialogueViewModel : ViewModel
 
     public void PushRight(string text, string gainItemText = null)
         => OnMessagePushed.Value = new ChatMessage(SpeakerSide.Right, text, gainItemText);
+    public void PushMiddle(string text)
+        => OnMessagePushed.Value = new ChatMessage(SpeakerSide.Middle, text);
 
-    public void PushOption(string t1, string t2, string t3)
-        => OnOpMessagePushed.Value = new OptionMessage(t1, t2, t3);
+    public void PushOption(string t1, string e1, string t2, string e2, string t3,string e3)
+        => OnOpMessagePushed.Value = new OptionMessage(t1,e1,t2,e2,t3,e3);
 
     private void MoveNext(DialogueRow row)
     {

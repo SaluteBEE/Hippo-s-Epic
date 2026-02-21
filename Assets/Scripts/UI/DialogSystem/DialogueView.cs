@@ -10,6 +10,7 @@ public sealed class DialogueView : View
 
     private readonly RectTransform _content;
     private readonly ChatBubbleLeftView leftBubblePrefab;
+    private readonly ChatBubbleMiddleView middleBubblePrefab;
     private readonly ChatBubbleRightView rightBubblePrefab;
     private readonly ChatBubbleOptionView bubbleOptionPrefab;
     
@@ -23,12 +24,14 @@ public sealed class DialogueView : View
 
     public DialogueView(RectTransform content,
         ChatBubbleLeftView left,
+        ChatBubbleMiddleView middle,
         ChatBubbleRightView right,
         ChatBubbleOptionView option,
         BackgroundView backgroundView)
     {
         _content = content;
         leftBubblePrefab = left;
+        middleBubblePrefab = middle;
         rightBubblePrefab = right;
         bubbleOptionPrefab = option;
         _backgroundView = backgroundView;
@@ -74,7 +77,15 @@ public sealed class DialogueView : View
 
     private void OnMessagePushed(ChatMessage msg)
     {
-        if (msg.Side == SpeakerSide.Left)
+        if (msg.Side == SpeakerSide.Middle)
+        {
+            var bubble = UnityEngine.Object.Instantiate(middleBubblePrefab, _content);
+            bubble.SetText(msg.Text);
+            MarkAsLatest(bubble.gameObject);
+            LayoutRebuilder.ForceRebuildLayoutImmediate(bubble.GetComponent<RectTransform>());
+            
+        }
+        else if (msg.Side == SpeakerSide.Left)
         {
             var bubble = UnityEngine.Object.Instantiate(leftBubblePrefab, _content);
             bubble.SetText(msg.Text);
@@ -96,7 +107,7 @@ public sealed class DialogueView : View
     {
         var opBubble = UnityEngine.Object.Instantiate(bubbleOptionPrefab, _content);
 
-        opBubble.Bind(msg.Text1, msg.Text2, msg.Text3, index =>
+        opBubble.Bind(msg.Text1, msg.Extend1,msg.Text2,msg.Extend2, msg.Text3,msg.Extend3, index =>
         {
             VM.ChooseOption(index);
             UnityEngine.Object.Destroy(opBubble.gameObject);
