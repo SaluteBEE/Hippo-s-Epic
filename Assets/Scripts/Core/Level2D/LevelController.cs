@@ -1,4 +1,5 @@
 using Core.Level2D.LevelObjects;
+using Core.Level2D.Maps;
 using UnityEngine;
 
 namespace Core.Level2D
@@ -11,6 +12,9 @@ namespace Core.Level2D
         {
             get => _playerCharacter;
         }
+
+        [SerializeField]
+        private Map _map;
 
         private void Update()
         {
@@ -83,6 +87,20 @@ namespace Core.Level2D
                 return;
             }
             Debug.Log("Level2D: Set Player Character failed.");
+        }
+
+        /// <summary>
+        /// 设置地图，释放现有地图并初始化新地图
+        /// </summary>
+        /// <param name="map"></param>
+        public void SetMap(Map map)
+        {
+            if (_map != null)
+            {
+                _map.Dispose();
+            }
+            map.Initialize();
+            _map = map;
         }
 
         /// <summary>
