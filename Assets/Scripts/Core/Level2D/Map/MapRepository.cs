@@ -16,7 +16,7 @@ namespace Core.Level2D.Maps
 
         [SerializeField]
         private Map[] mapPrefabs;
-        private Dictionary<string, Map> mapCache;
+        private Dictionary<string, Map> mapCache = new();
 
         private void Awake()
         {

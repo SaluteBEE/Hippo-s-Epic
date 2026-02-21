@@ -1,4 +1,6 @@
+using Codice.Client.BaseCommands;
 using Core.Level2D.LevelObjects;
+using Core.Level2D.Maps;
 using UnityEditor;
 using UnityEngine;
 
@@ -37,6 +39,12 @@ namespace Core.Level2D
         {
             GameObject playerCharacterPrefab = Resources.Load<GameObject>("Level2D/Player Character 2D");
             LevelManager.LevelController.SetPlayerCharacter(Object.Instantiate(playerCharacterPrefab).GetComponent<PlayerCharacter>());
+        }
+
+        [MenuItem("Tools/Level2D/Instantiate Mock Level")]
+        public static void InstantiateMockLevel()
+        {
+            MapRepository.InstantiateMap("Mock Map", LevelManager.LevelController.transform);
         }
     }
 }
