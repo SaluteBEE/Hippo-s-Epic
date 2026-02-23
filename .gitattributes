@@ -1,1 +1,2 @@
+Assets/Sprites/**/*.meta -filter -diff -merge text
 Assets/Sprites/** filter=lfs diff=lfs merge=lfs -text
