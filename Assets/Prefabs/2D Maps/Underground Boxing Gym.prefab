@@ -131,7 +131,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mainEntrance: {x: 0, y: -4}
-  cameraClampX: {x: -10, y: 10}
+  cameraClampX: {x: -5, y: 5}
   cameraClampY: {x: 0, y: 0}
 --- !u!1 &1461962650594508102
 GameObject:
