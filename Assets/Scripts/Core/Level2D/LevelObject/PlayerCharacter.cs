@@ -1,10 +1,12 @@
+using System;
+using Core.Level2D.Camera;
 using Core.Level2D.Maps;
 using UnityEngine;
 
 namespace Core.Level2D.LevelObjects
 {
     [AddComponentMenu("Level 2D/Player Character")]
-    public class PlayerCharacter : LevelObject
+    public class PlayerCharacter : LevelObject, IFocusTarget
     {
         public new Rigidbody2D rigidbody2D;
         public float MoveSpeed = 2.5f;
@@ -22,6 +24,7 @@ namespace Core.Level2D.LevelObjects
             Vector3 position = transform.position;
             Vector2 position2D = new Vector2(position.x, position.y);
             transform.position = new Vector3(position2D.x, position2D.y, position2D.y);
+            Moved?.Invoke(position2D);
 
             // Interaction Check
 
@@ -53,5 +56,7 @@ namespace Core.Level2D.LevelObjects
                 }
             }
         }
+
+        public event Action<Vector2> Moved;
     }
 }
