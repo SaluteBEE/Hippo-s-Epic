@@ -1,4 +1,4 @@
-using System;
+using Core.Level2D.Camera;
 using UnityEngine;
 
 namespace Core.Level2D.Maps
@@ -11,11 +11,16 @@ namespace Core.Level2D.Maps
         public Vector2 mainEntrance;
 
         /// <summary>
-        /// 摄像机位移限制
+        /// 摄像机 X 轴位移限制（x 为最小值，y 为最大值）
         /// </summary>
-        public Vector2 cameraClamp;
+        public Vector2 cameraClampX;
 
-        public void Initialize()
+        /// <summary>
+        /// 摄像机 Y 轴位移限制（x 为最小值，y 为最大值）
+        /// </summary>
+        public Vector2 cameraClampY;
+
+        public void Initialize(CameraController cameraController)
         {
             MapObject[] mapObjects = GetComponentsInChildren<MapObject>();
             for (int i = mapObjects.Length - 1; i >= 0; i--)
@@ -23,7 +28,10 @@ namespace Core.Level2D.Maps
                 mapObjects[i].Initialize();
             }
 
-            // TODO: 通知 Camera Controller，钳制摄像机位移
+            if (cameraController != null)
+            {
+                cameraController.SetCameraClamp(cameraClampX, cameraClampY);
+            }
         }
 
         public void Dispose()
