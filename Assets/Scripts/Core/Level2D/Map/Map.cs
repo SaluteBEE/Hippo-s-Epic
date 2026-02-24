@@ -1,4 +1,3 @@
-using Core.Level2D.Camera;
 using UnityEngine;
 
 namespace Core.Level2D.Maps
@@ -20,17 +19,12 @@ namespace Core.Level2D.Maps
         /// </summary>
         public Vector2 cameraClampY;
 
-        public void Initialize(CameraController cameraController)
+        public void Initialize()
         {
             MapObject[] mapObjects = GetComponentsInChildren<MapObject>();
             for (int i = mapObjects.Length - 1; i >= 0; i--)
             {
                 mapObjects[i].Initialize();
-            }
-
-            if (cameraController != null)
-            {
-                cameraController.SetCameraClamp(cameraClampX, cameraClampY);
             }
         }
 

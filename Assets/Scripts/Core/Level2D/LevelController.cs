@@ -103,7 +103,11 @@ namespace Core.Level2D
             {
                 _map.Dispose();
             }
-            map.Initialize(_cameraController);
+            map.Initialize();
+            if (_cameraController != null)
+            {
+                _cameraController.SetCameraClamp(map.cameraClampX, map.cameraClampY);
+            }
             _map = map;
         }
 
