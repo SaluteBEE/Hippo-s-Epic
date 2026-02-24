@@ -1,3 +1,4 @@
+using Core.Level2D.Camera;
 using Core.Level2D.LevelObjects;
 using Core.Level2D.Maps;
 using UnityEngine;
@@ -15,6 +16,9 @@ namespace Core.Level2D
 
         [SerializeField]
         private Map _map;
+
+        [SerializeField]
+        private CameraController _cameraController;
 
         private void Update()
         {
@@ -100,6 +104,10 @@ namespace Core.Level2D
                 _map.Dispose();
             }
             map.Initialize();
+            if (_cameraController != null)
+            {
+                _cameraController.SetCameraClamp(map.cameraClampX, map.cameraClampY);
+            }
             _map = map;
         }
 
