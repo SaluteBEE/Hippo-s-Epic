@@ -20,6 +20,11 @@ namespace Core.Level2D
         [SerializeField]
         private CameraController _cameraController;
 
+        private void Awake()
+        {
+            LevelManager.SetLevelController(this);
+        }
+
         private void Update()
         {
             HandleInput(out LevelInput levelInput);
@@ -87,7 +92,7 @@ namespace Core.Level2D
             if (_playerCharacter == null && playerCharacter != null)
             {
                 _playerCharacter = playerCharacter;
-
+                _cameraController.SetFocusTarget(playerCharacter);
                 return;
             }
             Debug.Log("Level2D: Set Player Character failed.");

@@ -8,6 +8,7 @@ namespace Core.Level2D
         public static LevelController LevelController
         {
             get => _levelController;
+            private set => _levelController = value;
         }
 
         public static void InstantiateLevelController()
@@ -18,6 +19,11 @@ namespace Core.Level2D
                 return;
             }
             Debug.Log("Level2D: Level Controller is already initialized.");
+        }
+
+        public static void SetLevelController(LevelController levelController)
+        {
+            LevelController = levelController;
         }
     }
 }

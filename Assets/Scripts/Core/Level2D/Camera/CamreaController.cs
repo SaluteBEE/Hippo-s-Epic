@@ -24,7 +24,9 @@ namespace Core.Level2D.Camera
                 FocusTarget.Moved -= SetPosition;
             }
 
-            if (focusTarget != null)
+            FocusTarget = focusTarget;
+
+            if (FocusTarget != null)
             {
                 // Subscribe
                 FocusTarget.Moved += SetPosition;
