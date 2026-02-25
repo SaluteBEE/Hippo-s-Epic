@@ -38,7 +38,7 @@ namespace Core.Level2D
                 {
                     // Instantiate Player Character
                     GameObject playerCharacterPrefab = Resources.Load<GameObject>("Level2D/Player Character 2D");
-                    Vector2 mainEntrance = Map.mainEntrance;
+                    Vector2 mainEntrance = Map.MainEntrance;
                     Vector3 position = new Vector3(mainEntrance.x, mainEntrance.y, mainEntrance.y);
                     SetPlayerCharacter(Instantiate(playerCharacterPrefab, position, Quaternion.identity).GetComponent<PlayerCharacter>());
                 }
@@ -128,7 +128,7 @@ namespace Core.Level2D
             {
                 if (_cameraController != null)
                 {
-                    _cameraController.Moved -= map.OnFocusMoved;
+                    _cameraController.Moved -= _map.OnFocusMoved;
                 }
                 _map.Dispose();
             }
@@ -136,7 +136,7 @@ namespace Core.Level2D
             map.Initialize();
             if (_cameraController != null)
             {
-                _cameraController.SetCameraClamp(map.cameraClampX, map.cameraClampY);
+                _cameraController.SetCameraClamp(map.CameraClampX, map.CameraClampY);
                 _cameraController.Moved += map.OnFocusMoved;
             }
         }

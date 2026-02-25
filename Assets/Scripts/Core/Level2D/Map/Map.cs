@@ -7,17 +7,17 @@ namespace Core.Level2D.Maps
         /// <summary>
         /// 默认入口
         /// </summary>
-        public Vector2 mainEntrance;
+        public Vector2 MainEntrance;
 
         /// <summary>
         /// 摄像机 X 轴位移限制（x 为最小值，y 为最大值）
         /// </summary>
-        public Vector2 cameraClampX;
+        public Vector2 CameraClampX;
 
         /// <summary>
         /// 摄像机 Y 轴位移限制（x 为最小值，y 为最大值）
         /// </summary>
-        public Vector2 cameraClampY;
+        public Vector2 CameraClampY;
 
         /// <summary>
         /// 视觉层根节点，对应名为 Visual 的子 GameObject
@@ -29,20 +29,24 @@ namespace Core.Level2D.Maps
 
         private void Reset()
         {
-            Transform visualTransform = transform.Find("Visual");
-            if (visualTransform != null)
+            if (VisualRoot == null)
             {
-                VisualRoot = visualTransform.gameObject;
-            }
-            else
-            {
-                VisualRoot = new GameObject("Visual");
-                VisualRoot.transform.SetParent(transform, false);
+                Transform visualTransform = transform.Find("Visual");
+                if (visualTransform != null)
+                {
+                    VisualRoot = visualTransform.gameObject;
+                }
+                else
+                {
+                    VisualRoot = new GameObject("Visual");
+                    VisualRoot.transform.SetParent(transform, false);
+                }
             }
         }
 
         public void Initialize()
         {
+            // TODO: parallaxLayers 的长度用 childCount - 1 计算，并假设恰好存在且仅存在一个名为 "Main" 的子层。若 VisualRoot 下没有 Main（或有多个 Main/命名不同），这里会出现数组长度为负、IndexOutOfRange 或数组中残留 null，随后 OnFocusMoved 遍历时会触发 NullReference。建议先统计非 Main 层数量（或用 List 动态收集）并在遍历时跳过 null。
             int childCount = VisualRoot.transform.childCount;
             parallaxLayers = new ParallaxLayer[childCount - 1];
             int layerIndex = 0;
