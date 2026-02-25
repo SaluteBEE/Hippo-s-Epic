@@ -362,9 +362,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0d2859a7512bf2846bd538ab2cf3637a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mainEntrance: {x: 0, y: -4}
-  cameraClampX: {x: -5, y: 5}
-  cameraClampY: {x: 0, y: 0}
+  MainEntrance: {x: 0, y: -4}
+  CameraClampX: {x: -5, y: 5}
+  CameraClampY: {x: 0, y: 0}
   VisualRoot: {fileID: 9220051580344519797}
 --- !u!1 &1461962650594508102
 GameObject:
