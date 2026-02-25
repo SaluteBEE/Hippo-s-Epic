@@ -14,7 +14,7 @@ namespace Core.Level2D
             get => _playerCharacter;
         }
 
-        // [SerializeField]
+
         private Map _map;
         public Map Map
         {
@@ -32,11 +32,16 @@ namespace Core.Level2D
             if (map != null)
             {
                 SetMap(map);
-                // Instantiate Player Character
-                GameObject playerCharacterPrefab = Resources.Load<GameObject>("Level2D/Player Character 2D");
-                Vector2 mainEntrance = Map.mainEntrance;
-                Vector3 position = new Vector3(mainEntrance.x, mainEntrance.y, mainEntrance.y);
-                SetPlayerCharacter(Instantiate(playerCharacterPrefab, position, Quaternion.identity).GetComponent<PlayerCharacter>());
+
+                // 仅在当前没有通过 Inspector 或其他方式绑定玩家时，才实例化玩家预制体
+                if (_playerCharacter == null)
+                {
+                    // Instantiate Player Character
+                    GameObject playerCharacterPrefab = Resources.Load<GameObject>("Level2D/Player Character 2D");
+                    Vector2 mainEntrance = Map.mainEntrance;
+                    Vector3 position = new Vector3(mainEntrance.x, mainEntrance.y, mainEntrance.y);
+                    SetPlayerCharacter(Instantiate(playerCharacterPrefab, position, Quaternion.identity).GetComponent<PlayerCharacter>());
+                }
             }
         }
 
