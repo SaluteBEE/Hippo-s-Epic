@@ -14,8 +14,13 @@ namespace Core.Level2D
             get => _playerCharacter;
         }
 
-        [SerializeField]
+        // [SerializeField]
         private Map _map;
+        public Map Map
+        {
+            get => _map;
+            private set => _map = value;
+        }
 
         [SerializeField]
         private CameraController _cameraController;
@@ -27,6 +32,11 @@ namespace Core.Level2D
             if (map != null)
             {
                 SetMap(map);
+                // Instantiate Player Character
+                GameObject playerCharacterPrefab = Resources.Load<GameObject>("Level2D/Player Character 2D");
+                Vector2 mainEntrance = Map.mainEntrance;
+                Vector3 position = new Vector3(mainEntrance.x, mainEntrance.y, mainEntrance.y);
+                SetPlayerCharacter(Instantiate(playerCharacterPrefab, position, Quaternion.identity).GetComponent<PlayerCharacter>());
             }
         }
 
