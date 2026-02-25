@@ -46,7 +46,7 @@ namespace Core.Level2D.Maps
 
         public void Initialize()
         {
-            // TODO: parallaxLayers 的长度用 childCount - 1 计算，并假设恰好存在且仅存在一个名为 "Main" 的子层。若 VisualRoot 下没有 Main（或有多个 Main/命名不同），这里会出现数组长度为负、IndexOutOfRange 或数组中残留 null，随后 OnFocusMoved 遍历时会触发 NullReference。建议先统计非 Main 层数量（或用 List 动态收集）并在遍历时跳过 null。
+            // TODO: #11 parallaxLayers 的长度用 childCount - 1 计算，并假设恰好存在且仅存在一个名为 "Main" 的子层。若 VisualRoot 下没有 Main（或有多个 Main/命名不同），这里会出现数组长度为负、IndexOutOfRange 或数组中残留 null，随后 OnFocusMoved 遍历时会触发 NullReference。建议先统计非 Main 层数量（或用 List 动态收集）并在遍历时跳过 null。
             int childCount = VisualRoot.transform.childCount;
             parallaxLayers = new ParallaxLayer[childCount - 1];
             int layerIndex = 0;
