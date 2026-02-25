@@ -163,6 +163,8 @@ namespace Core.Level2D
         /// </summary>
         public Vector2 playerControl;
 
+        // TODO: 将playerControl标记为过时，提供公开的访问属性和未归一化参数输入方法，在修改方法中归一化
+
         /// <summary>
         /// 玩家触发交互
         /// </summary>
