@@ -1,4 +1,5 @@
 using System;
+using PlasticGui.WorkspaceWindow.PendingChanges;
 using UnityEngine;
 
 namespace Core.Level2D.Camera
@@ -53,7 +54,10 @@ namespace Core.Level2D.Camera
                 vector2.y = Mathf.Clamp(vector2.y, _clampY.x, _clampY.y);
             }
             transform.position = new Vector3(0.0f, 0.0f, -10f) + (Vector3)vector2;
+            Moved?.Invoke(vector2);
         }
+
+        public event Action<Vector2> Moved;
     }
 
     public interface IFocusTarget

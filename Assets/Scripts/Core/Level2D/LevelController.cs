@@ -126,6 +126,10 @@ namespace Core.Level2D
         {
             if (_map != null)
             {
+                if (_cameraController != null)
+                {
+                    _cameraController.Moved -= map.OnFocusMoved;
+                }
                 _map.Dispose();
             }
             _map = map;
@@ -133,6 +137,7 @@ namespace Core.Level2D
             if (_cameraController != null)
             {
                 _cameraController.SetCameraClamp(map.cameraClampX, map.cameraClampY);
+                _cameraController.Moved += map.OnFocusMoved;
             }
         }
 
