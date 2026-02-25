@@ -620,7 +620,8 @@ EdgeCollider2D:
   m_Offset: {x: 0, y: -1.64}
   m_EdgeRadius: 0
   m_Points:
-  - {x: 9.950452, y: -0.017474532}
+  - {x: 0.06721598, y: 0.008096337}
+  - {x: 9.946344, y: -0.013447881}
   - {x: 10.7684555, y: 0.14627528}
   - {x: 10.995965, y: 1.0143639}
   - {x: 13.77972, y: 1.0097133}
@@ -632,11 +633,12 @@ EdgeCollider2D:
   - {x: -13.964818, y: -4.423993}
   - {x: -13.909794, y: 0.7344718}
   - {x: -9.808968, y: 0.7113005}
-  - {x: -9.559605, y: -0.015413642}
+  - {x: -9.209201, y: -0.047663808}
+  - {x: 0.0005584359, y: 0.0081881285}
   m_AdjacentStartPoint: {x: 0, y: 0}
   m_AdjacentEndPoint: {x: 0, y: 0}
-  m_UseAdjacentStartPoint: 1
-  m_UseAdjacentEndPoint: 1
+  m_UseAdjacentStartPoint: 0
+  m_UseAdjacentEndPoint: 0
 --- !u!1 &3927702912832927376
 GameObject:
   m_ObjectHideFlags: 0
