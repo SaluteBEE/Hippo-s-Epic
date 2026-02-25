@@ -1,3 +1,4 @@
+using System;
 using Core.Level2D.Camera;
 using Core.Level2D.LevelObjects;
 using Core.Level2D.Maps;
@@ -51,7 +52,7 @@ namespace Core.Level2D
 
             if(_playerCharacter != null)
             {
-                _playerCharacter.SetMoveInput(levelInput.playerControl);
+                _playerCharacter.SetMoveInput(levelInput.PlayerControl);
             }
         }
 
@@ -85,13 +86,9 @@ namespace Core.Level2D
             else if (flagMoveDown)
                 playerMoveInput.y = -1f;
 
-            // Normalize
-
-            playerMoveInput.Normalize();
-
             // Apply
 
-            levelInput.playerControl = playerMoveInput;
+            levelInput.SetPlayerControl(playerMoveInput);
 
             // Interactive
 
@@ -159,11 +156,26 @@ namespace Core.Level2D
     public struct LevelInput
     {
         /// <summary>
-        /// 用户的二维输入向量，需要被归一化
+        /// 用户的二维输入向量（已归一化）。已过时，请使用 <see cref="PlayerControl"/> 属性和 <see cref="SetPlayerControl"/> 方法。
         /// </summary>
+        [Obsolete("请使用 PlayerControl 属性读取，使用 SetPlayerControl 方法设置输入。")]
         public Vector2 playerControl;
 
-        // TODO: 将playerControl标记为过时，提供公开的访问属性和未归一化参数输入方法，在修改方法中归一化
+        private Vector2 _playerControl;
+
+        /// <summary>
+        /// 用户的二维输入向量（已归一化）
+        /// </summary>
+        public Vector2 PlayerControl => _playerControl;
+
+        /// <summary>
+        /// 设置玩家控制输入，接受未归一化的向量，内部自动归一化后存储
+        /// </summary>
+        /// <param name="input">未归一化的输入向量</param>
+        public void SetPlayerControl(Vector2 input)
+        {
+            _playerControl = input.normalized;
+        }
 
         /// <summary>
         /// 玩家触发交互
