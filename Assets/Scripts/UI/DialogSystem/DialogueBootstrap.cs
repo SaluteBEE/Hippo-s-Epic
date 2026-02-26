@@ -4,7 +4,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 
-public sealed class DialogueBootstrap : MonoBehaviour
+public sealed class DialogueBootstrap : UIWindow
 {
     [Header("Data")]
     [SerializeField] private TextAsset dialogueCsv;

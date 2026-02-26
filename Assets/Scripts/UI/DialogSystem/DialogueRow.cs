@@ -8,6 +8,10 @@ public enum DialogueType
 public sealed class DialogueRow
 {
     public int Id;
+
+    // 新增：对接任务系统（可空）
+    public int? DialogueTaskId;
+
     public DialogueType Type;
     public string Speaker;        // 说话人
     public string Text;           // 对话文本

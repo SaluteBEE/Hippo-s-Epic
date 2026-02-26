@@ -96,6 +96,12 @@ public sealed class DialogueViewModel : ViewModel
             MoveNext(row);
             return;
         }
+        
+        if (row.DialogueTaskId.HasValue)
+        {
+            Debug.Log("row.DialogueTaskId.Value"+row.DialogueTaskId.Value);
+            QuestSystem.TaskEventBus.RaiseTriggerDialogue(row.DialogueTaskId.Value);
+        }
 
         if (row.Type == DialogueType.结束)
         {
@@ -165,6 +171,7 @@ public sealed class DialogueViewModel : ViewModel
             _waitingOption = true;
             return;
         }
+        
 
         // 未知类型：顺序推进
         _currentId = GetNextId(_currentId);

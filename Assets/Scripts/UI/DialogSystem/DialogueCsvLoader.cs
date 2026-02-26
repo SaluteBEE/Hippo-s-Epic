@@ -32,16 +32,16 @@ public static class DialogueCsvLoader
 
             var typeStr = Get(cols, "对话类型");
             if (!Enum.TryParse(typeStr, out DialogueType type))
-            {
-                // 若 CSV 写的是“普通/选项/结束”中文枚举名，上面可直接 Parse；
-                // 若你后续改成英文，可在此做映射。
                 continue;
-            }
 
             var row = new DialogueRow
             {
                 Id = id,
                 Type = type,
+
+                // 新增：对话任务id（列名按你要求）
+                DialogueTaskId = TryParseInt(Get(cols, "对话任务id")),
+
                 Speaker = Get(cols, "说话人"),
                 Text = Get(cols, "对话文本"),
                 Text2 = Get(cols, "对话文本2"),
