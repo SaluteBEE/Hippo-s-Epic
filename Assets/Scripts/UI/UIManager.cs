@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using System.IO;
 
 public enum UILayer
 {
@@ -170,6 +171,28 @@ public class UIManager : MonoBehaviour
         // 栈中可能存在多个同类型（比如重复打开同一界面），这里做一次清理即可
         RemoveOneFromStack(type);
     }
+    public DialoguePanel OpenDialogue(string fileName, int startId = 1, bool autoAdvanceFirstLine = true)
+    {
+        const string prefabPath = "UI/DialoguePanel";
+
+        // 1) 读取 StreamingAssets 文件
+        string path = Path.Combine(Application.streamingAssetsPath, fileName);
+        if (!File.Exists(path))
+        {
+            Debug.LogError($"[UIManager] Dialogue csv not found: {path}");
+            return null;
+        }
+
+        string csvText = File.ReadAllText(path);
+
+        // 2) 用 TextAsset 包装文本（复用你现有 DialogueViewModel.Initialize(TextAsset)）
+        var csvAsset = new TextAsset(csvText);
+
+        // 3) 通过 args 传给面板
+        var args = new DialogueOpenArgs(csvAsset, startId, autoAdvanceFirstLine);
+        return Open<DialoguePanel>(prefabPath, args);
+    }
+    
 
     /// <summary>切换：关闭其他 Normal 层窗口，仅打开指定窗口（常用于主界面切页）</summary>
     public T SwitchExclusiveNormal<T>(string prefabPath, object args = null) where T : UIWindow
