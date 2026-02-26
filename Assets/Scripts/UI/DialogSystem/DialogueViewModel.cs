@@ -96,7 +96,7 @@ public sealed class DialogueViewModel : ViewModel
             MoveNext(row);
             return;
         }
-        
+        //对话系统自动触发任务系统
         if (row.DialogueTaskId.HasValue)
         {
             Debug.Log("row.DialogueTaskId.Value"+row.DialogueTaskId.Value);

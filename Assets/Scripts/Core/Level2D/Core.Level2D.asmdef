@@ -1,3 +1,4 @@
 {
-	"name": "Core.Level2D"
+	"name": "Core.Level2D",
+	"references":[ "GUID:5ef6d113c319928449cf3d4f4a33cec7" ]
 }

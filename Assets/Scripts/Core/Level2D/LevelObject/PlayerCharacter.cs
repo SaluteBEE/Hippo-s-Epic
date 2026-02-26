@@ -14,9 +14,35 @@ namespace Core.Level2D.LevelObjects
         public LayerMask interactionLayerMask;
 
         private InteractionCollider _currentInteractionCollider;
+
+        private  AnimationController currentAnimationController;
+        private bool isMove = false;
+        private void Awake()
+        {
+            currentAnimationController = GetComponentInChildren<AnimationController>();
+        }
+
         public void SetMoveInput(Vector2 vector2)
         {
             rigidbody2D.velocity = vector2 * MoveSpeed;
+            if (rigidbody2D.velocity.x > 0)
+            {
+                currentAnimationController.transform.localScale = new Vector3(-1, 1, 1);    
+            }
+            else
+            {
+                currentAnimationController.transform.localScale = new Vector3(1, 1, 1);    
+            }
+            
+            float speed = rigidbody2D.velocity.sqrMagnitude;
+            bool curState = speed > 0;
+
+            if (curState != isMove)
+            {
+                currentAnimationController.PlayComposition(speed>0?"walk2":"idle");
+                isMove = curState;
+            }
+            
         }
 
         private void Update()
