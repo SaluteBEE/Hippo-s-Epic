@@ -24,7 +24,7 @@ RenderSettings:
   m_AmbientEquatorColor: {r: 0.114, g: 0.125, b: 0.133, a: 1}
   m_AmbientGroundColor: {r: 0.047, g: 0.043, b: 0.035, a: 1}
   m_AmbientIntensity: 1
-  m_AmbientMode: 3
+  m_AmbientMode: 0
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
   m_SkyboxMaterial: {fileID: 0}
   m_HaloStrength: 0.5
@@ -336,17 +336,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 641536108590153611, guid: 335a63000ac1e0e43935281f53d402c2, type: 3}
   m_PrefabInstance: {fileID: 1194611662}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1194611664 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 3611452752252715434, guid: 335a63000ac1e0e43935281f53d402c2, type: 3}
-  m_PrefabInstance: {fileID: 1194611662}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0d2859a7512bf2846bd538ab2cf3637a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1772509168
 GameObject:
   m_ObjectHideFlags: 0
@@ -493,18 +482,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 7277009863979538177, guid: 65a0349fa2a7d1f449f15c6d95dad4e7, type: 3}
-      propertyPath: mapPrefabs.Array.size
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 7277009863979538177, guid: 65a0349fa2a7d1f449f15c6d95dad4e7, type: 3}
-      propertyPath: mapPrefabs.Array.data[0]
-      value: 
-      objectReference: {fileID: 1194611664}
-    - target: {fileID: 7277009863979538177, guid: 65a0349fa2a7d1f449f15c6d95dad4e7, type: 3}
-      propertyPath: mapPrefabs.Array.data[1]
-      value: 
-      objectReference: {fileID: 1194611664}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
