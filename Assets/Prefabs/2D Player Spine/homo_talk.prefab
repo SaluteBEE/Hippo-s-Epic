@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 5786653268730429607}
   - component: {fileID: 2344358099261587070}
   m_Layer: 0
-  m_Name: Player
+  m_Name: homo_talk
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -64,7 +64,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 661e2be28dc4ac94aa32b0a9f9e7f1d3, type: 2}
+  - {fileID: 2100000, guid: ed1bfe79405c6954ca24014dfd093b0e, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -135,7 +135,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 60ee02cbe6949d7408cd1459d1dfa416, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  config: {fileID: 11400000, guid: 55c1ecd71b39b874c8461c4516cc1067, type: 2}
+  config: {fileID: 11400000, guid: 7828768c42ce58c46a7efe0f156b596b, type: 2}
   debugLog: 0
   autoInitialize: 1
   slotManager: {fileID: 0}
