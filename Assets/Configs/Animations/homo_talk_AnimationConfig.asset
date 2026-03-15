@@ -56,19 +56,90 @@ MonoBehaviour:
     defaultWeight: 1
     additive: 0
     slotNames: []
-    availableClipNames: []
+    availableClipNames:
+    - homie-idle
+    - homie-talk
+    - homie-tink
   - name: UpperBody
     trackIndex: 1
     defaultWeight: 1
     additive: 0
     slotNames: []
-    availableClipNames: []
+    availableClipNames:
+    - body-tink1
+    - body-tink2
+    - body-tink3
   - name: LowerBody
     trackIndex: 2
     defaultWeight: 1
     additive: 0
     slotNames: []
     availableClipNames: []
-  compositions: []
+  compositions:
+  - name: talk
+    description: "\u6CB3\u9A6C\u8BF4\u8BDD\u52A8\u753B"
+    layers:
+    - layerName: Base
+      clipName: homie-talk
+      weight: 1
+      transitionTime: 0.1
+      delay: 0
+    - layerName: UpperBody
+      clipName: body-tink1
+      weight: 1
+      transitionTime: 0.1
+      delay: 0
+  - name: think1
+    description: "\u6CB3\u9A6C\u601D\u8003\u52A8\u753B\uFF0C\u770B\u5411\u4E0A\u8FB9"
+    layers:
+    - layerName: Base
+      clipName: homie-tink
+      weight: 1
+      transitionTime: 0.1
+      delay: 0
+    - layerName: UpperBody
+      clipName: body-tink2
+      weight: 1
+      transitionTime: 0.1
+      delay: 0
+  - name: idle
+    description: "\u6CB3\u9A6C\u5F85\u673A\u52A8\u753B"
+    layers:
+    - layerName: Base
+      clipName: homie-idle
+      weight: 1
+      transitionTime: 0.1
+      delay: 0
+    - layerName: UpperBody
+      clipName: body-tink1
+      weight: 1
+      transitionTime: 0.1
+      delay: 0
+  - name: think2
+    description: "\u6CB3\u9A6C\u601D\u8003\u52A8\u753B\uFF0C\u770B\u5411\u4E2D\u95F4"
+    layers:
+    - layerName: Base
+      clipName: homie-tink
+      weight: 1
+      transitionTime: 0.1
+      delay: 0
+    - layerName: UpperBody
+      clipName: body-tink2
+      weight: 1
+      transitionTime: 0.1
+      delay: 0
+  - name: think3
+    description: "\u6CB3\u9A6C\u601D\u8003\u52A8\u753B\uFF0C\u770B\u5411\u4E0B\u8FB9"
+    layers:
+    - layerName: Base
+      clipName: homie-tink
+      weight: 1
+      transitionTime: 0.1
+      delay: 0
+    - layerName: UpperBody
+      clipName: body-tink3
+      weight: 1
+      transitionTime: 0.1
+      delay: 0
   defaultComposition: Idle
   defaultTransitionTime: 0.1
