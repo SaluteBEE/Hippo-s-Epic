@@ -130,6 +130,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 5078597329802929950, guid: 7f2b4cc40ac313947a3f43421676553a, type: 3}
+      propertyPath: config
+      value: 
+      objectReference: {fileID: 11400000, guid: 55c1ecd71b39b874c8461c4516cc1067, type: 2}
     - target: {fileID: 5428240800198464939, guid: 7f2b4cc40ac313947a3f43421676553a, type: 3}
       propertyPath: m_Name
       value: Hippo
