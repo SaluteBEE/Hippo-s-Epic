@@ -1,0 +1,145 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 667ecdb9b442b9f49a7a2aaee87ac430, type: 3}
+  m_Name: homo_talk_AnimationConfig
+  m_EditorClassIdentifier: 
+  skeletonData: {fileID: 11400000, guid: 1298ceb26c49c444bafd1ed9044de6b3, type: 2}
+  clips:
+  - name: body-tink1
+    animation: {fileID: 11400000, guid: 9ae1f674cb22e67408dff4195776d3d0, type: 2}
+    animationName: body-tink1
+    speed: 1
+    loop: 1
+    type: 1
+  - name: body-tink2
+    animation: {fileID: 11400000, guid: cfbafe78fd776714bbe844fb36a98024, type: 2}
+    animationName: body-tink2
+    speed: 1
+    loop: 1
+    type: 1
+  - name: body-tink3
+    animation: {fileID: 11400000, guid: ef6b1d4e5e79b9146a1dd9e0e3c04965, type: 2}
+    animationName: body-tink3
+    speed: 1
+    loop: 1
+    type: 1
+  - name: homie-idle
+    animation: {fileID: 11400000, guid: eb386928bf480e14a941a0e0618b02c8, type: 2}
+    animationName: homie-idle
+    speed: 1
+    loop: 1
+    type: 0
+  - name: homie-talk
+    animation: {fileID: 11400000, guid: f8211c6f88e193a4c86b3dc9e6355c8c, type: 2}
+    animationName: homie-talk
+    speed: 1
+    loop: 1
+    type: 0
+  - name: homie-tink
+    animation: {fileID: 11400000, guid: 742649fba962ab7458b4a23f8081f9ed, type: 2}
+    animationName: homie-tink
+    speed: 1
+    loop: 1
+    type: 0
+  layers:
+  - name: Base
+    trackIndex: 0
+    defaultWeight: 1
+    additive: 0
+    slotNames: []
+    availableClipNames:
+    - homie-idle
+    - homie-talk
+    - homie-tink
+  - name: UpperBody
+    trackIndex: 1
+    defaultWeight: 1
+    additive: 0
+    slotNames: []
+    availableClipNames:
+    - body-tink1
+    - body-tink2
+    - body-tink3
+  - name: LowerBody
+    trackIndex: 2
+    defaultWeight: 1
+    additive: 0
+    slotNames: []
+    availableClipNames: []
+  compositions:
+  - name: talk
+    description: "\u6CB3\u9A6C\u8BF4\u8BDD\u52A8\u753B"
+    layers:
+    - layerName: Base
+      clipName: homie-talk
+      weight: 1
+      transitionTime: 0.1
+      delay: 0
+    - layerName: UpperBody
+      clipName: body-tink1
+      weight: 1
+      transitionTime: 0.1
+      delay: 0
+  - name: think1
+    description: "\u6CB3\u9A6C\u601D\u8003\u52A8\u753B\uFF0C\u770B\u5411\u4E0A\u8FB9"
+    layers:
+    - layerName: Base
+      clipName: homie-tink
+      weight: 1
+      transitionTime: 0.1
+      delay: 0
+    - layerName: UpperBody
+      clipName: body-tink2
+      weight: 1
+      transitionTime: 0.1
+      delay: 0
+  - name: idle
+    description: "\u6CB3\u9A6C\u5F85\u673A\u52A8\u753B"
+    layers:
+    - layerName: Base
+      clipName: homie-idle
+      weight: 1
+      transitionTime: 0.1
+      delay: 0
+    - layerName: UpperBody
+      clipName: body-tink1
+      weight: 1
+      transitionTime: 0.1
+      delay: 0
+  - name: think2
+    description: "\u6CB3\u9A6C\u601D\u8003\u52A8\u753B\uFF0C\u770B\u5411\u4E2D\u95F4"
+    layers:
+    - layerName: Base
+      clipName: homie-tink
+      weight: 1
+      transitionTime: 0.1
+      delay: 0
+    - layerName: UpperBody
+      clipName: body-tink2
+      weight: 1
+      transitionTime: 0.1
+      delay: 0
+  - name: think3
+    description: "\u6CB3\u9A6C\u601D\u8003\u52A8\u753B\uFF0C\u770B\u5411\u4E0B\u8FB9"
+    layers:
+    - layerName: Base
+      clipName: homie-tink
+      weight: 1
+      transitionTime: 0.1
+      delay: 0
+    - layerName: UpperBody
+      clipName: body-tink3
+      weight: 1
+      transitionTime: 0.1
+      delay: 0
+  defaultComposition: Idle
+  defaultTransitionTime: 0.1

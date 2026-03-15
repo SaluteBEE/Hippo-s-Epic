@@ -1,0 +1,111 @@
+
+河马.png
+size: 1159,978
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+右眼
+  rotate: true
+  xy: 1139, 959
+  size: 17, 15
+  orig: 19, 17
+  offset: 1, 1
+  index: -1
+右眼眶
+  rotate: true
+  xy: 436, 71
+  size: 34, 33
+  orig: 37, 35
+  offset: 2, 1
+  index: -1
+嘴巴
+  rotate: true
+  xy: 303, 136
+  size: 108, 33
+  orig: 111, 36
+  offset: 2, 1
+  index: -1
+嘴巴2
+  rotate: false
+  xy: 1078, 446
+  size: 77, 29
+  orig: 77, 29
+  offset: 0, 0
+  index: -1
+头
+  rotate: true
+  xy: 586, 430
+  size: 546, 428
+  orig: 546, 428
+  offset: 0, 0
+  index: -1
+头部受伤表情
+  rotate: false
+  xy: 586, 2
+  size: 562, 426
+  orig: 564, 428
+  offset: 1, 1
+  index: -1
+对话手
+  rotate: true
+  xy: 368, 107
+  size: 288, 207
+  orig: 288, 207
+  offset: 0, 0
+  index: -1
+左手
+  rotate: true
+  xy: 2, 246
+  size: 149, 364
+  orig: 151, 366
+  offset: 1, 1
+  index: -1
+左眼
+  rotate: false
+  xy: 1138, 828
+  size: 19, 19
+  orig: 21, 22
+  offset: 1, 1
+  index: -1
+左眼眶
+  rotate: false
+  xy: 1016, 434
+  size: 60, 41
+  orig: 62, 43
+  offset: 1, 1
+  index: -1
+思考手
+  rotate: false
+  xy: 2, 75
+  size: 299, 169
+  orig: 299, 169
+  offset: 0, 0
+  index: -1
+思考手2
+  rotate: true
+  xy: 1016, 849
+  size: 127, 121
+  orig: 129, 123
+  offset: 1, 1
+  index: -1
+法令纹
+  rotate: false
+  xy: 303, 16
+  size: 131, 89
+  orig: 131, 89
+  offset: 0, 0
+  index: -1
+眉毛鼻子
+  rotate: true
+  xy: 1016, 477
+  size: 370, 120
+  orig: 370, 120
+  offset: 0, 0
+  index: -1
+身体
+  rotate: false
+  xy: 2, 397
+  size: 582, 579
+  orig: 597, 579
+  offset: 15, 0
+  index: -1

@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 5078597329802929950}
   - component: {fileID: 3944109172226431431}
   m_Layer: 0
-  m_Name: Player
+  m_Name: homo_move
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -64,7 +64,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 008da97aa41b4fe4f9010aa5f00bb8cc, type: 2}
+  - {fileID: 2100000, guid: 661e2be28dc4ac94aa32b0a9f9e7f1d3, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -98,7 +98,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d247ba06193faa74d9335f5481b2b56c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  skeletonDataAsset: {fileID: 11400000, guid: 536e14943a74a07458184c4a536ce016, type: 2}
+  skeletonDataAsset: {fileID: 11400000, guid: fc24484f15958984fb6a47b29c02ebc0, type: 2}
   initialSkinName: 
   initialFlipX: 0
   initialFlipY: 0
@@ -135,7 +135,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 60ee02cbe6949d7408cd1459d1dfa416, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  config: {fileID: 11400000, guid: 55c1ecd71b39b874c8461c4516cc1067, type: 2}
+  config: {fileID: 11400000, guid: 5811a4f44c6b6c94686bc00afadcb180, type: 2}
   debugLog: 0
   autoInitialize: 1
   slotManager: {fileID: 0}

@@ -1,0 +1,55 @@
+
+河马.png
+size: 378,585
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+右手
+  rotate: true
+  xy: 190, 2
+  size: 78, 143
+  orig: 92, 144
+  offset: 14, 1
+  index: -1
+头
+  rotate: true
+  xy: 190, 82
+  size: 238, 186
+  orig: 240, 188
+  offset: 1, 1
+  index: -1
+头部受伤表情
+  rotate: true
+  xy: 2, 74
+  size: 246, 186
+  orig: 248, 188
+  offset: 1, 1
+  index: -1
+左手
+  rotate: true
+  xy: 2, 5
+  size: 67, 161
+  orig: 67, 161
+  offset: 0, 0
+  index: -1
+断肢
+  rotate: false
+  xy: 244, 323
+  size: 122, 100
+  orig: 125, 103
+  offset: 2, 1
+  index: -1
+表情
+  rotate: true
+  xy: 244, 425
+  size: 158, 107
+  orig: 160, 109
+  offset: 1, 1
+  index: -1
+身体
+  rotate: true
+  xy: 2, 322
+  size: 261, 240
+  orig: 262, 254
+  offset: 0, 0
+  index: -1
