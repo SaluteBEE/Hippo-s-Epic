@@ -1,0 +1,56 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 667ecdb9b442b9f49a7a2aaee87ac430, type: 3}
+  m_Name: npc_01_AnimationConfig
+  m_EditorClassIdentifier: 
+  skeletonData: {fileID: 11400000, guid: 18b1c58e3b219d64f9980b4bb5fd4989, type: 2}
+  clips:
+  - name: idle
+    animation: {fileID: 11400000, guid: bb1f24ad58270154b81a15a492451d1a, type: 2}
+    animationName: idle
+    speed: 1
+    loop: 1
+    type: 0
+  - name: idle2
+    animation: {fileID: 11400000, guid: 2b3c0117a0adb4348b7b2adbf5ff227a, type: 2}
+    animationName: idle2
+    speed: 1
+    loop: 1
+    type: 0
+  - name: idle3
+    animation: {fileID: 11400000, guid: 794e32d95699ee84e88e69860b1856bf, type: 2}
+    animationName: idle3
+    speed: 1
+    loop: 1
+    type: 0
+  layers:
+  - name: Base
+    trackIndex: 0
+    defaultWeight: 1
+    additive: 0
+    slotNames: []
+    availableClipNames: []
+  - name: UpperBody
+    trackIndex: 1
+    defaultWeight: 1
+    additive: 0
+    slotNames: []
+    availableClipNames: []
+  - name: LowerBody
+    trackIndex: 2
+    defaultWeight: 1
+    additive: 0
+    slotNames: []
+    availableClipNames: []
+  compositions: []
+  defaultComposition: Idle
+  defaultTransitionTime: 0.1

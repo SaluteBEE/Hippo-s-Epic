@@ -1,0 +1,62 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 667ecdb9b442b9f49a7a2aaee87ac430, type: 3}
+  m_Name: quanwang_bk_AnimationConfig
+  m_EditorClassIdentifier: 
+  skeletonData: {fileID: 11400000, guid: acb1d60f7182fdd47bb78e840c1d933d, type: 2}
+  clips:
+  - name: body-idle
+    animation: {fileID: 11400000, guid: 8a8b8713e3944254494672215eed360a, type: 2}
+    animationName: body-idle
+    speed: 1
+    loop: 1
+    type: 1
+  - name: body-idle2
+    animation: {fileID: 11400000, guid: 4edf399577e389f43b8fb6484fd17539, type: 2}
+    animationName: body-idle2
+    speed: 1
+    loop: 1
+    type: 1
+  - name: body-salut
+    animation: {fileID: 11400000, guid: 687b5eed53f4c104dbd5bc49d020d604, type: 2}
+    animationName: body-salut
+    speed: 1
+    loop: 1
+    type: 1
+  - name: leg-idle
+    animation: {fileID: 11400000, guid: bbf0ac51f3c42e746a015fbca2147dc7, type: 2}
+    animationName: leg-idle
+    speed: 1
+    loop: 1
+    type: 2
+  layers:
+  - name: Base
+    trackIndex: 0
+    defaultWeight: 1
+    additive: 0
+    slotNames: []
+    availableClipNames: []
+  - name: UpperBody
+    trackIndex: 1
+    defaultWeight: 1
+    additive: 0
+    slotNames: []
+    availableClipNames: []
+  - name: LowerBody
+    trackIndex: 2
+    defaultWeight: 1
+    additive: 0
+    slotNames: []
+    availableClipNames: []
+  compositions: []
+  defaultComposition: Idle
+  defaultTransitionTime: 0.1
