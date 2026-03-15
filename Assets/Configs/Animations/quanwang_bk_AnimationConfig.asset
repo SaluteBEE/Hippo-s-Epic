@@ -50,13 +50,56 @@ MonoBehaviour:
     defaultWeight: 1
     additive: 0
     slotNames: []
-    availableClipNames: []
+    availableClipNames:
+    - body-idle
+    - body-idle2
+    - body-salut
   - name: LowerBody
     trackIndex: 2
     defaultWeight: 1
     additive: 0
     slotNames: []
-    availableClipNames: []
-  compositions: []
+    availableClipNames:
+    - leg-idle
+  compositions:
+  - name: idle1
+    description: "\u63CF\u8FF0"
+    layers:
+    - layerName: UpperBody
+      clipName: body-idle
+      weight: 1
+      transitionTime: 0.1
+      delay: 0
+    - layerName: LowerBody
+      clipName: leg-idle
+      weight: 1
+      transitionTime: 0.1
+      delay: 0
+  - name: idle2
+    description: "\u63CF\u8FF0"
+    layers:
+    - layerName: UpperBody
+      clipName: body-idle2
+      weight: 1
+      transitionTime: 0.1
+      delay: 0
+    - layerName: LowerBody
+      clipName: leg-idle
+      weight: 1
+      transitionTime: 0.1
+      delay: 0
+  - name: throw
+    description: "\u63CF\u8FF0"
+    layers:
+    - layerName: UpperBody
+      clipName: body-salut
+      weight: 1
+      transitionTime: 0.1
+      delay: 0
+    - layerName: LowerBody
+      clipName: leg-idle
+      weight: 1
+      transitionTime: 0.1
+      delay: 0
   defaultComposition: Idle
   defaultTransitionTime: 0.1

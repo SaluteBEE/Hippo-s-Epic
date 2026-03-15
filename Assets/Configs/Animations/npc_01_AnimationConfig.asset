@@ -44,13 +44,40 @@ MonoBehaviour:
     defaultWeight: 1
     additive: 0
     slotNames: []
-    availableClipNames: []
+    availableClipNames:
+    - idle
+    - idle2
+    - idle3
   - name: LowerBody
     trackIndex: 2
     defaultWeight: 1
     additive: 0
     slotNames: []
     availableClipNames: []
-  compositions: []
+  compositions:
+  - name: idle1
+    description: "\u63CF\u8FF0"
+    layers:
+    - layerName: UpperBody
+      clipName: idle
+      weight: 1
+      transitionTime: 0.1
+      delay: 0
+  - name: idle2
+    description: "\u63CF\u8FF0"
+    layers:
+    - layerName: UpperBody
+      clipName: idle2
+      weight: 1
+      transitionTime: 0.1
+      delay: 0
+  - name: idle3
+    description: "\u63CF\u8FF0"
+    layers:
+    - layerName: UpperBody
+      clipName: idle3
+      weight: 1
+      transitionTime: 0.1
+      delay: 0
   defaultComposition: Idle
   defaultTransitionTime: 0.1
