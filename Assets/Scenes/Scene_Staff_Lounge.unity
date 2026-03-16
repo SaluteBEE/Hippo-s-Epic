@@ -142,6 +142,14 @@ PrefabInstance:
       propertyPath: interactionLayerMask.m_Bits
       value: 8
       objectReference: {fileID: 0}
+    - target: {fileID: 2363020091577210818, guid: 7f2b4cc40ac313947a3f43421676553a, type: 3}
+      propertyPath: m_SortingLayer
+      value: -2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2363020091577210818, guid: 7f2b4cc40ac313947a3f43421676553a, type: 3}
+      propertyPath: m_SortingLayerID
+      value: -1792411631
+      objectReference: {fileID: 0}
     - target: {fileID: 5078597329802929950, guid: 7f2b4cc40ac313947a3f43421676553a, type: 3}
       propertyPath: config
       value: 
@@ -250,8 +258,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 939dcd5d74af20e408dcc5405c098f47, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _playerCharacter: {fileID: 1756637505}
-  _cameraController: {fileID: 575340466}
+  playerCharacter: {fileID: 1756637505}
+  mapManager: {fileID: 107894906}
 --- !u!114 &107894906
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -267,7 +275,8 @@ MonoBehaviour:
   sceneMaps:
   - {fileID: 2114662418}
   - {fileID: 131731097}
-  _cameraController: {fileID: 575340466}
+  initialMapName: Staff Lounge
+  cameraController: {fileID: 575340466}
 --- !u!114 &131731097 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 3611452752252715434, guid: 335a63000ac1e0e43935281f53d402c2, type: 3}
@@ -641,9 +650,29 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1084607160946764517, guid: 335a63000ac1e0e43935281f53d402c2, type: 3}
+      propertyPath: m_SortingLayer
+      value: -3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1084607160946764517, guid: 335a63000ac1e0e43935281f53d402c2, type: 3}
+      propertyPath: m_SortingLayerID
+      value: -1573026795
+      objectReference: {fileID: 0}
     - target: {fileID: 1269926944890595336, guid: 335a63000ac1e0e43935281f53d402c2, type: 3}
       propertyPath: m_Name
       value: Underground Boxing Gym
+      objectReference: {fileID: 0}
+    - target: {fileID: 3611452752252715434, guid: 335a63000ac1e0e43935281f53d402c2, type: 3}
+      propertyPath: MainEntrance.y
+      value: -4
+      objectReference: {fileID: 0}
+    - target: {fileID: 7511972239876528790, guid: 335a63000ac1e0e43935281f53d402c2, type: 3}
+      propertyPath: m_SortingLayer
+      value: -3
+      objectReference: {fileID: 0}
+    - target: {fileID: 7511972239876528790, guid: 335a63000ac1e0e43935281f53d402c2, type: 3}
+      propertyPath: m_SortingLayerID
+      value: -1573026795
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -908,6 +937,26 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 107894904}
     m_Modifications:
+    - target: {fileID: 74156536049624916, guid: 01985814fdb7a3549b30aa53c66e87ed, type: 3}
+      propertyPath: CameraClampX.x
+      value: -1
+      objectReference: {fileID: 0}
+    - target: {fileID: 74156536049624916, guid: 01985814fdb7a3549b30aa53c66e87ed, type: 3}
+      propertyPath: CameraClampX.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2910730147684655333, guid: 01985814fdb7a3549b30aa53c66e87ed, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3243771223088058844, guid: 01985814fdb7a3549b30aa53c66e87ed, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 9.07
+      objectReference: {fileID: 0}
+    - target: {fileID: 3243771223088058844, guid: 01985814fdb7a3549b30aa53c66e87ed, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -4.72
+      objectReference: {fileID: 0}
     - target: {fileID: 3310776248233899069, guid: 01985814fdb7a3549b30aa53c66e87ed, type: 3}
       propertyPath: m_Name
       value: Staff Lounge

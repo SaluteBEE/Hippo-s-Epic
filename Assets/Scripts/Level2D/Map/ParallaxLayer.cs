@@ -1,23 +1,29 @@
 using UnityEngine;
 
+public class ParallaxLayer
+{
+    private readonly Transform transform;
+    private readonly Vector3 startLocalPosition;
+    private readonly float scaleFactor;
+
+    public ParallaxLayer(Transform transform, float scaleFactor)
+    {
+        this.transform = transform;
+        this.startLocalPosition = transform.localPosition;
+        this.scaleFactor = scaleFactor;
+    }
 
     /// <summary>
-    /// 基于自身 Transform Z 轴 作为系数，在 Camera Moved 回调中乘算
+    /// 根据相机相对基准点的偏移更新本层位置
     /// </summary>
-    public class ParallaxLayer
+    public void OnCameraOffsetChanged(Vector2 cameraDelta)
     {
-        private readonly Transform transform;
-        private readonly float scaleFactor;
+        Vector3 offset = new Vector3(
+            cameraDelta.x * scaleFactor,
+            cameraDelta.y * scaleFactor,
+            0f
+        );
 
-        public ParallaxLayer(Transform transform)
-        {
-            this.transform = transform;
-            scaleFactor = transform.position.z;
-        }
-
-        public void OnCameraMoved(Vector2 cameraOffset)
-        {
-            Vector2 layerOffset = cameraOffset * scaleFactor;
-            transform.position = (Vector3)layerOffset + new Vector3(0, 0, scaleFactor);
-        }
+        transform.localPosition = startLocalPosition + offset;
     }
+}

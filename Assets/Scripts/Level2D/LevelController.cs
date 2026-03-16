@@ -1,185 +1,144 @@
 using System;
 using UnityEngine;
 
-    public class LevelController : MonoBehaviour
+public class LevelController : MonoBehaviour
+{
+    public static LevelController Instance { get; private set; }
+
+    [Header("References")]
+    [SerializeField] private PlayerCharacter playerCharacter;
+    [SerializeField] private MapManager mapManager;
+
+    public PlayerCharacter PlayerCharacter => playerCharacter;
+    public MapManager MapManager => mapManager;
+
+    private void Awake()
     {
-        [SerializeField]
-        private PlayerCharacter _playerCharacter;
-        public PlayerCharacter PlayerCharacter
+        if (Instance != null && Instance != this)
         {
-            get => _playerCharacter;
+            Debug.LogWarning("LevelController already exists, destroy duplicate.");
+            Destroy(gameObject);
+            return;
         }
 
+        Instance = this;
 
-        private Map _map;
-        public Map Map
+        if (mapManager == null)
         {
-            get => _map;
-            private set => _map = value;
+            mapManager = GetComponentInChildren<MapManager>(true);
         }
 
-        [SerializeField]
-        private CameraController _cameraController;
+        InitializePlayer();
+        InitializeMap();
+    }
 
-        private void Awake()
+    private void Update()
+    {
+        HandleInput(out LevelInput levelInput);
+
+        if (playerCharacter != null)
         {
-            LevelManager.SetLevelController(this);
-            Map map = GetComponentInChildren<Map>();
-            if (map != null)
+            playerCharacter.SetMoveInput(levelInput.PlayerControl);
+
+            if (levelInput.IsPlayerInteractionTriggered)
             {
-                SetMap(map);
-
-                // 仅在当前没有通过 Inspector 或其他方式绑定玩家时，才实例化玩家预制体
-                if (_playerCharacter == null)
-                {
-                    // Instantiate Player Character
-                    GameObject playerCharacterPrefab = Resources.Load<GameObject>("Level2D/Player Character 2D");
-                    Vector2 mainEntrance = Map.MainEntrance;
-                    Vector3 position = new Vector3(mainEntrance.x, mainEntrance.y, mainEntrance.y);
-                    SetPlayerCharacter(Instantiate(playerCharacterPrefab, position, Quaternion.identity).GetComponent<PlayerCharacter>());
-                }
-                else
-                {
-                    Vector2 mainEntrance = Map.MainEntrance;
-                    Vector3 position = new Vector3(mainEntrance.x, mainEntrance.y, mainEntrance.y);
-                    SetPlayerCharacter(_playerCharacter.gameObject.GetComponent<PlayerCharacter>());
-                }
+                playerCharacter.PlayerExecute();
             }
-        }
-
-        private void Update()
-        {
-            HandleInput(out LevelInput levelInput);
-
-            if(_playerCharacter != null)
-            {
-                _playerCharacter.SetMoveInput(levelInput.PlayerControl);
-            }
-        }
-
-        /// <summary>
-        /// 处理 Level 在每一帧计算中所需要的所有输入指令
-        /// </summary>
-        /// <param name="levelInput"></param>
-        private void HandleInput(out LevelInput levelInput)
-        {
-            levelInput = new LevelInput();
-
-            // Move
-
-            // set flags
-
-            Vector2 playerMoveInput = Vector2.zero;
-            bool flagMoveLeft = Input.GetKey(KeyCode.A);
-            bool flagMoveRight = Input.GetKey(KeyCode.D);
-            bool flagMoveUp = Input.GetKey(KeyCode.W);
-            bool flagMoveDown = Input.GetKey(KeyCode.S);
-
-            // calculate
-
-            if (flagMoveLeft)
-                playerMoveInput.x = -1f;
-            else if (flagMoveRight)
-                playerMoveInput.x = 1f;
-
-            if (flagMoveUp)
-                playerMoveInput.y = 1f;
-            else if (flagMoveDown)
-                playerMoveInput.y = -1f;
-
-            // Apply
-
-            levelInput.SetPlayerControl(playerMoveInput);
-
-            // Interactive
-
-            if (Input.GetKeyDown(KeyCode.E))
-            {
-                _playerCharacter.PlayerExecute();
-            }
-
-        }
-
-        /// <summary>
-        /// 用于通过脚本挂载玩家角色，建议在实例化关卡后实例化玩家角色并挂载，同时执行其初始化脚本（基于存档或 Level Flag 计算玩家状态）
-        /// TODO: 实现方法
-        /// </summary>
-        /// <param name="playerCharacter"></param>
-        public void SetPlayerCharacter(PlayerCharacter playerCharacter)
-        {
-            if (_playerCharacter == null && playerCharacter != null)
-            {
-                _playerCharacter = playerCharacter;
-                _cameraController.SetFocusTarget(playerCharacter);
-                return;
-            }
-            Debug.Log("Level2D: Set Player Character failed.");
-        }
-
-        /// <summary>
-        /// 设置地图，释放现有地图并初始化新地图
-        /// </summary>
-        /// <param name="map"></param>
-        public void SetMap(Map map)
-        {
-            if (_map != null)
-            {
-                if (_cameraController != null)
-                {
-                    _cameraController.Moved -= _map.OnFocusMoved;
-                }
-                _map.Dispose();
-            }
-            _map = map;
-            map.Initialize();
-            if (_cameraController != null)
-            {
-                _cameraController.SetCameraClamp(map.CameraClampX, map.CameraClampY);
-                _cameraController.Moved += map.OnFocusMoved;
-            }
-        }
-
-        /// <summary>
-        /// 实例化一个 Level 的 GameObject 并挂载空 Level Controller 组件
-        /// </summary>
-        /// <returns></returns>
-        public static LevelController InstantiateLevelController()
-        {
-            GameObject levelGameObject = new GameObject("Level");
-            LevelController levelController = levelGameObject.AddComponent<LevelController>();
-            return levelController;
         }
     }
 
-    /// <summary>
-    /// Level Controller 在每一帧计算中需要的输入行为
-    /// </summary>
-    public struct LevelInput
+    private void InitializePlayer()
     {
-        /// <summary>
-        /// 用户的二维输入向量（已归一化）。已过时，请使用 <see cref="PlayerControl"/> 属性和 <see cref="SetPlayerControl"/> 方法。
-        /// </summary>
-        [Obsolete("请使用 PlayerControl 属性读取，使用 SetPlayerControl 方法设置输入。")]
-        public Vector2 playerControl;
+        if (playerCharacter != null)
+            return;
 
-        private Vector2 _playerControl;
-
-        /// <summary>
-        /// 用户的二维输入向量（已归一化）
-        /// </summary>
-        public Vector2 PlayerControl => _playerControl;
-
-        /// <summary>
-        /// 设置玩家控制输入，接受未归一化的向量，内部自动归一化后存储
-        /// </summary>
-        /// <param name="input">未归一化的输入向量</param>
-        public void SetPlayerControl(Vector2 input)
+        GameObject playerPrefab = Resources.Load<GameObject>("Level2D/Player Character 2D");
+        if (playerPrefab == null)
         {
-            _playerControl = input.normalized;
+            Debug.LogError("Player prefab not found at Resources/Level2D/Player Character 2D");
+            return;
         }
 
-        /// <summary>
-        /// 玩家触发交互
-        /// </summary>
-        public bool isPlayerInteractionTriggered;
+        var player = Instantiate(playerPrefab, Vector3.zero, Quaternion.identity)
+            .GetComponent<PlayerCharacter>();
+
+        SetPlayerCharacter(player);
     }
+
+    private void InitializeMap()
+    {
+        if (mapManager == null)
+        {
+            Debug.LogError("[LevelController] MapManager is null.");
+            return;
+        }
+
+        mapManager.Initialize(playerCharacter);
+    }
+
+    private void HandleInput(out LevelInput levelInput)
+    {
+        levelInput = new LevelInput();
+
+        Vector2 playerMoveInput = Vector2.zero;
+
+        bool moveLeft = Input.GetKey(KeyCode.A);
+        bool moveRight = Input.GetKey(KeyCode.D);
+        bool moveUp = Input.GetKey(KeyCode.W);
+        bool moveDown = Input.GetKey(KeyCode.S);
+
+        if (moveLeft)
+            playerMoveInput.x = -1f;
+        else if (moveRight)
+            playerMoveInput.x = 1f;
+
+        if (moveUp)
+            playerMoveInput.y = 1f;
+        else if (moveDown)
+            playerMoveInput.y = -1f;
+
+        levelInput.SetPlayerControl(playerMoveInput);
+
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            levelInput.IsPlayerInteractionTriggered = true;
+        }
+    }
+
+    public void SetPlayerCharacter(PlayerCharacter player)
+    {
+        if (player == null)
+        {
+            Debug.LogWarning("[LevelController] SetPlayerCharacter failed: player is null.");
+            return;
+        }
+
+        playerCharacter = player;
+    }
+
+    public static LevelController Create()
+    {
+        if (Instance != null)
+            return Instance;
+
+        GameObject levelGameObject = new GameObject("Level");
+        return levelGameObject.AddComponent<LevelController>();
+    }
+}
+
+public struct LevelInput
+{
+    [Obsolete("请使用 PlayerControl 属性读取，使用 SetPlayerControl 方法设置输入。")]
+    public Vector2 playerControl;
+
+    private Vector2 _playerControl;
+
+    public Vector2 PlayerControl => _playerControl;
+
+    public bool IsPlayerInteractionTriggered;
+
+    public void SetPlayerControl(Vector2 input)
+    {
+        _playerControl = input.normalized;
+    }
+}
