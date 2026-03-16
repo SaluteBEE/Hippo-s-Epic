@@ -8,7 +8,7 @@ public class ItemMapTeleporter : InteractionCollider
     {
         Debug.Log($"正在传送至地图: {targetMapName}");
         // 这里调用你之前的 MapRepository 加载新地图
-        MapSwitcher.Instance.SwitchMap(targetMapName); 
+        //MapManager.Instance.SwitchMap(targetMapName); 
     }
 
     public override void OnPlayerEnter()

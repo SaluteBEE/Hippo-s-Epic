@@ -38,6 +38,12 @@ using UnityEngine;
                     Vector3 position = new Vector3(mainEntrance.x, mainEntrance.y, mainEntrance.y);
                     SetPlayerCharacter(Instantiate(playerCharacterPrefab, position, Quaternion.identity).GetComponent<PlayerCharacter>());
                 }
+                else
+                {
+                    Vector2 mainEntrance = Map.MainEntrance;
+                    Vector3 position = new Vector3(mainEntrance.x, mainEntrance.y, mainEntrance.y);
+                    SetPlayerCharacter(_playerCharacter.gameObject.GetComponent<PlayerCharacter>());
+                }
             }
         }
 

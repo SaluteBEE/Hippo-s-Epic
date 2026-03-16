@@ -48,24 +48,32 @@ public class MapSwitcher : MonoBehaviour
         // 3. 初始化地图（如果你的地图有初始化逻辑）
         _currentMap.Initialize();
 
-        // 4. 传送玩家（如果有引用）
+        // 4. 传送玩家
         if (teleportPlayer && LevelManager.LevelController?.PlayerCharacter != null)
         {
-            // 将地图的本地入口坐标转换为该地图物体在世界中的绝对坐标
-            Vector3 absoluteEntrance = _currentMap.transform.TransformPoint(_currentMap.MainEntrance);
-    
-            // 设置玩家位置
-            LevelManager.LevelController.PlayerCharacter.transform.position = absoluteEntrance;
-            
-            _cameraController.SetCameraClamp(_currentMap.CameraClampX, _currentMap.CameraClampY);
-        
-            // 关键点：强制触发一次位置更新，让摄像机立刻瞬移到玩家当前位置，而不是等待玩家下一次移动
-            // 这里假设 PlayerCharacter 是当前的 FocusTarget
             var player = LevelManager.LevelController.PlayerCharacter;
-            if (player != null)
-            {
-                _cameraController.SetPosition(player.transform.position);
-            }
+
+            // 入口世界坐标
+            Vector3 absoluteEntrance = _currentMap.transform.TransformPoint(_currentMap.MainEntrance);
+
+            // 玩家位置
+            player.transform.position = new Vector3(
+                absoluteEntrance.x,
+                absoluteEntrance.y,
+                absoluteEntrance.y
+            );
+
+            // 更新摄像机限制
+            _cameraController.SetCameraClamp(_currentMap.CameraClampX, _currentMap.CameraClampY);
+
+            // 重新绑定 FocusTarget（防止地图事件残留）
+            _cameraController.SetFocusTarget(player);
+
+            // 强制同步摄像机
+            _cameraController.SetPosition(new Vector2(
+                player.transform.position.x,
+                player.transform.position.y
+            ));
         }
 
         Debug.Log($"[MapRepository] 已切换至地图: {mapName}");

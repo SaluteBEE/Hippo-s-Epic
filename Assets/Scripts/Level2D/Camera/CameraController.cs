@@ -17,19 +17,16 @@ using UnityEngine;
 
         public void SetFocusTarget(IFocusTarget focusTarget)
         {
+            if (FocusTarget == focusTarget)
+                return;
+
             if (FocusTarget != null)
-            {
-                // Unsubscribe
                 FocusTarget.Moved -= SetPosition;
-            }
 
             FocusTarget = focusTarget;
 
             if (FocusTarget != null)
-            {
-                // Subscribe
                 FocusTarget.Moved += SetPosition;
-            }
         }
 
         /// <summary>
@@ -44,15 +41,17 @@ using UnityEngine;
             _isClamped = true;
         }
 
-        public void SetPosition(Vector2 vector2)
+        public void SetPosition(Vector2 pos)
         {
             if (_isClamped)
             {
-                vector2.x = Mathf.Clamp(vector2.x, _clampX.x, _clampX.y);
-                vector2.y = Mathf.Clamp(vector2.y, _clampY.x, _clampY.y);
+                pos.x = Mathf.Clamp(pos.x, _clampX.x, _clampX.y);
+                pos.y = Mathf.Clamp(pos.y, _clampY.x, _clampY.y);
             }
-            transform.position = new Vector3(0.0f, 0.0f, -10f) + (Vector3)vector2;
-            Moved?.Invoke(vector2);
+
+            transform.position = new Vector3(pos.x, pos.y, -10f);
+
+            Moved?.Invoke(pos);
         }
 
         public event Action<Vector2> Moved;
