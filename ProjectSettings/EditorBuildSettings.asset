@@ -6,12 +6,15 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/InitScene.unity
+    path: Assets/Scenes/Scene_Init.unity
     guid: 0bc30f55fbd87f344a877a3348bc3770
   - enabled: 1
-    path: Assets/Scenes/Scene01.unity
+    path: Assets/Scenes/Scene_Staff_Lounge.unity
     guid: 7885e8548b0a3554cb5d16f915414e9b
   - enabled: 1
-    path: Assets/Scenes/DialogueScene.unity
+    path: Assets/Scenes/Scene_Underground_Boxing_Gym.unity
+    guid: d4b451921813ad647860e703bc31ea3c
+  - enabled: 1
+    path: Assets/Scenes/Scene_Dialogue.unity
     guid: c99d6acbe3268884baf0728f2808ae6f
   m_configObjects: {}
