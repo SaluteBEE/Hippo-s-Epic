@@ -3,19 +3,8 @@ using UnityEngine;
 
 public sealed class Map : MonoBehaviour
 {
-    /// <summary>
-    /// 默认入口（局部坐标）
-    /// </summary>
     public Vector2 MainEntrance;
-
-    /// <summary>
-    /// 摄像机 X 轴位移限制（局部坐标）
-    /// </summary>
     public Vector2 CameraClampX;
-
-    /// <summary>
-    /// 摄像机 Y 轴位移限制（局部坐标）
-    /// </summary>
     public Vector2 CameraClampY;
 
     public Vector2 CameraClampXWorld =>
@@ -30,13 +19,22 @@ public sealed class Map : MonoBehaviour
             CameraClampY.y + transform.position.y
         );
 
+    public Vector2 MapCenterWorld =>
+        new Vector2(
+            (CameraClampXWorld.x + CameraClampXWorld.y) * 0.5f,
+            (CameraClampYWorld.x + CameraClampYWorld.y) * 0.5f
+        );
+
     [Header("Visual Root")]
     [SerializeField] public GameObject VisualRoot;
 
     private ParallaxLayer[] parallaxLayers;
 
-    // 当前地图建立视差时记录的相机基准点
-    private Vector2 cameraBasePosition;
+    // 缓存每个视差层的原始局部位置
+    private readonly Dictionary<Transform, Vector3> originalLayerLocalPositions = new Dictionary<Transform, Vector3>();
+
+    // 防止重复采集“原始位置”
+    private bool originalPositionsCached;
 
     private void Reset()
     {
@@ -55,19 +53,17 @@ public sealed class Map : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 初始化地图，并记录视差的相机基准点
-    /// </summary>
-    public void Initialize(Vector2 cameraStartPosition)
+    public void Initialize()
     {
-        cameraBasePosition = cameraStartPosition;
-
         if (VisualRoot == null)
         {
             Debug.LogError($"[Map] VisualRoot is null on map: {name}");
             parallaxLayers = System.Array.Empty<ParallaxLayer>();
             return;
         }
+
+        CacheOriginalLayerPositionsIfNeeded();
+        RestoreLayerPositions();
 
         int childCount = VisualRoot.transform.childCount;
         var layerList = new List<ParallaxLayer>();
@@ -76,14 +72,12 @@ public sealed class Map : MonoBehaviour
         {
             Transform child = VisualRoot.transform.GetChild(i);
 
-            // 初始化该层下所有 MapObject
             MapObject[] mapObjects = child.GetComponentsInChildren<MapObject>();
             for (int j = mapObjects.Length - 1; j >= 0; j--)
             {
                 mapObjects[j].Initialize();
             }
 
-            // Main 层不参与视差
             if (child.name != "Main")
             {
                 float factor = child.localPosition.z;
@@ -94,28 +88,45 @@ public sealed class Map : MonoBehaviour
         parallaxLayers = layerList.ToArray();
     }
 
-    /// <summary>
-    /// 相机移动时调用。传入的是相机世界坐标。
-    /// </summary>
+    private void CacheOriginalLayerPositionsIfNeeded()
+    {
+        if (originalPositionsCached)
+            return;
+
+        originalLayerLocalPositions.Clear();
+
+        int childCount = VisualRoot.transform.childCount;
+        for (int i = 0; i < childCount; i++)
+        {
+            Transform child = VisualRoot.transform.GetChild(i);
+            originalLayerLocalPositions[child] = child.localPosition;
+        }
+
+        originalPositionsCached = true;
+    }
+
+    private void RestoreLayerPositions()
+    {
+        foreach (var pair in originalLayerLocalPositions)
+        {
+            if (pair.Key != null)
+            {
+                pair.Key.localPosition = pair.Value;
+            }
+        }
+    }
+
     public void OnFocusMoved(Vector2 cameraWorldPosition)
     {
         if (parallaxLayers == null || parallaxLayers.Length == 0)
             return;
 
-        Vector2 cameraDelta = cameraWorldPosition - cameraBasePosition;
+        Vector2 cameraDelta = cameraWorldPosition - MapCenterWorld;
 
         foreach (var item in parallaxLayers)
         {
             item?.OnCameraOffsetChanged(cameraDelta);
         }
-    }
-
-    /// <summary>
-    /// 如果切图后玩家/相机重新定位，需要刷新视差基准点
-    /// </summary>
-    public void ResetParallaxBase(Vector2 cameraWorldPosition)
-    {
-        cameraBasePosition = cameraWorldPosition;
     }
 
     public void Dispose()

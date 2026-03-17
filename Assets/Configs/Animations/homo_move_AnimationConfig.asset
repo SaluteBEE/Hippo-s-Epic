@@ -81,6 +81,9 @@ MonoBehaviour:
     additive: 0
     slotNames: []
     availableClipNames: []
-  compositions: []
+  compositions:
+  - name: "\u65B0\u7EC4\u5408"
+    description: "\u63CF\u8FF0"
+    layers: []
   defaultComposition: Idle
   defaultTransitionTime: 0.1

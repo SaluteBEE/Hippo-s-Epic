@@ -30,13 +30,12 @@ public class AnimationControllerTester : MonoBehaviour
     }
 
     [Header("引用")]
-    [SerializeField] private AnimationController controller;
-    [SerializeField] private bool autoFindController = true;
+    [SerializeField] private bool autoFindControllers = true;
     [SerializeField] private bool autoInitializeOnStart = false;
 
     [Header("界面设置")]
     [SerializeField] private bool showUI = true;
-    [SerializeField] private Rect windowRect = new Rect(20, 20, 430, 700);
+    [SerializeField] private Rect windowRect = new Rect(20, 20, 480, 760);
     [SerializeField] private bool draggableWindow = true;
 
     [Header("测试按钮 - Clip")]
@@ -54,6 +53,10 @@ public class AnimationControllerTester : MonoBehaviour
     [Header("调试")]
     [SerializeField] private bool logOperations = true;
 
+    private readonly List<AnimationController> controllers = new List<AnimationController>();
+    private AnimationController currentController;
+    private int currentControllerIndex = -1;
+
     private Vector2 scrollPos;
     private readonly Dictionary<string, float> layerWeights = new Dictionary<string, float>();
     private readonly Dictionary<string, float> layerSpeeds = new Dictionary<string, float>();
@@ -65,65 +68,105 @@ public class AnimationControllerTester : MonoBehaviour
 
     private void Awake()
     {
-        TryBindController();
+        if (autoFindControllers)
+        {
+            RefreshControllerList();
+        }
     }
 
     private void Start()
     {
-        if (autoInitializeOnStart && controller != null && !controller.IsInitialized)
+        if (autoInitializeOnStart)
         {
-            controller.Initialize();
-            LogMessage("Controller initialized on Start.");
+            foreach (var ctrl in controllers)
+            {
+                if (ctrl != null && !ctrl.IsInitialized)
+                {
+                    ctrl.Initialize();
+                }
+            }
         }
 
-        RefreshControllerCache();
+        RefreshCurrentControllerCache();
     }
 
     private void Reset()
     {
-        TryBindController();
+        RefreshControllerList();
     }
 
-    private void TryBindController()
+    private void RefreshControllerList()
     {
-        if (controller != null) return;
+        controllers.Clear();
 
-        if (autoFindController)
+        var found = FindObjectsOfType<AnimationController>(true);
+        foreach (var ctrl in found)
         {
-            controller = GetComponent<AnimationController>();
-
-            if (controller == null)
+            if (ctrl != null && !controllers.Contains(ctrl))
             {
-                controller = FindObjectOfType<AnimationController>();
+                controllers.Add(ctrl);
             }
+        }
+
+        if (controllers.Count > 0)
+        {
+            if (currentController == null || !controllers.Contains(currentController))
+            {
+                SetCurrentController(0);
+            }
+            else
+            {
+                currentControllerIndex = controllers.IndexOf(currentController);
+            }
+        }
+        else
+        {
+            currentController = null;
+            currentControllerIndex = -1;
         }
     }
 
-    private void RefreshControllerCache()
+    private void SetCurrentController(int index)
+    {
+        if (index < 0 || index >= controllers.Count)
+            return;
+
+        currentControllerIndex = index;
+        currentController = controllers[index];
+
+        RefreshCurrentControllerCache();
+
+        if (currentController != null)
+        {
+            LogMessage($"Current Controller: {currentController.gameObject.name}");
+        }
+    }
+
+    private void RefreshCurrentControllerCache()
     {
         cachedLayerNames.Clear();
         cachedCompositionNames.Clear();
         layerWeights.Clear();
         layerSpeeds.Clear();
 
-        if (controller == null)
+        if (currentController == null)
             return;
 
-        if (controller.IsInitialized)
+        if (currentController.IsInitialized)
         {
-            var layers = controller.GetLayerNames();
+            var layers = currentController.GetLayerNames();
             cachedLayerNames.AddRange(layers);
 
             foreach (var layerName in cachedLayerNames)
             {
-                layerWeights[layerName] = controller.GetLayerWeight(layerName);
+                layerWeights[layerName] = currentController.GetLayerWeight(layerName);
                 layerSpeeds[layerName] = 1f;
             }
         }
 
         if (autoShowCompositionsFromController)
         {
-            var compositions = controller.GetCompositionNames();
+            var compositions = currentController.GetCompositionNames();
             foreach (var composition in compositions)
             {
                 if (!string.IsNullOrEmpty(composition) && !cachedCompositionNames.Contains(composition))
@@ -144,9 +187,16 @@ public class AnimationControllerTester : MonoBehaviour
 
     private void DrawWindow(int id)
     {
-        scrollPos = GUILayout.BeginScrollView(scrollPos, GUILayout.Width(windowRect.width - 10), GUILayout.Height(windowRect.height - 35));
+        scrollPos = GUILayout.BeginScrollView(
+            scrollPos,
+            GUILayout.Width(windowRect.width - 10),
+            GUILayout.Height(windowRect.height - 35)
+        );
 
         DrawHeader();
+        GUILayout.Space(8);
+
+        DrawControllerSelectionSection();
         GUILayout.Space(8);
 
         DrawControllerSection();
@@ -174,44 +224,87 @@ public class AnimationControllerTester : MonoBehaviour
     private void DrawHeader()
     {
         GUILayout.Label("<b>运行时动画调试面板</b>", GetRichLabelStyle());
-        GUILayout.Label("用于测试 AnimationController 的播放、停止、权重与速度控制。");
+        GUILayout.Label("支持场景内多个 AnimationController 的选择与调试。");
+    }
+
+    private void DrawControllerSelectionSection()
+    {
+        GUILayout.BeginVertical("box");
+        GUILayout.Label("<b>Controller 选择</b>", GetRichLabelStyle());
+
+        GUILayout.BeginHorizontal();
+
+        if (GUILayout.Button("刷新场景 Controller", GUILayout.Height(28)))
+        {
+            RefreshControllerList();
+            RefreshCurrentControllerCache();
+            LogMessage($"Found Controllers: {controllers.Count}");
+        }
+
+        if (GUILayout.Button(showUI ? "Hide UI" : "Show UI", GUILayout.Height(28)))
+        {
+            showUI = !showUI;
+        }
+
+        GUILayout.EndHorizontal();
+
+        if (controllers.Count == 0)
+        {
+            GUILayout.Label("当前场景中未找到 AnimationController。");
+            GUILayout.EndVertical();
+            return;
+        }
+
+        GUILayout.Label($"已找到 {controllers.Count} 个 Controller");
+        GUILayout.Label($"当前对象: {(currentController != null ? currentController.gameObject.name : "无")}");
+
+        for (int i = 0; i < controllers.Count; i++)
+        {
+            var ctrl = controllers[i];
+            if (ctrl == null) continue;
+
+            string label = ctrl.gameObject.name;
+            if (ctrl == currentController)
+            {
+                label = $"[当前] {label}";
+            }
+
+            if (GUILayout.Button(label, GUILayout.Height(24)))
+            {
+                SetCurrentController(i);
+            }
+        }
+
+        GUILayout.EndVertical();
     }
 
     private void DrawControllerSection()
     {
         GUILayout.BeginVertical("box");
-        GUILayout.Label("<b>Controller</b>", GetRichLabelStyle());
+        GUILayout.Label("<b>当前 Controller</b>", GetRichLabelStyle());
 
-        if (controller == null)
+        if (currentController == null)
         {
-            GUILayout.Label("未绑定 AnimationController。");
-
-            if (GUILayout.Button("重新查找 Controller", GUILayout.Height(28)))
-            {
-                TryBindController();
-                RefreshControllerCache();
-                LogMessage(controller != null ? "Controller found." : "Controller not found.");
-            }
-
+            GUILayout.Label("未选择 AnimationController。");
             GUILayout.EndVertical();
             return;
         }
 
-        GUILayout.Label($"对象: {controller.gameObject.name}");
-        GUILayout.Label($"已初始化: {(controller.IsInitialized ? "是" : "否")}");
+        GUILayout.Label($"对象: {currentController.gameObject.name}");
+        GUILayout.Label($"已初始化: {(currentController.IsInitialized ? "是" : "否")}");
 
         GUILayout.BeginHorizontal();
 
         if (GUILayout.Button("Initialize", GUILayout.Height(28)))
         {
-            controller.Initialize();
-            RefreshControllerCache();
+            currentController.Initialize();
+            RefreshCurrentControllerCache();
             LogMessage("Initialize called.");
         }
 
         if (GUILayout.Button("Refresh Cache", GUILayout.Height(28)))
         {
-            RefreshControllerCache();
+            RefreshCurrentControllerCache();
             LogMessage("Cache refreshed.");
         }
 
@@ -221,13 +314,22 @@ public class AnimationControllerTester : MonoBehaviour
 
         if (GUILayout.Button("Stop All", GUILayout.Height(28)))
         {
-            controller.StopAll();
+            currentController.StopAll();
             LogMessage("StopAll called.");
         }
 
-        if (GUILayout.Button(showUI ? "Hide UI" : "Show UI", GUILayout.Height(28)))
+        if (GUILayout.Button("Init All Controllers", GUILayout.Height(28)))
         {
-            showUI = !showUI;
+            foreach (var ctrl in controllers)
+            {
+                if (ctrl != null && !ctrl.IsInitialized)
+                {
+                    ctrl.Initialize();
+                }
+            }
+
+            RefreshCurrentControllerCache();
+            LogMessage("All Controllers initialized.");
         }
 
         GUILayout.EndHorizontal();
@@ -240,16 +342,15 @@ public class AnimationControllerTester : MonoBehaviour
         GUILayout.BeginVertical("box");
         GUILayout.Label("<b>Composition 测试</b>", GetRichLabelStyle());
 
-        if (controller == null)
+        if (currentController == null)
         {
-            GUILayout.Label("无 Controller。");
+            GUILayout.Label("无当前 Controller。");
             GUILayout.EndVertical();
             return;
         }
 
         bool hasAnyButton = false;
 
-        // 手动配置的 Composition 按钮
         foreach (var item in compositionButtons)
         {
             if (item == null || string.IsNullOrEmpty(item.compositionName))
@@ -259,12 +360,11 @@ public class AnimationControllerTester : MonoBehaviour
 
             if (GUILayout.Button($"{item.buttonLabel}  [{item.compositionName}]", GUILayout.Height(28)))
             {
-                controller.PlayComposition(item.compositionName);
+                currentController.PlayComposition(item.compositionName);
                 LogMessage($"PlayComposition: {item.compositionName}");
             }
         }
 
-        // 自动从 controller 获取 Composition
         if (autoShowCompositionsFromController)
         {
             foreach (var compositionName in cachedCompositionNames)
@@ -276,7 +376,7 @@ public class AnimationControllerTester : MonoBehaviour
 
                 if (GUILayout.Button($"Auto: {compositionName}", GUILayout.Height(26)))
                 {
-                    controller.PlayComposition(compositionName);
+                    currentController.PlayComposition(compositionName);
                     LogMessage($"PlayComposition: {compositionName}");
                 }
             }
@@ -285,7 +385,7 @@ public class AnimationControllerTester : MonoBehaviour
         if (!hasAnyButton)
         {
             GUILayout.Label("没有可用的 Composition 按钮。");
-            GUILayout.Label("您可以手动配置 compositionButtons，或检查 Controller 配置中是否存在 compositions。");
+            GUILayout.Label("您可以手动配置 compositionButtons，或检查当前 Controller 的配置。");
         }
 
         GUILayout.EndVertical();
@@ -296,9 +396,9 @@ public class AnimationControllerTester : MonoBehaviour
         GUILayout.BeginVertical("box");
         GUILayout.Label("<b>Clip 测试</b>", GetRichLabelStyle());
 
-        if (controller == null)
+        if (currentController == null)
         {
-            GUILayout.Label("无 Controller。");
+            GUILayout.Label("无当前 Controller。");
             GUILayout.EndVertical();
             return;
         }
@@ -320,7 +420,7 @@ public class AnimationControllerTester : MonoBehaviour
 
             if (GUILayout.Button(label, GUILayout.Height(28)))
             {
-                controller.PlayClip(item.layerName, item.clipName, item.transitionTime);
+                currentController.PlayClip(item.layerName, item.clipName, item.transitionTime);
                 LogMessage($"PlayClip: layer={item.layerName}, clip={item.clipName}, transition={item.transitionTime}");
             }
         }
@@ -340,16 +440,16 @@ public class AnimationControllerTester : MonoBehaviour
             return;
         }
 
-        if (controller == null)
+        if (currentController == null)
         {
-            GUILayout.Label("无 Controller。");
+            GUILayout.Label("无当前 Controller。");
             GUILayout.EndVertical();
             return;
         }
 
-        if (!controller.IsInitialized)
+        if (!currentController.IsInitialized)
         {
-            GUILayout.Label("Controller 尚未初始化，无法读取 Layer。");
+            GUILayout.Label("当前 Controller 尚未初始化，无法读取 Layer。");
             GUILayout.EndVertical();
             return;
         }
@@ -359,7 +459,7 @@ public class AnimationControllerTester : MonoBehaviour
             GUILayout.Label("没有缓存到 Layer。");
             if (GUILayout.Button("重新读取 Layer", GUILayout.Height(26)))
             {
-                RefreshControllerCache();
+                RefreshCurrentControllerCache();
             }
 
             GUILayout.EndVertical();
@@ -379,10 +479,10 @@ public class AnimationControllerTester : MonoBehaviour
     {
         GUILayout.BeginVertical("box");
 
-        bool isPlaying = controller.IsPlaying(layerName);
-        float currentTime = controller.GetAnimationTime(layerName);
-        float duration = controller.GetAnimationDuration(layerName);
-        float currentWeight = controller.GetLayerWeight(layerName);
+        bool isPlaying = currentController.IsPlaying(layerName);
+        float currentTime = currentController.GetAnimationTime(layerName);
+        float duration = currentController.GetAnimationDuration(layerName);
+        float currentWeight = currentController.GetLayerWeight(layerName);
 
         GUILayout.Label($"<b>{layerName}</b>", GetRichLabelStyle());
         GUILayout.Label($"状态: {(isPlaying ? "播放中" : "未播放")}");
@@ -402,7 +502,7 @@ public class AnimationControllerTester : MonoBehaviour
         if (!Mathf.Approximately(newWeight, layerWeights[layerName]))
         {
             layerWeights[layerName] = newWeight;
-            controller.SetLayerWeight(layerName, newWeight);
+            currentController.SetLayerWeight(layerName, newWeight);
         }
 
         GUILayout.Space(2);
@@ -412,7 +512,7 @@ public class AnimationControllerTester : MonoBehaviour
         if (!Mathf.Approximately(newSpeed, layerSpeeds[layerName]))
         {
             layerSpeeds[layerName] = newSpeed;
-            controller.SetAnimationSpeed(layerName, newSpeed);
+            currentController.SetAnimationSpeed(layerName, newSpeed);
         }
 
         GUILayout.Space(4);
@@ -421,21 +521,21 @@ public class AnimationControllerTester : MonoBehaviour
 
         if (GUILayout.Button("Stop Layer", GUILayout.Height(24)))
         {
-            controller.StopLayer(layerName);
+            currentController.StopLayer(layerName);
             LogMessage($"StopLayer: {layerName}");
         }
 
         if (GUILayout.Button("Reset Weight", GUILayout.Height(24)))
         {
             layerWeights[layerName] = 1f;
-            controller.SetLayerWeight(layerName, 1f);
+            currentController.SetLayerWeight(layerName, 1f);
             LogMessage($"Reset Weight: {layerName}");
         }
 
         if (GUILayout.Button("Reset Speed", GUILayout.Height(24)))
         {
             layerSpeeds[layerName] = 1f;
-            controller.SetAnimationSpeed(layerName, 1f);
+            currentController.SetAnimationSpeed(layerName, 1f);
             LogMessage($"Reset Speed: {layerName}");
         }
 

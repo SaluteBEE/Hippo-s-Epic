@@ -25,7 +25,6 @@ public class MapManager : MonoBehaviour
             return;
         }
 
-        // 启动时先全部隐藏
         foreach (var map in sceneMaps)
         {
             if (map != null)
@@ -54,7 +53,7 @@ public class MapManager : MonoBehaviour
             return;
         }
 
-        LoadMap(startMap, player, true);
+        LoadMap(startMap, player, true, null);
     }
 
     public void SwitchMap(string mapName, bool teleportPlayer = true)
@@ -70,7 +69,26 @@ public class MapManager : MonoBehaviour
         LoadMap(
             targetMap,
             LevelController.Instance != null ? LevelController.Instance.PlayerCharacter : null,
-            teleportPlayer
+            teleportPlayer,
+            null
+        );
+    }
+
+    public void SwitchMap(string mapName, Vector2 targetEntrance, bool teleportPlayer = true)
+    {
+        Map targetMap = sceneMaps.FirstOrDefault(m => m != null && m.name == mapName);
+
+        if (targetMap == null)
+        {
+            Debug.LogError($"[MapManager] Map not found: {mapName}");
+            return;
+        }
+
+        LoadMap(
+            targetMap,
+            LevelController.Instance != null ? LevelController.Instance.PlayerCharacter : null,
+            teleportPlayer,
+            targetEntrance
         );
     }
 
@@ -85,22 +103,37 @@ public class MapManager : MonoBehaviour
         LoadMap(
             targetMap,
             LevelController.Instance != null ? LevelController.Instance.PlayerCharacter : null,
-            teleportPlayer
+            teleportPlayer,
+            null
         );
     }
 
-    private void LoadMap(Map targetMap, PlayerCharacter player, bool teleportPlayer)
+    public void SwitchMap(Map targetMap, Vector2 targetEntrance, bool teleportPlayer = true)
+    {
+        if (targetMap == null)
+        {
+            Debug.LogError("[MapManager] Target map is null.");
+            return;
+        }
+
+        LoadMap(
+            targetMap,
+            LevelController.Instance != null ? LevelController.Instance.PlayerCharacter : null,
+            teleportPlayer,
+            targetEntrance
+        );
+    }
+
+    private void LoadMap(Map targetMap, PlayerCharacter player, bool teleportPlayer, Vector2? customEntrance)
     {
         if (targetMap == null)
             return;
 
-        // 切换前取消旧地图的相机事件
         if (currentMap != null && cameraController != null)
         {
             cameraController.Moved -= currentMap.OnFocusMoved;
         }
 
-        // 如果切到的是另一张地图，隐藏旧地图
         if (currentMap != null && currentMap != targetMap)
         {
             currentMap.gameObject.SetActive(false);
@@ -109,10 +142,12 @@ public class MapManager : MonoBehaviour
         currentMap = targetMap;
         currentMap.gameObject.SetActive(true);
 
-        // 先传送玩家，再更新相机；这样相机基准点才是正确的
         if (teleportPlayer && player != null)
         {
-            MovePlayerToMainEntrance(player, currentMap);
+            if (customEntrance.HasValue)
+                MovePlayerToEntrance(player, currentMap, customEntrance.Value);
+            else
+                MovePlayerToMainEntrance(player, currentMap);
         }
 
         ApplyCamera(currentMap, player);
@@ -122,7 +157,12 @@ public class MapManager : MonoBehaviour
 
     private void MovePlayerToMainEntrance(PlayerCharacter player, Map map)
     {
-        Vector3 entranceWorld = map.transform.TransformPoint(map.MainEntrance);
+        MovePlayerToEntrance(player, map, map.MainEntrance);
+    }
+
+    private void MovePlayerToEntrance(PlayerCharacter player, Map map, Vector2 entranceLocal)
+    {
+        Vector3 entranceWorld = map.transform.TransformPoint(entranceLocal);
         player.transform.position = new Vector3(
             entranceWorld.x,
             entranceWorld.y,
@@ -135,28 +175,21 @@ public class MapManager : MonoBehaviour
         if (cameraController == null || map == null)
             return;
 
-        // 1. 先更新摄像机边界
         cameraController.SetCameraClamp(map.CameraClampXWorld, map.CameraClampYWorld);
 
-        // 2. 如果有玩家，先让相机对准玩家
         if (player != null)
         {
             cameraController.SetFocusTarget(player);
             cameraController.SnapToFocusTarget();
         }
 
-        // 3. 读取当前相机位置，作为这张地图的视差基准点
-        Vector3 camPos3 = cameraController.transform.position;
-        Vector2 camPos2 = new Vector2(camPos3.x, camPos3.y);
+        map.Initialize();
 
-        // 4. 用当前相机位置初始化地图的视差系统
-        map.Initialize(camPos2);
-
-        // 5. 重新绑定地图对相机移动的监听
         cameraController.Moved -= map.OnFocusMoved;
         cameraController.Moved += map.OnFocusMoved;
 
-        // 6. 初始化后立刻同步一次，确保视差层位置正确
+        Vector3 camPos3 = cameraController.transform.position;
+        Vector2 camPos2 = new Vector2(camPos3.x, camPos3.y);
         map.OnFocusMoved(camPos2);
     }
 }
