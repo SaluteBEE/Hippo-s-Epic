@@ -6,7 +6,7 @@ public class GameApp : MonoBehaviour
 
     [Header("Managers")]
     [SerializeField] private UIManager ui;
-    [SerializeField] private AudioManager audio;
+    [SerializeField] private new AudioManager audio;
     [SerializeField] private SceneController scene;
 
     [Header("Startup")]

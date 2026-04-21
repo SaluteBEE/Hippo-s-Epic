@@ -16,9 +16,11 @@ public class NPCInteractionCollider : SimpleInteractionObject
     [SerializeField] private string hintOnlyButtonText = "好吧";
 
     [Header("Dialogue")]
+#pragma warning disable CS0414
     [SerializeField] private string dialogueFileName = "dialogues/npc_001.csv";
     [SerializeField] private int startId = 1;
     [SerializeField] private bool autoAdvanceFirstLine = true;
+#pragma warning restore CS0414
 
     protected override void ExecuteInteraction()
     {

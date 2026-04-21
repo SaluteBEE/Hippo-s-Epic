@@ -2,7 +2,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using Spine.Unity;
 
-[CreateAssetMenu(fileName = "AnimationConfig", menuName = "Animation/Config", order = 100)]
+[CreateAssetMenu(fileName = "AnimationConfig", menuName = "HippoEpic/Animation/Config", order = 100)]
 public class AnimationConfig : ScriptableObject
 {
     [Header("骨骼数据")]
