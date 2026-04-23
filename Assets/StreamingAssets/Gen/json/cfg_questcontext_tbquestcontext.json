@@ -1,0 +1,55 @@
+[
+  {
+    "id": 1,
+    "questid": 1,
+    "des": "去找拳王对话",
+    "conditionid": [
+      1,
+      2
+    ],
+    "nextState": [
+      2,
+      3
+    ],
+    "reward": []
+  },
+  {
+    "id": 2,
+    "questid": 1,
+    "des": "击败拳王",
+    "conditionid": [
+      3
+    ],
+    "nextState": [],
+    "reward": [
+      [
+        1,
+        500
+      ],
+      [
+        2,
+        1
+      ]
+    ]
+  },
+  {
+    "id": 3,
+    "questid": 1,
+    "des": "",
+    "conditionid": [
+      4
+    ],
+    "nextState": [],
+    "reward": []
+  },
+  {
+    "id": 4,
+    "questid": 1,
+    "des": "",
+    "conditionid": [
+      5
+    ],
+    "nextState": [],
+    "reward": []
+  }
+]

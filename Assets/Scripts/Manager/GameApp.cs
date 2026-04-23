@@ -8,6 +8,7 @@ public class GameApp : MonoBehaviour
     [SerializeField] private UIManager ui;
     [SerializeField] private new AudioManager audio;
     [SerializeField] private SceneController scene;
+    [SerializeField] private DataTableManager dataTable;
 
     [Header("Startup")]
     [SerializeField] private string mainMenuSceneName = "MainMenu";
@@ -15,6 +16,7 @@ public class GameApp : MonoBehaviour
     public UIManager UI => ui;
     public AudioManager Audio => audio;
     public SceneController Scene => scene;
+    public DataTableManager DataTable => dataTable;
 
     public GameStateMachine StateMachine { get; private set; }
 
@@ -35,6 +37,9 @@ public class GameApp : MonoBehaviour
         if (ui == null) ui = GetComponentInChildren<UIManager>(true);
         if (audio == null) audio = GetComponentInChildren<AudioManager>(true);
         if (scene == null) scene = GetComponentInChildren<SceneController>(true);
+        if (dataTable == null) dataTable = GetComponentInChildren<DataTableManager>(true);
+
+        dataTable.LoadTables();
     }
 
     private void Start()

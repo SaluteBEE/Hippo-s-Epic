@@ -1,0 +1,22 @@
+[
+  {
+    "id": 1,
+    "type": 1,
+    "name": "钱币",
+    "icon": 1,
+    "stackable": true,
+    "tip": "金闪闪",
+    "func": [],
+    "param1": ""
+  },
+  {
+    "id": 2,
+    "type": 2,
+    "name": "拳王的牙齿",
+    "icon": 2,
+    "stackable": false,
+    "tip": "一口好牙",
+    "func": [],
+    "param1": ""
+  }
+]

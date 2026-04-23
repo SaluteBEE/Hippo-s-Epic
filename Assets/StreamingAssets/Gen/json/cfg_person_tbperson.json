@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1,
+    "name": "河马",
+    "hp": 100,
+    "hpmax": 100,
+    "animstate": 1,
+    "prefab1": "Assets\\Prefabs\\player\\Hippo",
+    "prefab2": "Assets\\Prefabs\\player\\homo_talk",
+    "buffIds": [
+      1
+    ]
+  },
+  {
+    "id": 2,
+    "name": "教练",
+    "hp": 100,
+    "hpmax": 100,
+    "animstate": 1,
+    "prefab1": "Assets\\Prefabs\\player\\Hippo",
+    "prefab2": "Assets\\Prefabs\\player\\homo_talk",
+    "buffIds": [
+      2
+    ]
+  }
+]

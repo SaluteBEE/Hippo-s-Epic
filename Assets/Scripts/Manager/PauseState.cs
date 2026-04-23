@@ -12,13 +12,11 @@ public class PauseState : IGameState
     public void Enter()
     {
         Time.timeScale = 0f;
-        app.UI.Open<PausePanel>();
     }
 
     public void Exit()
     {
         Time.timeScale = 1f;
-        app.UI.Close<PausePanel>();
     }
 
     public void Update()

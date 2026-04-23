@@ -1,0 +1,96 @@
+[
+  {
+    "id": 1,
+    "condition_type": [
+      1,
+      2,
+      3
+    ],
+    "composeType": [
+      [
+        2,
+        3
+      ],
+      [
+        2
+      ],
+      [
+        4
+      ]
+    ],
+    "hasItem": [
+      1,
+      1
+    ],
+    "taskState": [
+      1,
+      1
+    ],
+    "hasPerkId": [
+      1,
+      2
+    ]
+  },
+  {
+    "id": 2,
+    "condition_type": [
+      1
+    ],
+    "composeType": [
+      [
+        1
+      ]
+    ],
+    "hasItem": [
+      1,
+      1
+    ],
+    "taskState": [],
+    "hasPerkId": []
+  },
+  {
+    "id": 3,
+    "condition_type": [
+      1
+    ],
+    "composeType": [
+      [
+        1
+      ]
+    ],
+    "hasItem": [],
+    "taskState": [],
+    "hasPerkId": []
+  },
+  {
+    "id": 4,
+    "condition_type": [
+      1
+    ],
+    "composeType": [
+      [
+        1
+      ]
+    ],
+    "hasItem": [],
+    "taskState": [],
+    "hasPerkId": []
+  },
+  {
+    "id": 5,
+    "condition_type": [
+      1
+    ],
+    "composeType": [
+      [
+        1
+      ]
+    ],
+    "hasItem": [
+      1,
+      1
+    ],
+    "taskState": [],
+    "hasPerkId": []
+  }
+]

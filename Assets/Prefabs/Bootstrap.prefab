@@ -9,7 +9,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 9093285937574195668}
-  - component: {fileID: 3900043886934180817}
   - component: {fileID: 711315078727347509}
   m_Layer: 0
   m_Name: Bootstrap
@@ -35,18 +34,6 @@ Transform:
   - {fileID: 5931928361479325271}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3900043886934180817
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4524377649243448655}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0d0e51c25d0b73f499b9a1b33a323b18, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &711315078727347509
 MonoBehaviour:
   m_ObjectHideFlags: 0

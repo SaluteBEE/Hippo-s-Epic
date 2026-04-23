@@ -86,7 +86,6 @@ GameObject:
   - component: {fileID: 885635602522205988}
   - component: {fileID: 2932592269893609845}
   - component: {fileID: 1856270452665499511}
-  - component: {fileID: 8640275397758433339}
   m_Layer: 5
   m_Name: DialoguePanel
   m_TagString: Untagged
@@ -156,24 +155,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &8640275397758433339
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3589138466992030107}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6f75e164c34d9134eb28f180dab83b07, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  chatContent: {fileID: 1230555340917258624}
-  leftBubbleLeftPrefab: {fileID: 2078431082266119376, guid: ab105f16188c31b4a8edfcd8de2fe12f, type: 3}
-  rightBubbleLeftPrefab: {fileID: 2701169778038989980, guid: cbba89dd17a70de4e83ec9117ea420e3, type: 3}
-  middleBubblePrefab: {fileID: 7625559222826937333, guid: c73df702408772b42b68a4b0d89e3205, type: 3}
-  chatBubbleOptionPrefab: {fileID: 4484761057056695814, guid: 5e0861a17eabd3a4db06b3cfc207ce42, type: 3}
-  backgroundView: {fileID: 6711865296987592}
 --- !u!1 &3931712626776617531
 GameObject:
   m_ObjectHideFlags: 0
@@ -373,10 +354,10 @@ RectTransform:
   - {fileID: 3710785209186674783}
   m_Father: {fileID: 885635602522205988}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 93.497086, y: 5.8604}
-  m_SizeDelta: {x: 1326.1542, y: 1428.2793}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &9107365559531978878
 CanvasRenderer:
@@ -603,10 +584,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Padding:
-    m_Left: 0
-    m_Right: 0
-    m_Top: 0
-    m_Bottom: 588
+    m_Left: 20
+    m_Right: 20
+    m_Top: 20
+    m_Bottom: 20
   m_ChildAlignment: 0
   m_Spacing: 0
   m_ChildForceExpandWidth: 0

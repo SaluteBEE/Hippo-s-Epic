@@ -1,0 +1,180 @@
+[
+  {
+    "id": 1,
+    "type": 1,
+    "param1": [
+      2
+    ],
+    "param2": "",
+    "selection_name": "",
+    "speakerid1": 1,
+    "speakerid2": 2
+  },
+  {
+    "id": 2,
+    "type": 2,
+    "param1": [
+      3,
+      4,
+      5
+    ],
+    "param2": "",
+    "selection_name": "",
+    "speakerid1": 1,
+    "speakerid2": 2
+  },
+  {
+    "id": 3,
+    "type": 1,
+    "param1": [
+      2
+    ],
+    "param2": "",
+    "selection_name": "我是来患上一种病叫查尔斯顿狂<br>热，然后一直跳舞跳到屎尿横流为止",
+    "speakerid1": 1,
+    "speakerid2": 2
+  },
+  {
+    "id": 4,
+    "type": 1,
+    "param1": [],
+    "param2": "",
+    "selection_name": "一拳打在他脸上！",
+    "speakerid1": 1,
+    "speakerid2": 2
+  },
+  {
+    "id": 5,
+    "type": 1,
+    "param1": [
+      2
+    ],
+    "param2": "",
+    "selection_name": "9之后的数字应该是10。",
+    "speakerid1": 1,
+    "speakerid2": 2
+  },
+  {
+    "id": 100,
+    "type": 1,
+    "param1": [
+      101
+    ],
+    "param2": "",
+    "selection_name": "",
+    "speakerid1": 1,
+    "speakerid2": 2
+  },
+  {
+    "id": 101,
+    "type": 1,
+    "param1": [],
+    "param2": "",
+    "selection_name": "",
+    "speakerid1": 1,
+    "speakerid2": 2
+  },
+  {
+    "id": 200,
+    "type": 2,
+    "param1": [
+      201,
+      202
+    ],
+    "param2": "",
+    "selection_name": "",
+    "speakerid1": 1,
+    "speakerid2": 2
+  },
+  {
+    "id": 201,
+    "type": 1,
+    "param1": [
+      200
+    ],
+    "param2": "",
+    "selection_name": "再来一遍",
+    "speakerid1": 1,
+    "speakerid2": 2
+  },
+  {
+    "id": 202,
+    "type": 1,
+    "param1": [
+      203
+    ],
+    "param2": "",
+    "selection_name": "我受够了",
+    "speakerid1": 1,
+    "speakerid2": 2
+  },
+  {
+    "id": 203,
+    "type": 1,
+    "param1": [],
+    "param2": "",
+    "selection_name": "",
+    "speakerid1": 1,
+    "speakerid2": 2
+  },
+  {
+    "id": 300,
+    "type": 2,
+    "param1": [
+      301,
+      302
+    ],
+    "param2": "",
+    "selection_name": "",
+    "speakerid1": 1,
+    "speakerid2": 2
+  },
+  {
+    "id": 301,
+    "type": 2,
+    "param1": [
+      303,
+      304
+    ],
+    "param2": "",
+    "selection_name": "打听消息",
+    "speakerid1": 1,
+    "speakerid2": 2
+  },
+  {
+    "id": 302,
+    "type": 1,
+    "param1": [],
+    "param2": "",
+    "selection_name": "转身离开",
+    "speakerid1": 1,
+    "speakerid2": 2
+  },
+  {
+    "id": 303,
+    "type": 1,
+    "param1": [],
+    "param2": "",
+    "selection_name": "关于拳王",
+    "speakerid1": 1,
+    "speakerid2": 2
+  },
+  {
+    "id": 304,
+    "type": 1,
+    "param1": [],
+    "param2": "",
+    "selection_name": "关于这个小镇",
+    "speakerid1": 1,
+    "speakerid2": 2
+  },
+  {
+    "id": 400,
+    "type": 1,
+    "param1": [],
+    "param2": "",
+    "selection_name": "",
+    "speakerid1": 1,
+    "speakerid2": 2
+  }
+]

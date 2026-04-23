@@ -15,15 +15,12 @@ public class GameplayState : IGameState
 
         app.UI.Close<LoadingPanel>();
         app.UI.Close<MainMenuPanel>();
-        app.UI.Close<PausePanel>();
 
-        app.UI.Open<HUDPanel>();
         app.Audio.PlayBGM("Gameplay");
     }
 
     public void Exit()
     {
-        app.UI.Close<HUDPanel>();
     }
 
     public void Update()
