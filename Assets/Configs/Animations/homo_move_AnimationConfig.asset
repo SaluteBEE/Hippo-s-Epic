@@ -68,22 +68,45 @@ MonoBehaviour:
     defaultWeight: 1
     additive: 0
     slotNames: []
-    availableClipNames: []
+    availableClipNames:
+    - head-headhit
+    - head-idle
   - name: UpperBody
     trackIndex: 1
     defaultWeight: 1
     additive: 0
     slotNames: []
-    availableClipNames: []
+    availableClipNames:
+    - body-headhit
+    - body-idle
+    - body-walk
+    - body-walk2
   - name: LowerBody
     trackIndex: 2
     defaultWeight: 1
     additive: 0
     slotNames: []
-    availableClipNames: []
+    availableClipNames:
+    - leg-idle
+    - leg-walk
   compositions:
-  - name: "\u65B0\u7EC4\u5408"
+  - name: idle
     description: "\u63CF\u8FF0"
-    layers: []
+    layers:
+    - layerName: Base
+      clipName: head-idle
+      weight: 1
+      transitionTime: 0.1
+      delay: 0
+    - layerName: UpperBody
+      clipName: body-idle
+      weight: 1
+      transitionTime: 0.1
+      delay: 0
+    - layerName: LowerBody
+      clipName: leg-idle
+      weight: 1
+      transitionTime: 0.1
+      delay: 0
   defaultComposition: Idle
   defaultTransitionTime: 0.1

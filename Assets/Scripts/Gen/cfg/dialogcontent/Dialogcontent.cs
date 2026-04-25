@@ -22,8 +22,10 @@ public sealed partial class Dialogcontent : Luban.BeanBase
         Type = _buf.ReadInt();
         Content = _buf.ReadString();
         Sortid = _buf.ReadInt();
-        Emotion1 = _buf.ReadInt();
-        Emotion2 = _buf.ReadInt();
+        Statename1 = _buf.ReadString();
+        Statename2 = _buf.ReadString();
+        Slotstateid1 = _buf.ReadInt();
+        Slotstateid2 = _buf.ReadInt();
     }
 
     public static Dialogcontent DeserializeDialogcontent(ByteBuf _buf)
@@ -53,13 +55,21 @@ public sealed partial class Dialogcontent : Luban.BeanBase
     /// </summary>
     public readonly int Sortid;
     /// <summary>
-    /// 表情1
+    /// 左说话人状态名
     /// </summary>
-    public readonly int Emotion1;
+    public readonly string Statename1;
     /// <summary>
-    /// 表情2
+    /// 右说话人状态名
     /// </summary>
-    public readonly int Emotion2;
+    public readonly string Statename2;
+    /// <summary>
+    /// 说话人1插槽状态外键
+    /// </summary>
+    public readonly int Slotstateid1;
+    /// <summary>
+    /// 说话人2插槽状态外键
+    /// </summary>
+    public readonly int Slotstateid2;
    
     public const int __ID__ = 780059274;
     public override int GetTypeId() => __ID__;
@@ -77,8 +87,10 @@ public sealed partial class Dialogcontent : Luban.BeanBase
         + "type:" + Type + ","
         + "content:" + Content + ","
         + "sortid:" + Sortid + ","
-        + "emotion1:" + Emotion1 + ","
-        + "emotion2:" + Emotion2 + ","
+        + "statename1:" + Statename1 + ","
+        + "statename2:" + Statename2 + ","
+        + "slotstateid1:" + Slotstateid1 + ","
+        + "slotstateid2:" + Slotstateid2 + ","
         + "}";
     }
 }

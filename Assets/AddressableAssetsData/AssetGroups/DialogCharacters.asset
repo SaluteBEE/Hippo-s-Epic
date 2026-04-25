@@ -1,0 +1,59 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: DialogCharacters
+  m_EditorClassIdentifier: 
+  m_GroupName: DialogCharacters
+  m_Data:
+    m_SerializedData: []
+  m_GUID: d609369cf5d490f47ac46ab3d24ed000
+  m_SerializeEntries:
+  - m_GUID: d08b0455da5bbe141a2e9e1171c9caac
+    m_Address: prefabs/player/homo_talk
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - dialog_character
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7f2b4cc40ac313947a3f43421676553a
+    m_Address: prefabs/player/Hippo
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - dialog_character
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5553d0deef21410409282b4bbdff67dd
+    m_Address: prefabs/npc/coach
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - dialog_character
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 05234a69a8ffea648af4da48217a29fc
+    m_Address: prefabs/npc/quanwang_bk
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - dialog_character
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7be800446140d564b9f34a7a248473e9
+    m_Address: prefabs/npc/npc_01
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - dialog_character
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5032e2d1138e79a47a46be1469cbe1c0
+    m_Address: prefabs/npc/npc_02
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - dialog_character
+    FlaggedDuringContentUpdateRestriction: 0
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: dd90b6ecff8020e40aa537a3ddf43594, type: 2}
+  m_SchemaSet:
+    m_Schemas: []

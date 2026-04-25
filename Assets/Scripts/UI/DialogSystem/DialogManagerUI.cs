@@ -68,54 +68,54 @@ public class DialogManagerUI : MonoBehaviour
         DialogManager.Instance.Advance();
     }
 
-    private void OnContent(SpeakerSide side, string text, string speakerName)
-    {
-        switch (side)
-        {
-            case SpeakerSide.Left:
-            {
-                var bubble = Instantiate(leftBubblePrefab, chatContent);
-                bubble.SetText(text);
-                MarkAsLatest(bubble.gameObject);
-                LayoutRebuilder.ForceRebuildLayoutImmediate(bubble.GetComponent<RectTransform>());
-                break;
-            }
-            case SpeakerSide.Middle:
-            {
-                var bubble = Instantiate(middleBubblePrefab, chatContent);
-                bubble.SetText(text);
-                MarkAsLatest(bubble.gameObject);
-                LayoutRebuilder.ForceRebuildLayoutImmediate(bubble.GetComponent<RectTransform>());
-                break;
-            }
-            case SpeakerSide.Right:
-            {
-                var bubble = Instantiate(rightBubblePrefab, chatContent);
-                bubble.SetText(text);
-                MarkAsLatest(bubble.gameObject);
-                LayoutRebuilder.ForceRebuildLayoutImmediate(bubble.GetComponent<RectTransform>());
-                break;
-            }
-        }
-        LayoutRebuilder.ForceRebuildLayoutImmediate(chatContent);
-        ScrollToBottom();
-    }
-
     private void OnOptions(List<OptionInfo> options)
     {
         var opBubble = Instantiate(optionBubblePrefab, chatContent);
 
-        string t1 = options.Count > 0 ? options[0].Text : "";
-        string t2 = options.Count > 1 ? options[1].Text : "";
-        string t3 = options.Count > 2 ? options[2].Text : "";
-
-        opBubble.Bind(t1, "", t2, "", t3, "", index =>
+        var texts = new string[options.Count];
+        var extends = new string[options.Count];
+        for (int i = 0; i < options.Count; i++)
         {
-            DialogManager.Instance.ChooseOption(index);
+            texts[i] = options[i].Text;
+            extends[i] = "";
+        }
+
+        opBubble.Bind(texts, extends, index =>
+        {
+            opBubble.gameObject.SetActive(false);
+            RemoveFromTints(opBubble.gameObject);
             Destroy(opBubble.gameObject);
+            DialogManager.Instance.ChooseOption(index);
         });
 
-        MarkAsLatest(opBubble.gameObject);
+        LayoutRebuilder.ForceRebuildLayoutImmediate(chatContent);
+        ScrollToBottom();
+    }
+
+    private void OnContent(SpeakerSide side, string text, string speakerName)
+    {
+        GameObject bubbleRoot;
+        switch (side)
+        {
+            case SpeakerSide.Left:
+                var leftBubble = Instantiate(leftBubblePrefab, chatContent);
+                leftBubble.SetText(text);
+                bubbleRoot = leftBubble.gameObject;
+                break;
+            case SpeakerSide.Right:
+                var rightBubble = Instantiate(rightBubblePrefab, chatContent);
+                rightBubble.SetText(text);
+                bubbleRoot = rightBubble.gameObject;
+                break;
+            default:
+                var middleBubble = Instantiate(middleBubblePrefab, chatContent);
+                middleBubble.SetText(text);
+                bubbleRoot = middleBubble.gameObject;
+                break;
+        }
+
+        MarkAsLatest(bubbleRoot);
+        LayoutRebuilder.ForceRebuildLayoutImmediate(bubbleRoot.GetComponent<RectTransform>());
         LayoutRebuilder.ForceRebuildLayoutImmediate(chatContent);
         ScrollToBottom();
     }
@@ -123,6 +123,7 @@ public class DialogManagerUI : MonoBehaviour
     private void OnDialogEnded()
     {
         ClearAllBubbles();
+        DialogCharacterManager.Instance?.CleanupDynamicCharacters();
     }
 
     private void MarkAsLatest(GameObject bubbleRoot)
@@ -151,6 +152,15 @@ public class DialogManagerUI : MonoBehaviour
         for (int i = chatContent.childCount - 1; i >= 0; i--)
             Destroy(chatContent.GetChild(i).gameObject);
         _bubbleTints.Clear();
+    }
+
+    private void RemoveFromTints(GameObject go)
+    {
+        for (int i = _bubbleTints.Count - 1; i >= 0; i--)
+        {
+            if (_bubbleTints[i] == null || _bubbleTints[i].gameObject == go)
+                _bubbleTints.RemoveAt(i);
+        }
     }
 
     private void ScrollToBottom()

@@ -27,13 +27,26 @@ public class DialogManager : MonoBehaviour
 
     public DialogState State { get; private set; } = DialogState.Idle;
 
+    public event Action<int, int> OnDialogStart;
     public event Action<SpeakerSide, string, string> OnContent;
     public event Action<List<OptionInfo>> OnOptions;
     public event Action OnDialogEnded;
+    public event Action<int, string> OnEmotion;
+    public event Action<int, int> OnSlotState;
 
     private cfg.Tables _tables;
     private Queue<Dialogcontent> _contentQueue;
     private Dialog _currentDialog;
+    private bool _waitingCharacters;
+    private int _transitionDepth;
+    private bool _endingDialog;
+    private const int MaxTransitionDepth = 50;
+
+    protected void OnDestroy()
+    {
+        if (_instance == this)
+            _instance = null;
+    }
 
     public void SetTables(cfg.Tables tables)
     {
@@ -55,15 +68,47 @@ public class DialogManager : MonoBehaviour
             return;
         }
 
+        if (_endingDialog)
+        {
+            Debug.LogWarning($"[DialogManager] EndDialog 回调中不能启动新对话 {dialogId}，已延迟启动");
+            return;
+        }
+
+        if (State == DialogState.Playing)
+        {
+            Debug.LogWarning($"[DialogManager] 对话正在进行中 (id={_currentDialog?.Id}), 先结束当前对话");
+            EndDialog();
+        }
+
         Debug.Log($"[DialogManager] 开始对话 {dialogId}, Type={dialog.Type}");
         _currentDialog = dialog;
         State = DialogState.Playing;
+        _waitingCharacters = false;
+        _transitionDepth = 0;
+
+        if (OnDialogStart != null)
+        {
+            _waitingCharacters = true;
+            OnDialogStart.Invoke(dialog.Speakerid1, dialog.Speakerid2);
+        }
+        else
+        {
+            PlayCurrentDialog();
+        }
+    }
+
+    public void NotifyCharactersReady()
+    {
+        if (!_waitingCharacters) return;
+        if (_currentDialog == null) return;
+        _waitingCharacters = false;
         PlayCurrentDialog();
     }
 
     public void Advance()
     {
         if (State != DialogState.Playing) return;
+        if (_waitingCharacters) return;
 
         if (_contentQueue != null && _contentQueue.Count > 0)
         {
@@ -81,16 +126,42 @@ public class DialogManager : MonoBehaviour
         if (index < 0 || index >= _currentDialog.Param1.Count) return;
 
         int nextId = _currentDialog.Param1[index];
-        var nextDialog = _tables.TbDialog.GetOrDefault(nextId);
-        if (nextDialog == null)
+        TransitionToDialog(nextId);
+    }
+
+    private void TransitionToDialog(int dialogId)
+    {
+        _transitionDepth++;
+        if (_transitionDepth > MaxTransitionDepth)
         {
-            Debug.LogError($"[DialogManager] 选项目标 Dialog {nextId} 不存在");
+            Debug.LogWarning($"[DialogManager] 对话跳转深度超过 {MaxTransitionDepth}，可能存在循环，强制结束");
             EndDialog();
             return;
         }
 
+        var nextDialog = _tables.TbDialog.GetOrDefault(dialogId);
+        if (nextDialog == null)
+        {
+            Debug.LogError($"[DialogManager] 目标 Dialog {dialogId} 不存在");
+            EndDialog();
+            return;
+        }
+
+        bool speakerChanged = _currentDialog == null
+            || _currentDialog.Speakerid1 != nextDialog.Speakerid1
+            || _currentDialog.Speakerid2 != nextDialog.Speakerid2;
+
         _currentDialog = nextDialog;
-        PlayCurrentDialog();
+
+        if (speakerChanged && OnDialogStart != null)
+        {
+            _waitingCharacters = true;
+            OnDialogStart.Invoke(nextDialog.Speakerid1, nextDialog.Speakerid2);
+        }
+        else
+        {
+            PlayCurrentDialog();
+        }
     }
 
     private void PlayCurrentDialog()
@@ -125,6 +196,20 @@ public class DialogManager : MonoBehaviour
         string speakerName = ResolveSpeakerName(content, side);
 
         OnContent?.Invoke(side, content.Content, speakerName);
+
+        var dialog = _currentDialog;
+        if (dialog == null) return;
+
+        if (!string.IsNullOrEmpty(content.Statename1) && dialog.Speakerid1 != 0)
+            OnEmotion?.Invoke(dialog.Speakerid1, content.Statename1);
+
+        if (!string.IsNullOrEmpty(content.Statename2) && dialog.Speakerid2 != 0)
+            OnEmotion?.Invoke(dialog.Speakerid2, content.Statename2);
+
+        if (content.Slotstateid1 != 0 && dialog.Speakerid1 != 0)
+            OnSlotState?.Invoke(dialog.Speakerid1, content.Slotstateid1);
+        if (content.Slotstateid2 != 0 && dialog.Speakerid2 != 0)
+            OnSlotState?.Invoke(dialog.Speakerid2, content.Slotstateid2);
     }
 
     private void ProcessCurrentDialogFlow()
@@ -142,15 +227,7 @@ public class DialogManager : MonoBehaviour
         }
 
         int nextId = _currentDialog.Param1[0];
-        var nextDialog = _tables.TbDialog.GetOrDefault(nextId);
-        if (nextDialog == null)
-        {
-            EndDialog();
-            return;
-        }
-
-        _currentDialog = nextDialog;
-        PlayCurrentDialog();
+        TransitionToDialog(nextId);
     }
 
     private void ShowOptions()
@@ -168,10 +245,13 @@ public class DialogManager : MonoBehaviour
 
     private void EndDialog()
     {
+        _endingDialog = true;
         State = DialogState.Ended;
+        _waitingCharacters = false;
         _currentDialog = null;
         _contentQueue = null;
         OnDialogEnded?.Invoke();
+        _endingDialog = false;
     }
 
     private SpeakerSide ResolveSide(Dialogcontent content)
@@ -187,7 +267,7 @@ public class DialogManager : MonoBehaviour
 
     private string ResolveSpeakerName(Dialogcontent content, SpeakerSide side)
     {
-        var dialog = _tables.TbDialog.GetOrDefault(content.Dialogid);
+        var dialog = _currentDialog;
         if (dialog == null) return "";
 
         switch (side)

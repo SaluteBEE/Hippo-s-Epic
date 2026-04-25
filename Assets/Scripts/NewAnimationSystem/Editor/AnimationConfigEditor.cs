@@ -46,6 +46,7 @@ public class AnimationConfigEditor : Editor
         defaultCompositionProp = serializedObject.FindProperty("defaultComposition");
         defaultTransitionTimeProp = serializedObject.FindProperty("defaultTransitionTime");
         cacheDirty = true;
+        _matchChecked = false;
     }
     
     private void UpdateCacheIfNeeded()
@@ -129,6 +130,93 @@ public class AnimationConfigEditor : Editor
         }
         
         EditorGUILayout.EndHorizontal();
+        
+        EditorGUILayout.Space();
+        EditorGUILayout.LabelField("Luban 数据导出", EditorStyles.boldLabel);
+
+        if (!_matchChecked)
+        {
+            _matchChecked = true;
+            LoadPersonTable();
+            TryAutoMatch();
+        }
+
+        if (!string.IsNullOrEmpty(_matchInfo))
+        {
+            if (_matchInfo.StartsWith("自动匹配"))
+                EditorGUILayout.HelpBox(_matchInfo, MessageType.Info);
+            else
+                EditorGUILayout.HelpBox(_matchInfo, MessageType.Warning);
+        }
+
+        if (_personOptions != null && _personOptions.Length > 0)
+        {
+            int newPersonIdx = EditorGUILayout.Popup("角色", _personPopupIndex, _personOptions);
+            if (newPersonIdx != _personPopupIndex)
+            {
+                _personPopupIndex = newPersonIdx;
+                _exportPersonId = _cachedPersons[newPersonIdx].Id;
+                _prefabTypePopupIndex = 0;
+                _exportPrefabType = 1;
+                _matchInfo = $"手动选择: {_cachedPersons[newPersonIdx].Name}(id={_exportPersonId})";
+            }
+
+            if (_personPopupIndex >= 0 && _personPopupIndex < _cachedPersons.Count)
+            {
+                var selected = _cachedPersons[_personPopupIndex];
+                int configCount = selected.Animconfigs != null ? selected.Animconfigs.Count : 0;
+                string[] typeLabels = new string[PrefabTypeLabels.Length];
+                for (int i = 0; i < PrefabTypeLabels.Length; i++)
+                    typeLabels[i] = i < configCount ? $"{PrefabTypeLabels[i]} → {selected.Animconfigs[i]}" : PrefabTypeLabels[i];
+
+                int newTypeIdx = EditorGUILayout.Popup("预制体类型", _prefabTypePopupIndex, typeLabels);
+                if (newTypeIdx != _prefabTypePopupIndex)
+                {
+                    _prefabTypePopupIndex = newTypeIdx;
+                    _exportPrefabType = newTypeIdx + 1;
+                    _matchInfo = $"手动选择: {selected.Name}(id={selected.Id}) {PrefabTypeLabels[newTypeIdx]}";
+                }
+            }
+        }
+        else
+        {
+            EditorGUILayout.HelpBox("无法加载 person 表数据", MessageType.Error);
+        }
+
+        EditorGUILayout.LabelField($"导出目标: personId={_exportPersonId}, prefabType={_exportPrefabType} ({((AnimationConfig)target).compositions.Count} 个组合)");
+        
+        EditorGUILayout.BeginHorizontal();
+        
+        if (GUILayout.Button("导出动画状态", GUILayout.Height(25)))
+        {
+            ExportAnimationState();
+        }
+        
+        if (GUILayout.Button("导出插槽状态", GUILayout.Height(25)))
+        {
+            ExportSlotState();
+        }
+        
+        if (GUILayout.Button("一键全部导出", GUILayout.Height(25)))
+        {
+            ExportAll();
+        }
+        
+        EditorGUILayout.EndHorizontal();
+        
+        if (GUILayout.Button("一键全部导出 + Luban重新生成", GUILayout.Height(30)))
+        {
+            ExportAll();
+            RunLubanGen();
+        }
+
+        EditorGUILayout.Space();
+        EditorGUILayout.LabelField("批量操作", EditorStyles.boldLabel);
+
+        if (GUILayout.Button("批量导出所有配置 + Luban重新生成", GUILayout.Height(30)))
+        {
+            BatchExportAllAndRegen();
+        }
         
         serializedObject.ApplyModifiedProperties();
     }
@@ -940,6 +1028,410 @@ public class AnimationConfigEditor : Editor
         else
         {
             Debug.Log("未添加任何新动画片段（可能已全部存在）");
+        }
+    }
+
+    private int _exportPersonId;
+    private int _exportPrefabType = 1;
+    private string _matchInfo = "";
+    private bool _matchChecked;
+
+    private List<cfg.cfg.person.Person> _cachedPersons;
+    private string[] _personOptions;
+    private int _personPopupIndex = -1;
+    private int _prefabTypePopupIndex;
+
+    private static readonly string[] PrefabTypeLabels = { "对话(prefab1)", "战斗(prefab2)" };
+
+    private void LoadPersonTable()
+    {
+        string binDir = Path.Combine(Application.streamingAssetsPath, "Gen", "bin");
+        string personBin = Path.Combine(binDir, "cfg_person_tbperson.bytes");
+        if (!File.Exists(personBin))
+        {
+            _matchInfo = "未找到 person 表二进制数据，请先运行 Luban 生成";
+            _cachedPersons = null;
+            _personOptions = null;
+            return;
+        }
+
+        try
+        {
+            byte[] bytes = File.ReadAllBytes(personBin);
+            var tbPerson = new cfg.cfg.person.TbPerson(new Luban.ByteBuf(bytes));
+            _cachedPersons = new List<cfg.cfg.person.Person>(tbPerson.DataList);
+
+            _personOptions = new string[_cachedPersons.Count];
+            for (int i = 0; i < _cachedPersons.Count; i++)
+            {
+                var p = _cachedPersons[i];
+                string configs = p.Animconfigs != null ? string.Join(",", p.Animconfigs) : "无";
+                _personOptions[i] = $"{p.Id} - {p.Name} [{configs}]";
+            }
+        }
+        catch (System.Exception ex)
+        {
+            _matchInfo = $"加载 person 表失败: {ex.Message}";
+            _cachedPersons = null;
+            _personOptions = null;
+        }
+    }
+
+    private void TryAutoMatch()
+    {
+        if (_cachedPersons == null) return;
+
+        string assetPath = AssetDatabase.GetAssetPath(target);
+        string assetName = Path.GetFileNameWithoutExtension(assetPath);
+        string configName = assetName.Replace("_AnimationConfig", "");
+
+        for (int pi = 0; pi < _cachedPersons.Count; pi++)
+        {
+            var person = _cachedPersons[pi];
+            if (person.Animconfigs == null || person.Animconfigs.Count == 0)
+                continue;
+
+            for (int i = 0; i < person.Animconfigs.Count; i++)
+            {
+                if (string.Equals(person.Animconfigs[i], configName, System.StringComparison.OrdinalIgnoreCase))
+                {
+                    _personPopupIndex = pi;
+                    _exportPersonId = person.Id;
+                    _prefabTypePopupIndex = i;
+                    _exportPrefabType = i + 1;
+                    string prefabLabel = i == 0 ? "对话" : "战斗";
+                    _matchInfo = $"自动匹配: {person.Name}(id={person.Id}) {prefabLabel}(config={configName})";
+                    return;
+                }
+            }
+        }
+
+        _matchInfo = $"未匹配到角色 (配置名={configName})，请手动选择";
+        _personPopupIndex = -1;
+        _prefabTypePopupIndex = 0;
+    }
+
+    private string RunPythonUpdate(string mode, string json)
+    {
+        string projectRoot = Directory.GetParent(Application.dataPath).FullName;
+        string pythonScript = Path.Combine(projectRoot, "DataTables", "update_excel.py");
+        string xlsxName = mode == "animationstate" ? "animationstate.xlsx" : "slotstate.xlsx";
+        string xlsxPath = Path.Combine(projectRoot, "DataTables", "Datas", xlsxName);
+        string tempJson = Path.Combine(Path.GetTempPath(), $"luban_export_{mode}_{_exportPersonId}.json");
+
+        File.WriteAllText(tempJson, json, System.Text.Encoding.UTF8);
+
+        UnityEditor.AssetDatabase.ReleaseCachedFileHandles();
+
+        var psi = new System.Diagnostics.ProcessStartInfo
+        {
+            FileName = "python",
+            Arguments = $"\"{pythonScript}\" {mode} \"{xlsxPath}\" \"{tempJson}\"",
+            UseShellExecute = false,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            CreateNoWindow = true
+        };
+
+        using (var proc = System.Diagnostics.Process.Start(psi))
+        {
+            string output = proc.StandardOutput.ReadToEnd();
+            string error = proc.StandardError.ReadToEnd();
+            proc.WaitForExit(10000);
+
+            if (File.Exists(tempJson))
+                File.Delete(tempJson);
+
+            if (proc.ExitCode != 0)
+                return $"ERR: {error}";
+            return output.Trim();
+        }
+    }
+
+    private void ExportAnimationState()
+    {
+        ExportAnimationState((AnimationConfig)target, _exportPersonId, _exportPrefabType, true);
+    }
+
+    private bool ExportAnimationState(AnimationConfig config, int personId, int prefabType, bool showDialog)
+    {
+        if (config.compositions == null || config.compositions.Count == 0)
+        {
+            if (showDialog)
+                EditorUtility.DisplayDialog("导出动画状态", "当前配置没有动画组合", "确定");
+            return false;
+        }
+
+        var sb = new System.Text.StringBuilder();
+        sb.Append("[");
+        for (int i = 0; i < config.compositions.Count; i++)
+        {
+            var comp = config.compositions[i];
+            if (i > 0) sb.Append(",");
+            sb.Append($"{{\"personid\":{personId},\"statename\":\"{comp.name}\",\"prefabtype\":{prefabType}}}");
+        }
+        sb.Append("]");
+
+        string result = RunPythonUpdate("animationstate", sb.ToString());
+
+        if (result.StartsWith("ERR:"))
+        {
+            Debug.LogError($"[AnimationConfigEditor] 导出失败: {result}");
+            if (showDialog)
+                EditorUtility.DisplayDialog("导出失败", result, "确定");
+            return false;
+        }
+
+        Debug.Log($"[AnimationConfigEditor] animationstate.xlsx 已更新 (person={personId}, prefab={prefabType}): {result}");
+        if (showDialog)
+            EditorUtility.DisplayDialog("导出完成",
+                $"animationstate.xlsx 已更新 (personid={personId}, prefabtype={prefabType})\n{result}", "确定");
+        return true;
+    }
+
+    private void ExportSlotState()
+    {
+        ExportSlotState((AnimationConfig)target, _exportPersonId, _exportPrefabType, true);
+    }
+
+    private bool ExportSlotState(AnimationConfig config, int personId, int prefabType, bool showDialog)
+    {
+        var slotAttachments = new Dictionary<string, int>();
+
+        if (config.skeletonData != null)
+        {
+            var skeletonData = config.skeletonData.GetSkeletonData(true);
+            if (skeletonData != null && skeletonData.Slots != null)
+            {
+                foreach (var slot in skeletonData.Slots)
+                {
+                    if (slot != null && !string.IsNullOrEmpty(slot.Name))
+                        slotAttachments[slot.Name] = 0;
+                }
+            }
+        }
+
+        if (slotAttachments.Count == 0)
+        {
+            if (showDialog)
+                EditorUtility.DisplayDialog("导出插槽状态",
+                    $"未找到骨骼槽位。\n请确保 AnimationConfig 的 SkeletonData 已正确设置。", "确定");
+            return false;
+        }
+
+        var sb = new System.Text.StringBuilder();
+        sb.Append("[");
+        sb.Append($"{{\"personid\":{personId},\"prefabtype\":{prefabType},\"slots\":{{");
+        bool firstSlot = true;
+        foreach (var kvp in slotAttachments)
+        {
+            if (!firstSlot) sb.Append(",");
+            firstSlot = false;
+            sb.Append($"\"{kvp.Key}\":{kvp.Value}");
+        }
+        sb.Append("}}");
+        sb.Append("]");
+
+        string result = RunPythonUpdate("slotstate", sb.ToString());
+
+        if (result.StartsWith("ERR:"))
+        {
+            Debug.LogError($"[AnimationConfigEditor] 导出失败: {result}");
+            if (showDialog)
+                EditorUtility.DisplayDialog("导出失败", result, "确定");
+            return false;
+        }
+
+        Debug.Log($"[AnimationConfigEditor] slotstate.xlsx 已更新 (person={personId}, prefab={prefabType}): {result}");
+        if (showDialog)
+            EditorUtility.DisplayDialog("导出完成",
+                $"slotstate.xlsx 已更新 (personid={personId}, prefabtype={prefabType})\n{slotAttachments.Count} 个插槽，默认值=0\n请在Excel中手动配置各状态附件索引\n{result}", "确定");
+        return true;
+    }
+
+    private void ExportAll()
+    {
+        ExportAnimationState();
+        ExportSlotState();
+        Debug.Log("[AnimationConfigEditor] 全部导出完成 (animationstate + slotstate)");
+    }
+
+    private void BatchExportAllAndRegen()
+    {
+        LoadPersonTable();
+        if (_cachedPersons == null || _cachedPersons.Count == 0)
+        {
+            EditorUtility.DisplayDialog("批量导出", "无法加载 person 表数据，请先运行 Luban 生成", "确定");
+            return;
+        }
+
+        string configFolder = "Assets/Configs/Animations";
+        string[] configGuids = AssetDatabase.FindAssets("t:AnimationConfig", new[] { configFolder });
+        if (configGuids == null || configGuids.Length == 0)
+        {
+            EditorUtility.DisplayDialog("批量导出", $"在 {configFolder} 中未找到 AnimationConfig 资产", "确定");
+            return;
+        }
+
+        var personByConfig = new Dictionary<string, cfg.cfg.person.Person>();
+        foreach (var person in _cachedPersons)
+        {
+            if (person.Animconfigs == null) continue;
+            foreach (var configName in person.Animconfigs)
+                personByConfig[configName.ToLower()] = person;
+        }
+
+        int totalCount = 0, successCount = 0, failCount = 0;
+        var errors = new List<string>();
+
+        for (int gi = 0; gi < configGuids.Length; gi++)
+        {
+            string assetPath = AssetDatabase.GUIDToAssetPath(configGuids[gi]);
+            string assetName = Path.GetFileNameWithoutExtension(assetPath);
+            string configName = assetName.Replace("_AnimationConfig", "");
+            string configKey = configName.ToLower();
+
+            if (EditorUtility.DisplayCancelableProgressBar("批量导出", $"正在导出 {configName}...", (float)gi / configGuids.Length))
+                break;
+
+            if (!personByConfig.TryGetValue(configKey, out var person))
+            {
+                Debug.LogWarning($"[BatchExport] 跳过 {assetName}：未在 person 表中匹配到角色");
+                continue;
+            }
+
+            var config = AssetDatabase.LoadAssetAtPath<AnimationConfig>(assetPath);
+            if (config == null) continue;
+
+            int prefabIndex = person.Animconfigs.FindIndex(a => a.Equals(configName, System.StringComparison.OrdinalIgnoreCase));
+            int prefabType = prefabIndex + 1;
+
+            totalCount++;
+            bool animOk = ExportAnimationState(config, person.Id, prefabType, false);
+            bool slotOk = ExportSlotState(config, person.Id, prefabType, false);
+
+            if (animOk || slotOk)
+            {
+                successCount++;
+                Debug.Log($"[BatchExport] {configName} → person={person.Name}(id={person.Id}), prefabType={prefabType}");
+            }
+            else
+            {
+                failCount++;
+                errors.Add(configName);
+            }
+        }
+
+        EditorUtility.ClearProgressBar();
+
+        if (successCount > 0)
+            RunLubanGen();
+        else
+            AssetDatabase.ReleaseCachedFileHandles();
+
+        string msg = $"共扫描 {configGuids.Length} 个配置资产\n导出 {totalCount} 个 (成功 {successCount}, 失败 {failCount})";
+        if (errors.Count > 0)
+            msg += $"\n失败: {string.Join(", ", errors)}";
+        EditorUtility.DisplayDialog("批量导出完成", msg, "确定");
+    }
+
+    private void RunLubanGen()
+    {
+        string projectRoot = Directory.GetParent(Application.dataPath).FullName;
+        string lubanDll = Path.Combine(projectRoot, "Tools", "Luban", "Luban", "Luban.dll");
+        string confRoot = Path.Combine(projectRoot, "DataTables");
+        string genDir = Path.Combine(projectRoot, "Assets", "Scripts", "Gen");
+        string binDir = Path.Combine(projectRoot, "Assets", "StreamingAssets", "Gen", "bin");
+        string jsonDir = Path.Combine(projectRoot, "Assets", "StreamingAssets", "Gen", "json");
+
+        string[] handWritten = {
+            "DataTableManager.cs", "LubanData.Gen.asmdef",
+            "DialogManager.cs", "SpeakerSide.cs", "OptionInfo.cs"
+        };
+
+        string tempDir = Path.GetTempPath();
+        bool genSuccess = false;
+
+        Debug.Log("[AnimationConfigEditor] 备份手写文件...");
+        foreach (var f in handWritten)
+        {
+            string src = Path.Combine(genDir, f);
+            string dst = Path.Combine(tempDir, f);
+            if (File.Exists(src))
+                File.Copy(src, dst, true);
+        }
+
+        try
+        {
+            Debug.Log("[AnimationConfigEditor] Luban 生成 binary code + data...");
+            int exitCode = RunProcess("dotnet",
+                $"\"{lubanDll}\" -t client -c cs-bin -d bin --conf \"{confRoot}\\luban.conf\" -x outputCodeDir=\"{genDir}\" -x outputDataDir=\"{binDir}\"",
+                confRoot);
+
+            if (exitCode != 0)
+            {
+                Debug.LogError("[AnimationConfigEditor] Luban binary 生成失败!");
+                return;
+            }
+
+            Debug.Log("[AnimationConfigEditor] Luban 生成 json data...");
+            RunProcess("dotnet",
+                $"\"{lubanDll}\" -t client -d json --conf \"{confRoot}\\luban.conf\" -x outputDataDir=\"{jsonDir}\"",
+                confRoot);
+
+            genSuccess = true;
+            Debug.Log("[AnimationConfigEditor] Luban 全部生成完成");
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"[AnimationConfigEditor] Luban 生成异常: {ex.Message}");
+            EditorUtility.DisplayDialog("错误", $"Luban 生成失败:\n{ex.Message}", "确定");
+        }
+        finally
+        {
+            Debug.Log("[AnimationConfigEditor] 恢复手写文件...");
+            foreach (var f in handWritten)
+            {
+                string src = Path.Combine(tempDir, f);
+                string dst = Path.Combine(genDir, f);
+                if (File.Exists(src))
+                    File.Copy(src, dst, true);
+            }
+        }
+
+        AssetDatabase.Refresh();
+
+        if (genSuccess)
+        {
+            EditorUtility.DisplayDialog("完成", "全部导出 + Luban 生成已完成", "确定");
+        }
+    }
+
+    private int RunProcess(string fileName, string arguments, string workDir)
+    {
+        var psi = new System.Diagnostics.ProcessStartInfo
+        {
+            FileName = fileName,
+            Arguments = arguments,
+            WorkingDirectory = workDir,
+            UseShellExecute = false,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            CreateNoWindow = true
+        };
+
+        using (var proc = System.Diagnostics.Process.Start(psi))
+        {
+            string output = proc.StandardOutput.ReadToEnd();
+            string error = proc.StandardError.ReadToEnd();
+            proc.WaitForExit(30000);
+
+            if (!string.IsNullOrEmpty(output))
+                Debug.Log($"[Luban] {output}");
+            if (!string.IsNullOrEmpty(error) && proc.ExitCode != 0)
+                Debug.LogError($"[Luban] {error}");
+
+            return proc.ExitCode;
         }
     }
 }

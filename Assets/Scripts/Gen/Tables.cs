@@ -49,6 +49,14 @@ public partial class Tables
     /// 任务上下文表
     /// </summary>
     public cfg.questcontext.TbQuestcontext TbQuestcontext {get; }
+    /// <summary>
+    /// 动画状态表
+    /// </summary>
+    public cfg.animationstate.TbAnimationstate TbAnimationstate {get; }
+    /// <summary>
+    /// 插槽状态表
+    /// </summary>
+    public cfg.slotstate.TbSlotstate TbSlotstate {get; }
 
     public Tables(System.Func<string, ByteBuf> loader)
     {
@@ -61,6 +69,8 @@ public partial class Tables
         TbItem = new cfg.item.TbItem(loader("cfg_item_tbitem"));
         TbQuest = new cfg.quest.TbQuest(loader("cfg_quest_tbquest"));
         TbQuestcontext = new cfg.questcontext.TbQuestcontext(loader("cfg_questcontext_tbquestcontext"));
+        TbAnimationstate = new cfg.animationstate.TbAnimationstate(loader("cfg_animationstate_tbanimationstate"));
+        TbSlotstate = new cfg.slotstate.TbSlotstate(loader("cfg_slotstate_tbslotstate"));
         ResolveRef();
     }
     
@@ -75,6 +85,8 @@ public partial class Tables
         TbItem.ResolveRef(this);
         TbQuest.ResolveRef(this);
         TbQuestcontext.ResolveRef(this);
+        TbAnimationstate.ResolveRef(this);
+        TbSlotstate.ResolveRef(this);
     }
 }
 

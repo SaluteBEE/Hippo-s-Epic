@@ -75,7 +75,7 @@ MonoBehaviour:
     description: "\u63CF\u8FF0"
     layers:
     - layerName: UpperBody
-      clipName: idle2
+      clipName: idle3
       weight: 1
       transitionTime: 0.1
       delay: 0

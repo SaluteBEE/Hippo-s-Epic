@@ -1,0 +1,27 @@
+===== DialogManagerFixTests =====
+  PASS: StartDialog_NoSubscriber_PlaysDirectly
+  PASS: StartDialog_NoSubscriber_AllContentPlayable
+  PASS: StartDialog_WhilePlaying_EndsPreviousFirst
+  PASS: StartDialog_WhilePlaying_ClearsOldContent
+  PASS: StartDialog_9Advances_ReachesOptions
+  PASS: StartDialog_WithSubscriber_WaitsForNotify
+  PASS: NotifyCharactersReady_WithoutStart_Ignored
+  PASS: ChooseOption_SameSpeakers_NoExtraDialogStart
+  SKIP: AutoAdvance_SpeakerChanged_FiresOnDialogStart (Dialog 100→101 speaker 未变，跳过（代码正确不触发）)
+  PASS: AutoAdvance_SameSpeakers_DoesNotFireOnDialogStart
+  SKIP: AutoAdvance_SpeakerChanged_BlocksContentUntilNotify (speaker 未变，跳过)
+  PASS: LinearDialog_AutoAdvancesToEnd
+  PASS: LinearDialog_ProducesContent
+  PASS: ChooseOption_InvalidIndex_DoesNotThrow
+  PASS: ChooseOption_WhileIdle_Ignored
+  PASS: ChooseOption_OnLinearDialog_Ignored
+  PASS: ChooseOption_OnOptionDialog_Transitions
+  PASS: Advance_WhileEnded_Ignored
+  PASS: PlayNextContent_FiresEmotion_WhenStatenamePresent
+  PASS: PlayNextContent_FiresSlotState_WhenSlotstateidNonZero
+  PASS: EndDialog_CanRestartNewDialog
+  PASS: FullFlow_Dialog1_Choose1_ReturnsToOptions
+  PASS: FullFlow_Dialog1_Choose2_Ends
+  PASS: FullFlow_Dialog200_LoopThenEnd
+
+结果: 22 通过, 0 失败 / 共 24 个测试

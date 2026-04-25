@@ -12,9 +12,9 @@ class DialogDataTests
     }
 
     [Test]
-    public void Dialog_Count_IsFive()
+    public void Dialog_Count_IsSeventeen()
     {
-        Assert.AreEqual(5, tables.TbDialog.DataList.Count);
+        Assert.AreEqual(17, tables.TbDialog.DataList.Count);
     }
 
     [Test]

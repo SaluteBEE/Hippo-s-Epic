@@ -12,9 +12,9 @@ class PersonDataTests
     }
 
     [Test]
-    public void Person_Count_IsTwo()
+    public void Person_Count_IsFive()
     {
-        Assert.AreEqual(2, tables.TbPerson.DataList.Count);
+        Assert.AreEqual(5, tables.TbPerson.DataList.Count);
     }
 
     [Test]
@@ -26,8 +26,8 @@ class PersonDataTests
         Assert.AreEqual(100, person.Hp);
         Assert.AreEqual(100, person.Hpmax);
         Assert.AreEqual(1, person.Animstate);
-        Assert.AreEqual("Assets\\Prefabs\\player\\Hippo", person.Prefab1);
-        Assert.AreEqual("Assets\\Prefabs\\player\\homo_talk", person.Prefab2);
+        Assert.AreEqual("Assets\\Prefabs\\player\\homo_talk", person.Prefab1);
+        Assert.AreEqual("Assets\\Prefabs\\player\\Hippo", person.Prefab2);
         Assert.IsNotNull(person.BuffIds);
         CollectionAssert.AreEqual(new List<int> { 1 }, person.BuffIds);
     }

@@ -12,9 +12,9 @@ class DialogcontentDataTests
     }
 
     [Test]
-    public void Dialogcontent_Count_IsSeventeen()
+    public void Dialogcontent_Count_IsFortyEight()
     {
-        Assert.AreEqual(17, tables.TbDialogcontent.DataList.Count);
+        Assert.AreEqual(48, tables.TbDialogcontent.DataList.Count);
     }
 
     [Test]
@@ -26,8 +26,8 @@ class DialogcontentDataTests
         Assert.AreEqual(0, dc.Type);
         Assert.AreEqual("教练双手揣在口袋里，假装自己是洛奇·巴尔博亚的教练米奇，或者是米老鼠，米老头，米什么玩意儿。", dc.Content);
         Assert.AreEqual(1, dc.Sortid);
-        Assert.AreEqual(0, dc.Emotion1);
-        Assert.AreEqual(0, dc.Emotion2);
+        Assert.AreEqual("", dc.Statename1);
+        Assert.AreEqual("", dc.Statename2);
     }
 
     [Test]

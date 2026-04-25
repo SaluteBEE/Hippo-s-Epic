@@ -35,7 +35,7 @@ public class AnimationControllerTester : MonoBehaviour
 
     [Header("界面设置")]
     [SerializeField] private bool showUI = true;
-    [SerializeField] private Rect windowRect = new Rect(20, 20, 480, 760);
+    [SerializeField] private Rect windowRect = new Rect(10, 10, 360, Screen.height - 20);
     [SerializeField] private bool draggableWindow = true;
 
     [Header("测试按钮 - Clip")]
@@ -50,6 +50,11 @@ public class AnimationControllerTester : MonoBehaviour
     [Header("自动显示 Layer 调试控制")]
     [SerializeField] private bool autoShowLayerControls = true;
 
+    [Header("State Manager 测试")]
+    [SerializeField] private int testPersonId = 1;
+    [SerializeField] private int testPrefabType = 1;
+    [SerializeField] private bool autoInitStateManager = true;
+
     [Header("调试")]
     [SerializeField] private bool logOperations = true;
 
@@ -63,14 +68,33 @@ public class AnimationControllerTester : MonoBehaviour
     private readonly List<string> cachedLayerNames = new List<string>();
     private readonly List<string> cachedCompositionNames = new List<string>();
 
+    private DataTableManager _dataTable;
+    private AnimationStateManager _stateMgr;
+
     private string lastMessage = "Ready";
     private const int WindowId = 246810;
+
+    private SlotManager _cachedSlotMgr;
+    private readonly List<string> _cachedSlotNames = new List<string>();
+    private Vector2 _slotScrollPos;
+    private string _slotStateIdInput = "1";
+
+    private static readonly string[] StateNames =
+    {
+        "idle", "talk", "angry", "think1", "think2",
+        "think3", "throw", "idle2", "idle3"
+    };
 
     private void Awake()
     {
         if (autoFindControllers)
         {
             RefreshControllerList();
+        }
+
+        if (autoInitStateManager)
+        {
+            InitStateManager();
         }
     }
 
@@ -94,6 +118,46 @@ public class AnimationControllerTester : MonoBehaviour
     {
         RefreshControllerList();
     }
+
+    #region StateManager
+
+    private void InitStateManager()
+    {
+        var dtObj = new GameObject("DataTableManager");
+        dtObj.transform.SetParent(transform);
+        _dataTable = dtObj.AddComponent<DataTableManager>();
+        _dataTable.LoadTables();
+
+        var mgrObj = new GameObject("AnimationStateManager");
+        mgrObj.transform.SetParent(transform);
+        _stateMgr = mgrObj.AddComponent<AnimationStateManager>();
+        _stateMgr.SetTables(_dataTable.Tables);
+
+        LogMessage($"StateManager 初始化完成, Slotstate={_dataTable.Tables.TbSlotstate.DataList.Count}, Animationstate={_dataTable.Tables.TbAnimationstate.DataList.Count}");
+    }
+
+    private void RegisterCurrentControllerToStateManager()
+    {
+        if (_stateMgr == null)
+        {
+            LogMessage("StateManager 未初始化");
+            return;
+        }
+
+        if (currentController == null)
+        {
+            LogMessage("未选择 Controller");
+            return;
+        }
+
+        var slotMgr = currentController.GetComponent<SlotManager>();
+        _stateMgr.RegisterCharacter(testPersonId, testPrefabType, currentController, slotMgr);
+        LogMessage($"注册角色{testPersonId} prefabType={testPrefabType}, SlotManager={slotMgr != null}, SlotCount={slotMgr?.SlotCount ?? 0}");
+    }
+
+    #endregion
+
+    #region ControllerList
 
     private void RefreshControllerList()
     {
@@ -177,20 +241,35 @@ public class AnimationControllerTester : MonoBehaviour
         }
     }
 
+    #endregion
+
+    #region GUI
+
     private void OnGUI()
     {
         if (!showUI)
+        {
+            if (GUI.Button(new Rect(10, 10, 120, 30), "显示动画测试"))
+            {
+                showUI = true;
+            }
             return;
+        }
 
-        windowRect = GUI.Window(WindowId, windowRect, DrawWindow, "Animation Controller Tester");
+        windowRect = GUI.Window(WindowId, windowRect, DrawWindow, "动画调试面板");
     }
 
     private void DrawWindow(int id)
     {
+        float svHeight = windowRect.height - 30;
+        if (svHeight < 100) svHeight = Screen.height - 60;
+
         scrollPos = GUILayout.BeginScrollView(
             scrollPos,
-            GUILayout.Width(windowRect.width - 10),
-            GUILayout.Height(windowRect.height - 35)
+            false,
+            true,
+            GUILayout.Width(windowRect.width - 16),
+            GUILayout.Height(svHeight)
         );
 
         DrawHeader();
@@ -202,6 +281,9 @@ public class AnimationControllerTester : MonoBehaviour
         DrawControllerSection();
         GUILayout.Space(8);
 
+        DrawStateManagerSection();
+        GUILayout.Space(8);
+
         DrawCompositionSection();
         GUILayout.Space(8);
 
@@ -209,6 +291,9 @@ public class AnimationControllerTester : MonoBehaviour
         GUILayout.Space(8);
 
         DrawLayerControlSection();
+        GUILayout.Space(8);
+
+        DrawSlotSection();
         GUILayout.Space(8);
 
         DrawStatusSection();
@@ -224,7 +309,7 @@ public class AnimationControllerTester : MonoBehaviour
     private void DrawHeader()
     {
         GUILayout.Label("<b>运行时动画调试面板</b>", GetRichLabelStyle());
-        GUILayout.Label("支持场景内多个 AnimationController 的选择与调试。");
+        GUILayout.Label("支持 AnimationController 调试 + StateManager 表数据测试");
     }
 
     private void DrawControllerSelectionSection()
@@ -333,6 +418,81 @@ public class AnimationControllerTester : MonoBehaviour
         }
 
         GUILayout.EndHorizontal();
+
+        GUILayout.EndVertical();
+    }
+
+    private void DrawStateManagerSection()
+    {
+        GUILayout.BeginVertical("box");
+        GUILayout.Label("<b>State Manager 测试</b>", GetRichLabelStyle());
+
+        if (_stateMgr == null)
+        {
+            GUILayout.Label("StateManager 未初始化。");
+
+            if (GUILayout.Button("初始化 StateManager", GUILayout.Height(28)))
+            {
+                InitStateManager();
+            }
+
+            GUILayout.EndVertical();
+            return;
+        }
+
+        GUILayout.BeginHorizontal();
+        GUILayout.Label($"角色ID: {testPersonId}", GUILayout.Width(70));
+        if (GUILayout.Button("-", GUILayout.Width(24), GUILayout.Height(24)))
+        {
+            testPersonId = Mathf.Max(1, testPersonId - 1);
+            LogMessage($"切换到角色{testPersonId}");
+        }
+        if (GUILayout.Button("+", GUILayout.Width(24), GUILayout.Height(24)))
+        {
+            testPersonId = Mathf.Min(5, testPersonId + 1);
+            LogMessage($"切换到角色{testPersonId}");
+        }
+        GUILayout.Label($"类型: {testPrefabType}", GUILayout.Width(60));
+        if (GUILayout.Button("切换类型", GUILayout.Width(60), GUILayout.Height(24)))
+        {
+            testPrefabType = testPrefabType == 1 ? 2 : 1;
+            LogMessage($"切换到 prefabType={testPrefabType}");
+        }
+        GUILayout.EndHorizontal();
+
+        if (GUILayout.Button("注册当前Controller", GUILayout.Height(24)))
+        {
+            RegisterCurrentControllerToStateManager();
+        }
+
+        GUILayout.Space(4);
+        GUILayout.Label("状态测试:");
+
+        string[] stateLabels = new string[StateNames.Length];
+        var stateActions = new System.Action[StateNames.Length];
+        for (int i = 0; i < StateNames.Length; i++)
+        {
+            string stateName = StateNames[i];
+            stateLabels[i] = stateName;
+            stateActions[i] = () =>
+            {
+                _stateMgr.ApplyState(testPersonId, stateName);
+                LogMessage($"ApplyState({testPersonId}, {stateName})");
+            };
+        }
+        DrawWrapButtons(stateLabels, stateActions);
+        GUILayout.Space(4);
+
+        GUILayout.Space(4);
+
+        if (GUILayout.Button("打印所有 Slotstate 数据", GUILayout.Height(26)))
+        {
+            foreach (var row in _dataTable.Tables.TbSlotstate.DataList)
+            {
+                Debug.Log($"[Tester] Slotstate: id={row.Id}, personId={row.Personid}, prefabType={row.Prefabtype}, A={row.A}");
+            }
+            LogMessage($"打印了 {_dataTable.Tables.TbSlotstate.DataList.Count} 条 Slotstate 记录");
+        }
 
         GUILayout.EndVertical();
     }
@@ -544,6 +704,204 @@ public class AnimationControllerTester : MonoBehaviour
         GUILayout.EndVertical();
     }
 
+    private void DrawSlotSection()
+    {
+        GUILayout.BeginVertical("box");
+        GUILayout.Label("<b>Slot 插槽调试</b>", GetRichLabelStyle());
+
+        if (currentController == null)
+        {
+            GUILayout.Label("未选择 Controller。");
+            GUILayout.EndVertical();
+            return;
+        }
+
+        SlotManager slotMgr = GetCurrentSlotManager();
+        if (slotMgr == null || !slotMgr.IsInitialized)
+        {
+            GUILayout.Label("当前角色无 SlotManager 或未初始化。");
+            GUILayout.EndVertical();
+            return;
+        }
+
+        int autoPersonId = ResolvePersonIdFromController();
+        if (autoPersonId <= 0)
+        {
+            GUILayout.Label($"无法匹配角色 (gameObject={currentController.gameObject.name})，请手动设置角色ID");
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("角色ID:", GUILayout.Width(55));
+            string idStr = GUILayout.TextField(testPersonId.ToString(), GUILayout.Width(40));
+            if (int.TryParse(idStr, out int parsed)) testPersonId = Mathf.Clamp(parsed, 1, 5);
+            GUILayout.EndHorizontal();
+        }
+        else
+        {
+            testPersonId = autoPersonId;
+        }
+
+        GUILayout.Label($"当前角色: personId={testPersonId}  ({currentController.gameObject.name})", GetMiniLabelStyle());
+
+        if (_stateMgr != null)
+        {
+            bool registered = _stateMgr.IsRegistered(testPersonId, testPrefabType);
+            if (!registered)
+            {
+                if (GUILayout.Button($"注册角色{testPersonId} prefabType={testPrefabType} 到 StateManager", GUILayout.Height(22)))
+                {
+                    _stateMgr.RegisterCharacter(testPersonId, testPrefabType, currentController, slotMgr);
+                    LogMessage($"注册角色{testPersonId} prefabType={testPrefabType}");
+                }
+            }
+        }
+
+        #region Slotstate ID 测试
+
+        GUILayout.Label("Slotstate ID 测试:", GetBoldLabelStyle());
+
+        GUILayout.BeginHorizontal();
+        GUILayout.Label("slotstate ID:", GUILayout.Width(85));
+        _slotStateIdInput = GUILayout.TextField(_slotStateIdInput, GUILayout.Width(50));
+        if (GUILayout.Button("应用", GUILayout.Width(50), GUILayout.Height(22)))
+        {
+            if (int.TryParse(_slotStateIdInput, out int id) && _stateMgr != null)
+            {
+                _stateMgr.ApplySlotStateById(testPersonId, id);
+                LogMessage($"ApplySlotStateById(personId={testPersonId}, slotstateId={id})");
+            }
+            else
+            {
+                LogMessage("无效 ID 或 StateManager 未初始化");
+            }
+        }
+        GUILayout.EndHorizontal();
+
+        GUILayout.Space(4);
+
+        if (_dataTable != null)
+        {
+            var slotStates = _dataTable.Tables.TbSlotstate.DataList;
+            if (slotStates != null && slotStates.Count > 0)
+            {
+                GUILayout.Label($"共 {slotStates.Count} 条 Slotstate 记录，点击快速应用:");
+
+                int matched = 0;
+                foreach (var ss in slotStates)
+                {
+                    if (ss.Personid == testPersonId)
+                    {
+                        matched++;
+                        GUILayout.BeginHorizontal();
+                        if (GUILayout.Button($"ID={ss.Id} prefabType={ss.Prefabtype}", GUILayout.Height(22)))
+                        {
+                            if (_stateMgr != null)
+                            {
+                                _stateMgr.ApplySlotStateById(testPersonId, ss.Id);
+                                LogMessage($"ApplySlotStateById(personId={testPersonId}, slotstateId={ss.Id})");
+                            }
+                        }
+                        GUILayout.EndHorizontal();
+                    }
+                }
+
+                if (matched == 0)
+                    GUILayout.Label($"  当前角色({testPersonId})无匹配 Slotstate");
+            }
+        }
+
+        GUILayout.Space(6);
+
+        #endregion
+
+        #region 逐插槽开关
+
+        GUILayout.Label("逐插槽开关:", GetBoldLabelStyle());
+
+        GUILayout.BeginHorizontal();
+        if (GUILayout.Button("全部显示", GUILayout.Height(22)))
+        {
+            slotMgr.SetAllVisible(true, 0f);
+            LogMessage("全部显示");
+        }
+        if (GUILayout.Button("全部隐藏", GUILayout.Height(22)))
+        {
+            slotMgr.SetAllVisible(false, 0f);
+            LogMessage("全部隐藏");
+        }
+        GUILayout.EndHorizontal();
+
+        GUILayout.Space(2);
+
+        _slotScrollPos = GUILayout.BeginScrollView(_slotScrollPos, GUILayout.Height(300));
+        {
+            var names = slotMgr.SlotNames;
+            foreach (var slotName in names)
+            {
+                bool visible = slotMgr.IsSlotVisible(slotName);
+                string attachName = slotMgr.GetSlotAttachmentName(slotName) ?? "";
+
+                bool newVisible = GUILayout.Toggle(visible, slotName);
+                if (newVisible != visible)
+                {
+                    slotMgr.SetSlotVisible(slotName, newVisible, 0f);
+                    LogMessage($"Slot '{slotName}' → {(newVisible ? "显示" : "隐藏")}");
+                }
+
+                if (!string.IsNullOrEmpty(attachName))
+                {
+                    GUILayout.Label($"  └ {attachName}", GetMiniLabelStyle());
+                }
+            }
+        }
+        GUILayout.EndScrollView();
+
+        GUILayout.Space(2);
+        GUILayout.Label($"共 {slotMgr.SlotCount} 个插槽", GetMiniLabelStyle());
+
+        #endregion
+
+        GUILayout.EndVertical();
+    }
+
+    private SlotManager GetCurrentSlotManager()
+    {
+        if (currentController == null)
+            return null;
+
+        SlotManager mgr = currentController.GetComponent<SlotManager>();
+
+        if (mgr != _cachedSlotMgr)
+        {
+            _cachedSlotMgr = mgr;
+            _cachedSlotNames.Clear();
+            if (mgr != null && mgr.IsInitialized)
+                _cachedSlotNames.AddRange(mgr.SlotNames);
+        }
+
+        return mgr;
+    }
+
+    private int ResolvePersonIdFromController()
+    {
+        if (_dataTable == null || currentController == null)
+            return -1;
+
+        string goName = currentController.gameObject.name;
+
+        foreach (var person in _dataTable.Tables.TbPerson.DataList)
+        {
+            if (person.Animconfigs != null)
+            {
+                foreach (var cfg in person.Animconfigs)
+                {
+                    if (goName.IndexOf(cfg, System.StringComparison.OrdinalIgnoreCase) >= 0)
+                        return person.Id;
+                }
+            }
+        }
+
+        return -1;
+    }
+
     private void DrawStatusSection()
     {
         GUILayout.BeginVertical("box");
@@ -552,17 +910,22 @@ public class AnimationControllerTester : MonoBehaviour
         GUILayout.EndVertical();
     }
 
+    #endregion
+
     private void LogMessage(string msg)
     {
         lastMessage = msg;
 
         if (logOperations)
         {
-            Debug.Log($"[AnimationControllerTester] {msg}");
+            Debug.Log($"[AnimationTester] {msg}");
         }
     }
 
     private GUIStyle richLabelStyle;
+    private GUIStyle boldLabelStyle;
+    private GUIStyle miniLabelStyle;
+
     private GUIStyle GetRichLabelStyle()
     {
         if (richLabelStyle == null)
@@ -574,5 +937,60 @@ public class AnimationControllerTester : MonoBehaviour
         }
 
         return richLabelStyle;
+    }
+
+    private GUIStyle GetBoldLabelStyle()
+    {
+        if (boldLabelStyle == null)
+        {
+            boldLabelStyle = new GUIStyle(GUI.skin.label);
+            boldLabelStyle.fontStyle = FontStyle.Bold;
+        }
+        return boldLabelStyle;
+    }
+
+    private GUIStyle GetMiniLabelStyle()
+    {
+        if (miniLabelStyle == null)
+        {
+            miniLabelStyle = new GUIStyle(GUI.skin.label);
+            miniLabelStyle.fontSize = 10;
+        }
+        return miniLabelStyle;
+    }
+
+    private void DrawWrapButtons(string[] labels, System.Action[] callbacks, float height = 26f)
+    {
+        float available = windowRect.width - 36;
+        float rowW = 0f;
+        bool inRow = false;
+
+        for (int i = 0; i < labels.Length; i++)
+        {
+            float btnW = GUI.skin.button.CalcSize(new GUIContent(labels[i])).x + 12f;
+
+            if (rowW + btnW > available && inRow)
+            {
+                GUILayout.EndHorizontal();
+                inRow = false;
+                rowW = 0f;
+            }
+
+            if (!inRow)
+            {
+                GUILayout.BeginHorizontal();
+                inRow = true;
+            }
+
+            int idx = i;
+            if (GUILayout.Button(labels[i], GUILayout.Height(height), GUILayout.MinWidth(btnW)))
+            {
+                callbacks[idx]?.Invoke();
+            }
+            rowW += btnW + 4f;
+        }
+
+        if (inRow)
+            GUILayout.EndHorizontal();
     }
 }

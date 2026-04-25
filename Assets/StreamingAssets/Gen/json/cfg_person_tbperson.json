@@ -5,10 +5,14 @@
     "hp": 100,
     "hpmax": 100,
     "animstate": 1,
-    "prefab1": "Assets\\Prefabs\\player\\Hippo",
-    "prefab2": "Assets\\Prefabs\\player\\homo_talk",
+    "prefab1": "prefabs/player/homo_talk",
+    "prefab2": "Assets\\Prefabs\\player\\Hippo",
     "buffIds": [
       1
+    ],
+    "animconfigs": [
+      "homo_talk",
+      "homo_move"
     ]
   },
   {
@@ -17,10 +21,52 @@
     "hp": 100,
     "hpmax": 100,
     "animstate": 1,
-    "prefab1": "Assets\\Prefabs\\player\\Hippo",
-    "prefab2": "Assets\\Prefabs\\player\\homo_talk",
+    "prefab1": "prefabs/npc/coach",
+    "prefab2": "Assets\\Prefabs\\npc\\coach",
     "buffIds": [
       2
+    ],
+    "animconfigs": [
+      "coach"
+    ]
+  },
+  {
+    "id": 3,
+    "name": "拳王",
+    "hp": 200,
+    "hpmax": 200,
+    "animstate": 1,
+    "prefab1": "prefabs/npc/quanwang_bk",
+    "prefab2": "Assets\\Prefabs\\npc\\quanwang_bk",
+    "buffIds": [],
+    "animconfigs": [
+      "quanwang_bk"
+    ]
+  },
+  {
+    "id": 4,
+    "name": "乌合之众1",
+    "hp": 50,
+    "hpmax": 50,
+    "animstate": 1,
+    "prefab1": "prefabs/npc/npc_01",
+    "prefab2": "Assets\\Prefabs\\npc\\npc_01",
+    "buffIds": [],
+    "animconfigs": [
+      "npc_01"
+    ]
+  },
+  {
+    "id": 5,
+    "name": "乌合之众2",
+    "hp": 50,
+    "hpmax": 50,
+    "animstate": 1,
+    "prefab1": "prefabs/npc/npc_02",
+    "prefab2": "Assets\\Prefabs\\npc\\npc_02",
+    "buffIds": [],
+    "animconfigs": [
+      "npc_02"
     ]
   }
 ]

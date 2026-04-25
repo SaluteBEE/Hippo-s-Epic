@@ -30,6 +30,7 @@ public class GameApp : MonoBehaviour
 
         Instance = this;
         DontDestroyOnLoad(gameObject);
+        Application.runInBackground = true;
 
         StateMachine = new GameStateMachine();
 

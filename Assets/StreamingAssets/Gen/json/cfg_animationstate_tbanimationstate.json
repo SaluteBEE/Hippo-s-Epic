@@ -1,0 +1,128 @@
+[
+  {
+    "id": 1001,
+    "personid": 1,
+    "statename": "talk",
+    "prefabtype": 1,
+    "slotstateid": 0
+  },
+  {
+    "id": 1002,
+    "personid": 1,
+    "statename": "think1",
+    "prefabtype": 1,
+    "slotstateid": 0
+  },
+  {
+    "id": 1003,
+    "personid": 1,
+    "statename": "idle",
+    "prefabtype": 1,
+    "slotstateid": 0
+  },
+  {
+    "id": 1004,
+    "personid": 1,
+    "statename": "think2",
+    "prefabtype": 1,
+    "slotstateid": 0
+  },
+  {
+    "id": 1005,
+    "personid": 1,
+    "statename": "think3",
+    "prefabtype": 1,
+    "slotstateid": 0
+  },
+  {
+    "id": 1000,
+    "personid": 1,
+    "statename": "idle",
+    "prefabtype": 2,
+    "slotstateid": 0
+  },
+  {
+    "id": 2000,
+    "personid": 2,
+    "statename": "idle",
+    "prefabtype": 1,
+    "slotstateid": 0
+  },
+  {
+    "id": 2001,
+    "personid": 2,
+    "statename": "angry",
+    "prefabtype": 1,
+    "slotstateid": 0
+  },
+  {
+    "id": 2002,
+    "personid": 2,
+    "statename": "talk",
+    "prefabtype": 1,
+    "slotstateid": 0
+  },
+  {
+    "id": 3000,
+    "personid": 3,
+    "statename": "idle1",
+    "prefabtype": 1,
+    "slotstateid": 0
+  },
+  {
+    "id": 3001,
+    "personid": 3,
+    "statename": "idle2",
+    "prefabtype": 1,
+    "slotstateid": 0
+  },
+  {
+    "id": 3002,
+    "personid": 3,
+    "statename": "throw",
+    "prefabtype": 1,
+    "slotstateid": 0
+  },
+  {
+    "id": 4000,
+    "personid": 4,
+    "statename": "idle1",
+    "prefabtype": 1,
+    "slotstateid": 0
+  },
+  {
+    "id": 4001,
+    "personid": 4,
+    "statename": "idle2",
+    "prefabtype": 1,
+    "slotstateid": 0
+  },
+  {
+    "id": 4002,
+    "personid": 4,
+    "statename": "idle3",
+    "prefabtype": 1,
+    "slotstateid": 0
+  },
+  {
+    "id": 5000,
+    "personid": 5,
+    "statename": "idle1",
+    "prefabtype": 1,
+    "slotstateid": 0
+  },
+  {
+    "id": 5001,
+    "personid": 5,
+    "statename": "idle2",
+    "prefabtype": 1,
+    "slotstateid": 0
+  },
+  {
+    "id": 5002,
+    "personid": 5,
+    "statename": "idle3",
+    "prefabtype": 1,
+    "slotstateid": 0
+  }
+]

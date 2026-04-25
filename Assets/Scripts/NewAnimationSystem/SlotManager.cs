@@ -654,6 +654,49 @@ public class SlotManager : MonoBehaviour
     {
         return slots.ContainsKey(slotName);
     }
+
+    public string GetAttachmentNameByIndex(string slotName, int index)
+    {
+        if (!slots.TryGetValue(slotName, out var slot))
+            return null;
+
+        var skinEntries = new List<string>();
+        var skeletonData = skeleton.Data;
+        var defaultSkin = skeletonData.DefaultSkin;
+        int slotIndex = slot.Data.Index;
+
+        if (defaultSkin != null)
+        {
+            foreach (var entry in defaultSkin.Attachments)
+            {
+                if (entry.Key.SlotIndex == slotIndex)
+                    skinEntries.Add(entry.Key.Name);
+            }
+        }
+
+        if (skeletonData.Skins != null)
+        {
+            foreach (var skin in skeletonData.Skins)
+            {
+                if (skin == defaultSkin) continue;
+                foreach (var entry in skin.Attachments)
+                {
+                    if (entry.Key.SlotIndex == slotIndex)
+                    {
+                        if (!skinEntries.Contains(entry.Key.Name))
+                            skinEntries.Add(entry.Key.Name);
+                    }
+                }
+            }
+        }
+
+        skinEntries.Sort(string.CompareOrdinal);
+
+        if (index >= 1 && index <= skinEntries.Count)
+            return skinEntries[index - 1];
+
+        return null;
+    }
     
     /// <summary>
     /// 获取插槽透明度

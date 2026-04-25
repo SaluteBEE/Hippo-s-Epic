@@ -10,6 +10,9 @@ public class DialogTestLauncher : MonoBehaviour
 
     private DataTableManager _dataTable;
     private DialogManager _dialogManager;
+    private AnimationStateManager _stateMgr;
+    private DialogCharacterManager _charMgr;
+    private DialogManagerUI _dialogUI;
     private string _statusText = "等待初始化...";
 
     private static readonly int[] TestDialogIds = { 1, 100, 200, 300, 400 };
@@ -37,6 +40,15 @@ public class DialogTestLauncher : MonoBehaviour
 
         _dialogManager.OnOptions += OnOptions;
         _dialogManager.OnDialogEnded += OnDialogEnded;
+
+        var smObj = new GameObject("AnimationStateManager");
+        smObj.transform.SetParent(transform);
+        _stateMgr = smObj.AddComponent<AnimationStateManager>();
+        _stateMgr.SetTables(_dataTable.Tables);
+
+        var cmObj = new GameObject("DialogCharacterManager");
+        cmObj.transform.SetParent(transform);
+        _charMgr = cmObj.AddComponent<DialogCharacterManager>();
 
         SetupCanvas();
     }
@@ -83,14 +95,16 @@ public class DialogTestLauncher : MonoBehaviour
 
         DestroyExistingBubbles(content);
 
-        var ui = panel.AddComponent<DialogManagerUI>();
-        ui.Initialize(
+        _dialogUI = panel.AddComponent<DialogManagerUI>();
+        _dialogUI.Initialize(
             content as RectTransform,
             leftPrefab,
             middlePrefab,
             rightPrefab,
             optionPrefab
         );
+
+        _charMgr.Initialize(_dataTable.Tables);
     }
 
     private void DestroyExistingBubbles(Transform content)

@@ -5,8 +5,10 @@
     "type": 0,
     "content": "教练双手揣在口袋里，假装自己是洛奇·巴尔博亚的教练米奇，或者是米老鼠，米老头，米什么玩意儿。",
     "sortid": 1,
-    "emotion1": 0,
-    "emotion2": 0
+    "statename1": "idle",
+    "statename2": "idle",
+    "slotstateid1": 0,
+    "slotstateid2": 0
   },
   {
     "id": 2,
@@ -14,8 +16,10 @@
     "type": 0,
     "content": "他嘴里哼哼着那首曲子，你知道的，就是那首，噔噔噔，噔噔噔。哦不对应该是噔噔灯？还是噔噔灯？",
     "sortid": 2,
-    "emotion1": 0,
-    "emotion2": 0
+    "statename1": "idle",
+    "statename2": "idle",
+    "slotstateid1": 0,
+    "slotstateid2": 0
   },
   {
     "id": 3,
@@ -23,8 +27,10 @@
     "type": 0,
     "content": "想到这里一股无名怒火从你心里开始燃起，你的拳头给出了一个提议：“一拳打在他脸上！趁他两只手都在口袋里！”",
     "sortid": 3,
-    "emotion1": 0,
-    "emotion2": 0
+    "statename1": "think1",
+    "statename2": "angry",
+    "slotstateid1": 0,
+    "slotstateid2": 2001
   },
   {
     "id": 4,
@@ -32,8 +38,10 @@
     "type": 2,
     "content": "嘿，光屁股，你不是本地人吧。",
     "sortid": 4,
-    "emotion1": 0,
-    "emotion2": 0
+    "statename1": "idle",
+    "statename2": "talk",
+    "slotstateid1": 0,
+    "slotstateid2": 0
   },
   {
     "id": 5,
@@ -41,8 +49,10 @@
     "type": 0,
     "content": "你开始用右手酝酿自己的决心，是的，该向世界展示下你自己的伟大了。",
     "sortid": 5,
-    "emotion1": 0,
-    "emotion2": 0
+    "statename1": "talk",
+    "statename2": "idle",
+    "slotstateid1": 0,
+    "slotstateid2": 0
   },
   {
     "id": 6,
@@ -50,8 +60,10 @@
     "type": 2,
     "content": "拳王已经连胜9场！我们拳馆派去的人被打的<color=red>满地找牙</color>。",
     "sortid": 6,
-    "emotion1": 0,
-    "emotion2": 0
+    "statename1": "idle",
+    "statename2": "talk",
+    "slotstateid1": 0,
+    "slotstateid2": 0
   },
   {
     "id": 7,
@@ -59,8 +71,10 @@
     "type": 2,
     "content": "我知道他们会说什么，哦，教练，哦···",
     "sortid": 7,
-    "emotion1": 0,
-    "emotion2": 0
+    "statename1": "think2",
+    "statename2": "talk",
+    "slotstateid1": 0,
+    "slotstateid2": 0
   },
   {
     "id": 8,
@@ -68,8 +82,10 @@
     "type": 2,
     "content": "这是我们的生活方式！",
     "sortid": 8,
-    "emotion1": 0,
-    "emotion2": 0
+    "statename1": "idle",
+    "statename2": "talk",
+    "slotstateid1": 0,
+    "slotstateid2": 0
   },
   {
     "id": 9,
@@ -77,8 +93,10 @@
     "type": 2,
     "content": "但是我说这是一场溃败，现在已经没有多余的牙齿用了，真的已经完全找不见了。",
     "sortid": 9,
-    "emotion1": 0,
-    "emotion2": 0
+    "statename1": "think3",
+    "statename2": "angry",
+    "slotstateid1": 0,
+    "slotstateid2": 2001
   },
   {
     "id": 10,
@@ -86,8 +104,10 @@
     "type": 2,
     "content": "哦！哦，操，哦，哦，不，哦······",
     "sortid": 1,
-    "emotion1": 0,
-    "emotion2": 0
+    "statename1": "",
+    "statename2": "",
+    "slotstateid1": 0,
+    "slotstateid2": 0
   },
   {
     "id": 11,
@@ -95,8 +115,10 @@
     "type": 2,
     "content": "操你，唉，为什么！我是说，<color=red>嗯？</color>",
     "sortid": 2,
-    "emotion1": 0,
-    "emotion2": 0
+    "statename1": "",
+    "statename2": "",
+    "slotstateid1": 0,
+    "slotstateid2": 0
   },
   {
     "id": 12,
@@ -104,8 +126,10 @@
     "type": 2,
     "content": "新的参赛者！新的参赛者！",
     "sortid": 3,
-    "emotion1": 0,
-    "emotion2": 0
+    "statename1": "",
+    "statename2": "",
+    "slotstateid1": 0,
+    "slotstateid2": 0
   },
   {
     "id": 13,
@@ -113,8 +137,10 @@
     "type": 2,
     "content": "教练朝拳台方向大喊，你好像不该揍他这一拳的，现在后悔还来得及吗？",
     "sortid": 4,
-    "emotion1": 0,
-    "emotion2": 0
+    "statename1": "",
+    "statename2": "",
+    "slotstateid1": 0,
+    "slotstateid2": 0
   },
   {
     "id": 14,
@@ -122,8 +148,10 @@
     "type": 2,
     "content": "你绝对可以终结他的九连胜，我说真的，我上次吃到这么重的一拳还是在9年前。",
     "sortid": 5,
-    "emotion1": 0,
-    "emotion2": 0
+    "statename1": "",
+    "statename2": "",
+    "slotstateid1": 0,
+    "slotstateid2": 0
   },
   {
     "id": 15,
@@ -131,8 +159,10 @@
     "type": 2,
     "content": "我带你了解更多",
     "sortid": 6,
-    "emotion1": 0,
-    "emotion2": 0
+    "statename1": "",
+    "statename2": "",
+    "slotstateid1": 0,
+    "slotstateid2": 0
   },
   {
     "id": 16,
@@ -140,8 +170,10 @@
     "type": 2,
     "content": "是吗，那跳够了再来找我吧，记得别搞到台子上了，否则他们非让你吃回去不可。",
     "sortid": 1,
-    "emotion1": 0,
-    "emotion2": 0
+    "statename1": "",
+    "statename2": "",
+    "slotstateid1": 0,
+    "slotstateid2": 0
   },
   {
     "id": 17,
@@ -149,8 +181,10 @@
     "type": 2,
     "content": "是吗，我觉得至少不应该是9，不过我建议你藏好这个秘密，9之后的数字或许会在朋克城引起恐慌。",
     "sortid": 1,
-    "emotion1": 0,
-    "emotion2": 0
+    "statename1": "",
+    "statename2": "",
+    "slotstateid1": 0,
+    "slotstateid2": 0
   },
   {
     "id": 100,
@@ -158,8 +192,10 @@
     "type": 1,
     "content": "喂，你听说了吗？",
     "sortid": 1,
-    "emotion1": 0,
-    "emotion2": 0
+    "statename1": "",
+    "statename2": "",
+    "slotstateid1": 0,
+    "slotstateid2": 0
   },
   {
     "id": 101,
@@ -167,8 +203,10 @@
     "type": 2,
     "content": "听说什么？我什么都不知道。",
     "sortid": 2,
-    "emotion1": 0,
-    "emotion2": 0
+    "statename1": "",
+    "statename2": "",
+    "slotstateid1": 0,
+    "slotstateid2": 0
   },
   {
     "id": 102,
@@ -176,8 +214,10 @@
     "type": 0,
     "content": "空气中弥漫着一股紧张的气氛。",
     "sortid": 3,
-    "emotion1": 0,
-    "emotion2": 0
+    "statename1": "",
+    "statename2": "",
+    "slotstateid1": 0,
+    "slotstateid2": 0
   },
   {
     "id": 103,
@@ -185,8 +225,10 @@
     "type": 1,
     "content": "算了，也没什么大不了的......",
     "sortid": 4,
-    "emotion1": 0,
-    "emotion2": 0
+    "statename1": "",
+    "statename2": "",
+    "slotstateid1": 0,
+    "slotstateid2": 0
   },
   {
     "id": 104,
@@ -194,8 +236,10 @@
     "type": 2,
     "content": "好吧，那我就直说了：<color=red>拳王要来这个镇子了。</color>",
     "sortid": 1,
-    "emotion1": 0,
-    "emotion2": 0
+    "statename1": "",
+    "statename2": "",
+    "slotstateid1": 0,
+    "slotstateid2": 0
   },
   {
     "id": 105,
@@ -203,8 +247,10 @@
     "type": 1,
     "content": "真的假的？！",
     "sortid": 2,
-    "emotion1": 0,
-    "emotion2": 0
+    "statename1": "",
+    "statename2": "",
+    "slotstateid1": 0,
+    "slotstateid2": 0
   },
   {
     "id": 106,
@@ -212,8 +258,10 @@
     "type": 0,
     "content": "这个消息像一阵风一样传遍了整个小镇。",
     "sortid": 3,
-    "emotion1": 0,
-    "emotion2": 0
+    "statename1": "",
+    "statename2": "",
+    "slotstateid1": 0,
+    "slotstateid2": 0
   },
   {
     "id": 200,
@@ -221,8 +269,10 @@
     "type": 0,
     "content": "神秘人从阴影中走出来，低声说道。",
     "sortid": 1,
-    "emotion1": 0,
-    "emotion2": 0
+    "statename1": "",
+    "statename2": "",
+    "slotstateid1": 0,
+    "slotstateid2": 0
   },
   {
     "id": 201,
@@ -230,8 +280,10 @@
     "type": 2,
     "content": "你有两个选择，听好了。",
     "sortid": 2,
-    "emotion1": 0,
-    "emotion2": 0
+    "statename1": "",
+    "statename2": "",
+    "slotstateid1": 0,
+    "slotstateid2": 0
   },
   {
     "id": 202,
@@ -239,8 +291,10 @@
     "type": 1,
     "content": "好吧，我选再来一遍！",
     "sortid": 1,
-    "emotion1": 0,
-    "emotion2": 0
+    "statename1": "",
+    "statename2": "",
+    "slotstateid1": 0,
+    "slotstateid2": 0
   },
   {
     "id": 203,
@@ -248,8 +302,10 @@
     "type": 0,
     "content": "神秘人叹了口气，又重复了一遍。",
     "sortid": 2,
-    "emotion1": 0,
-    "emotion2": 0
+    "statename1": "",
+    "statename2": "",
+    "slotstateid1": 0,
+    "slotstateid2": 0
   },
   {
     "id": 204,
@@ -257,8 +313,10 @@
     "type": 1,
     "content": "够了够了，我不玩了！",
     "sortid": 1,
-    "emotion1": 0,
-    "emotion2": 0
+    "statename1": "",
+    "statename2": "",
+    "slotstateid1": 0,
+    "slotstateid2": 0
   },
   {
     "id": 205,
@@ -266,8 +324,10 @@
     "type": 0,
     "content": "神秘人露出了满意的微笑。",
     "sortid": 2,
-    "emotion1": 0,
-    "emotion2": 0
+    "statename1": "",
+    "statename2": "",
+    "slotstateid1": 0,
+    "slotstateid2": 0
   },
   {
     "id": 206,
@@ -275,8 +335,10 @@
     "type": 2,
     "content": "很好，你终于做出了正确的选择。<color=red>记住，在朋克城，耐心比拳头更重要。</color>",
     "sortid": 1,
-    "emotion1": 0,
-    "emotion2": 0
+    "statename1": "",
+    "statename2": "",
+    "slotstateid1": 0,
+    "slotstateid2": 0
   },
   {
     "id": 207,
@@ -284,8 +346,10 @@
     "type": 0,
     "content": "神秘人消失在夜色中，只留下一个背影。",
     "sortid": 2,
-    "emotion1": 0,
-    "emotion2": 0
+    "statename1": "",
+    "statename2": "",
+    "slotstateid1": 0,
+    "slotstateid2": 0
   },
   {
     "id": 300,
@@ -293,8 +357,10 @@
     "type": 0,
     "content": "你走进一家昏暗的酒馆，吧台后面站着一个老练的酒保。",
     "sortid": 1,
-    "emotion1": 0,
-    "emotion2": 0
+    "statename1": "",
+    "statename2": "",
+    "slotstateid1": 0,
+    "slotstateid2": 0
   },
   {
     "id": 301,
@@ -302,8 +368,10 @@
     "type": 2,
     "content": "哟，新面孔啊。想喝点什么，还是想打听点什么？",
     "sortid": 2,
-    "emotion1": 0,
-    "emotion2": 0
+    "statename1": "",
+    "statename2": "",
+    "slotstateid1": 0,
+    "slotstateid2": 0
   },
   {
     "id": 302,
@@ -311,8 +379,10 @@
     "type": 0,
     "content": "酒保擦着杯子，等着你的回答。",
     "sortid": 1,
-    "emotion1": 0,
-    "emotion2": 0
+    "statename1": "",
+    "statename2": "",
+    "slotstateid1": 0,
+    "slotstateid2": 0
   },
   {
     "id": 303,
@@ -320,8 +390,10 @@
     "type": 0,
     "content": "你转身离开了酒馆，身后的门吱呀一声关上了。",
     "sortid": 1,
-    "emotion1": 0,
-    "emotion2": 0
+    "statename1": "",
+    "statename2": "",
+    "slotstateid1": 0,
+    "slotstateid2": 0
   },
   {
     "id": 304,
@@ -329,8 +401,10 @@
     "type": 2,
     "content": "拳王？哈，那可是个大人物。听说他连胜了九场，没人能撑过一个回合。<color=red>不过最近有人说有个新来的要挑战他。</color>",
     "sortid": 1,
-    "emotion1": 0,
-    "emotion2": 0
+    "statename1": "",
+    "statename2": "",
+    "slotstateid1": 0,
+    "slotstateid2": 0
   },
   {
     "id": 305,
@@ -338,8 +412,10 @@
     "type": 0,
     "content": "酒保压低了声音，仿佛在说什么秘密。",
     "sortid": 2,
-    "emotion1": 0,
-    "emotion2": 0
+    "statename1": "",
+    "statename2": "",
+    "slotstateid1": 0,
+    "slotstateid2": 0
   },
   {
     "id": 306,
@@ -347,8 +423,10 @@
     "type": 2,
     "content": "这个小镇？名字叫朋克城。别看它小，<color=red>这里可是地下拳赛的圣地。</color>每周都有人从各地赶来挑战拳王。",
     "sortid": 1,
-    "emotion1": 0,
-    "emotion2": 0
+    "statename1": "",
+    "statename2": "",
+    "slotstateid1": 0,
+    "slotstateid2": 0
   },
   {
     "id": 307,
@@ -356,8 +434,10 @@
     "type": 0,
     "content": "酒保指了指墙上的一张褪色的海报。",
     "sortid": 2,
-    "emotion1": 0,
-    "emotion2": 0
+    "statename1": "",
+    "statename2": "",
+    "slotstateid1": 0,
+    "slotstateid2": 0
   },
   {
     "id": 400,
@@ -365,8 +445,10 @@
     "type": 0,
     "content": "夜幕降临，朋克城的霓虹灯逐一亮起。",
     "sortid": 1,
-    "emotion1": 0,
-    "emotion2": 0
+    "statename1": "",
+    "statename2": "",
+    "slotstateid1": 0,
+    "slotstateid2": 0
   },
   {
     "id": 401,
@@ -374,8 +456,10 @@
     "type": 0,
     "content": "街道上空无一人，只有远处传来的音乐声和偶尔的狗吠。",
     "sortid": 2,
-    "emotion1": 0,
-    "emotion2": 0
+    "statename1": "",
+    "statename2": "",
+    "slotstateid1": 0,
+    "slotstateid2": 0
   },
   {
     "id": 402,
@@ -383,8 +467,10 @@
     "type": 0,
     "content": "你站在十字路口，不知道该往哪个方向走。",
     "sortid": 3,
-    "emotion1": 0,
-    "emotion2": 0
+    "statename1": "",
+    "statename2": "",
+    "slotstateid1": 0,
+    "slotstateid2": 0
   },
   {
     "id": 403,
@@ -392,8 +478,10 @@
     "type": 0,
     "content": "突然，一张被风吹过来的海报贴在了你脸上。",
     "sortid": 4,
-    "emotion1": 0,
-    "emotion2": 0
+    "statename1": "",
+    "statename2": "",
+    "slotstateid1": 0,
+    "slotstateid2": 0
   },
   {
     "id": 404,
@@ -401,8 +489,10 @@
     "type": 0,
     "content": "你揭下来一看：<color=red>\"拳王挑战赛，今晚八点，地下竞技场。\"</color>",
     "sortid": 5,
-    "emotion1": 0,
-    "emotion2": 0
+    "statename1": "",
+    "statename2": "",
+    "slotstateid1": 0,
+    "slotstateid2": 0
   },
   {
     "id": 405,
@@ -410,7 +500,31 @@
     "type": 0,
     "content": "你看了看时间——七点四十五。",
     "sortid": 6,
-    "emotion1": 0,
-    "emotion2": 0
+    "statename1": "",
+    "statename2": "",
+    "slotstateid1": 0,
+    "slotstateid2": 0
+  },
+  {
+    "id": 406,
+    "dialogid": 400,
+    "type": 1,
+    "content": "你决定去地下竞技场看看。",
+    "sortid": 7,
+    "statename1": "idle",
+    "statename2": "",
+    "slotstateid1": 1,
+    "slotstateid2": 2
+  },
+  {
+    "id": 407,
+    "dialogid": 400,
+    "type": 2,
+    "content": "来吧，让我看看你的实力。",
+    "sortid": 8,
+    "statename1": "talk",
+    "statename2": "",
+    "slotstateid1": 3,
+    "slotstateid2": 1
   }
 ]

@@ -1,7 +1,7 @@
 {
     "name": "NewAnimationSystem",
     "rootNamespace": "",
-    "references": ["spine-unity"],
+    "references": ["spine-unity", "Luban.Runtime", "LubanData.Gen"],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,

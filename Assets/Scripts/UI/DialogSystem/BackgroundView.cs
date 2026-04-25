@@ -11,7 +11,6 @@ public sealed class BackgroundView : MonoBehaviour
 
     public void Apply(string normalizedName)
     {
-        Debug.Log(normalizedName);
         if (target == null) return;
         if (string.IsNullOrWhiteSpace(normalizedName)) return;
 

@@ -54,7 +54,7 @@ class BoundaryTests
     public void BackslashPath_CorrectValue()
     {
         var person = tables.TbPerson.Get(1);
-        Assert.AreEqual("Assets\\Prefabs\\player\\Hippo", person.Prefab1);
+        Assert.AreEqual("Assets\\Prefabs\\player\\homo_talk", person.Prefab1);
     }
 
     [Test]
