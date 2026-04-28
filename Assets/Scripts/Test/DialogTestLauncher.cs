@@ -1,5 +1,8 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.UI;
 
 public class DialogTestLauncher : MonoBehaviour
@@ -50,10 +53,10 @@ public class DialogTestLauncher : MonoBehaviour
         cmObj.transform.SetParent(transform);
         _charMgr = cmObj.AddComponent<DialogCharacterManager>();
 
-        SetupCanvas();
+        StartCoroutine(SetupCanvasCoroutine());
     }
 
-    private void SetupCanvas()
+    private IEnumerator SetupCanvasCoroutine()
     {
         var canvasObj = new GameObject("DialogCanvas");
         canvasObj.transform.SetParent(transform);
@@ -65,14 +68,15 @@ public class DialogTestLauncher : MonoBehaviour
         scaler.referenceResolution = new Vector2(1920, 1080);
         canvasObj.AddComponent<GraphicRaycaster>();
 
-        var panelPrefab = Resources.Load<GameObject>("UI/DialoguePanel");
-        if (panelPrefab == null)
+        var panelHandle = Addressables.LoadAssetAsync<GameObject>("ui/DialoguePanel");
+        yield return panelHandle;
+        if (panelHandle.Status != AsyncOperationStatus.Succeeded)
         {
-            Debug.LogError("[DialogTestLauncher] 未找到 DialoguePanel 预制体");
-            return;
+            Debug.LogError($"[DialogTestLauncher] 未找到 DialoguePanel：{panelHandle.OperationException}");
+            yield break;
         }
 
-        var panel = Instantiate(panelPrefab, canvasObj.transform, false);
+        var panel = Instantiate(panelHandle.Result, canvasObj.transform, false);
         panel.name = "DialoguePanel";
 
         var panelRect = panel.GetComponent<RectTransform>();
@@ -85,26 +89,33 @@ public class DialogTestLauncher : MonoBehaviour
         if (content == null)
         {
             Debug.LogError("[DialogTestLauncher] 未找到 Content 节点");
-            return;
+            yield break;
         }
 
-        var leftPrefab = Resources.Load<ChatBubbleLeftView>("UI/BubbleLeft");
-        var middlePrefab = Resources.Load<ChatBubbleMiddleView>("UI/BubbleMiddle");
-        var rightPrefab = Resources.Load<ChatBubbleRightView>("UI/BubbleRight");
-        var optionPrefab = Resources.Load<ChatBubbleOptionView>("UI/BubbleOption");
+        var leftHandle = Addressables.LoadAssetAsync<GameObject>("ui/BubbleLeft");
+        var middleHandle = Addressables.LoadAssetAsync<GameObject>("ui/BubbleMiddle");
+        var rightHandle = Addressables.LoadAssetAsync<GameObject>("ui/BubbleRight");
+        var optionHandle = Addressables.LoadAssetAsync<GameObject>("ui/BubbleOption");
+        yield return leftHandle;
+        yield return middleHandle;
+        yield return rightHandle;
+        yield return optionHandle;
 
         DestroyExistingBubbles(content);
 
         _dialogUI = panel.AddComponent<DialogManagerUI>();
         _dialogUI.Initialize(
             content as RectTransform,
-            leftPrefab,
-            middlePrefab,
-            rightPrefab,
-            optionPrefab
+            leftHandle.Result.GetComponent<ChatBubbleLeftView>(),
+            middleHandle.Result.GetComponent<ChatBubbleMiddleView>(),
+            rightHandle.Result.GetComponent<ChatBubbleRightView>(),
+            optionHandle.Result.GetComponent<ChatBubbleOptionView>()
         );
 
         _charMgr.Initialize(_dataTable.Tables);
+
+        if (autoStart)
+            StartDialog();
     }
 
     private void DestroyExistingBubbles(Transform content)
@@ -121,7 +132,7 @@ public class DialogTestLauncher : MonoBehaviour
 
         Debug.Log($"[DialogTestLauncher] 初始化完成, 当前对话ID={startDialogId}, autoStart={autoStart}");
 
-        if (autoStart)
+        if (autoStart && _dialogUI != null)
             StartDialog();
     }
 

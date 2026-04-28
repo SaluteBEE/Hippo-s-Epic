@@ -1,4 +1,6 @@
+using System;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameApp : MonoBehaviour
 {
@@ -11,12 +13,11 @@ public class GameApp : MonoBehaviour
     [SerializeField] private DataTableManager dataTable;
 
     [Header("Startup")]
-    [SerializeField] private string mainMenuSceneName = "MainMenu";
+    [SerializeField] private string mainMenuSceneName = "Scene_Init";
+    [SerializeField] private string gameSceneName = "Level01";
+    [SerializeField] private LaunchConfig launchConfig;
 
-    public UIManager UI => ui;
-    public AudioManager Audio => audio;
-    public SceneController Scene => scene;
-    public DataTableManager DataTable => dataTable;
+    public string GameSceneName => gameSceneName;
 
     public GameStateMachine StateMachine { get; private set; }
 
@@ -34,17 +35,34 @@ public class GameApp : MonoBehaviour
 
         StateMachine = new GameStateMachine();
 
-        // 如果 Inspector 没拖，自动从子物体查找
         if (ui == null) ui = GetComponentInChildren<UIManager>(true);
         if (audio == null) audio = GetComponentInChildren<AudioManager>(true);
         if (scene == null) scene = GetComponentInChildren<SceneController>(true);
-        if (dataTable == null) dataTable = GetComponentInChildren<DataTableManager>(true);
+        if (dataTable == null)  dataTable = GetComponentInChildren<DataTableManager>(true);
 
-        dataTable.LoadTables();
+        ManagerRegistry.Register(this);
+        ManagerRegistry.Register(ui);
+        ManagerRegistry.Register(audio);
+        ManagerRegistry.Register(scene);
+        ManagerRegistry.Register(dataTable);
     }
 
     private void Start()
     {
+        if (launchConfig != null && launchConfig.LaunchTasks != null && launchConfig.LaunchTasks.Length > 0)
+        {
+            foreach (var task in launchConfig.LaunchTasks)
+            {
+                if (task == null) continue;
+                task.Execute();
+            }
+            Debug.Log("[GameApp] 启动任务链完成");
+        }
+        else
+        {
+            dataTable.LoadTables();
+        }
+
         GoMainMenu();
     }
 
@@ -55,6 +73,12 @@ public class GameApp : MonoBehaviour
 
     public void GoMainMenu()
     {
+        if (SceneManager.GetActiveScene().name == mainMenuSceneName)
+        {
+            StateMachine.ChangeState(new MainMenuState(this));
+            return;
+        }
+
         StateMachine.ChangeState(
             new LoadingState(this, mainMenuSceneName, () => new MainMenuState(this))
         );

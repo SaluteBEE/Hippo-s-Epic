@@ -1,29 +1,33 @@
+using System;
+using System.Collections;
 using UnityEngine;
 
 public class Launcher : MonoBehaviour
 {
     public LaunchConfig launchConfig;
 
-    private void Awake()
+    public void Run(LaunchConfig config, Action onCompleted = null)
     {
-        if (launchConfig != null)
+        if (config == null || config.LaunchTasks == null || config.LaunchTasks.Length == 0)
         {
-            // TODO: 对 launchConfig 进行校验，确保其中的 LaunchTask 不为 null
-            Launch(launchConfig);
+            onCompleted?.Invoke();
+            return;
         }
-#if UNITY_EDITOR
-        else
-        {
-            Debug.LogError("LaunchConfig is not assigned in the Launcher.");
-        }
-#endif
+
+        StartCoroutine(RunTasksCoroutine(config.LaunchTasks, onCompleted));
     }
 
-    private void Launch(LaunchConfig config)
+    private IEnumerator RunTasksCoroutine(LaunchTask[] tasks, Action onCompleted)
     {
-        foreach (var task in config.LaunchTasks)
+        foreach (var task in tasks)
         {
+            if (task == null) continue;
+            Debug.Log($"[Launcher] 执行启动任务: {task.name}");
             task.Execute();
+            yield return null;
         }
+
+        Debug.Log("[Launcher] 所有启动任务完成");
+        onCompleted?.Invoke();
     }
 }

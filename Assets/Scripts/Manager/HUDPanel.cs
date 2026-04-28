@@ -2,7 +2,7 @@ public class HUDPanel : UIWindow
 {
     public void OnClickPause()
     {
-        GameApp.Instance.Audio.PlayUI("Click");
+        ManagerRegistry.Get<AudioManager>()?.PlayUI("Click");
         GameApp.Instance.TogglePause();
     }
 }

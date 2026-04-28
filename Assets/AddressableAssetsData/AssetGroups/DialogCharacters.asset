@@ -53,6 +53,12 @@ MonoBehaviour:
     m_SerializedLabels:
     - dialog_character
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3a1f1ad59dc35d545b1537fc2b790d9e
+    m_Address: prefabs/player/PlayerCharacter2D
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - dialog_character
+    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: dd90b6ecff8020e40aa537a3ddf43594, type: 2}
   m_SchemaSet:

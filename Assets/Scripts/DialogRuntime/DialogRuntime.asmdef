@@ -1,10 +1,7 @@
 {
-    "name": "LubanData.Gen",
+    "name": "DialogRuntime",
     "rootNamespace": "",
-    "references": [
-        "Luban.Runtime",
-        "Core"
-    ],
+    "references": ["Core", "LubanData.Gen", "Luban.Runtime", "NewAnimationSystem", "Manager", "Unity.Addressables", "Unity.ResourceManager"],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,

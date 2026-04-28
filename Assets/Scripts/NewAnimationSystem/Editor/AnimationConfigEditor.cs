@@ -1345,7 +1345,7 @@ public class AnimationConfigEditor : Editor
         string jsonDir = Path.Combine(projectRoot, "Assets", "StreamingAssets", "Gen", "json");
 
         string[] handWritten = {
-            "DataTableManager.cs", "LubanData.Gen.asmdef",
+            "LubanData.Gen.asmdef",
             "DialogManager.cs", "SpeakerSide.cs", "OptionInfo.cs"
         };
 

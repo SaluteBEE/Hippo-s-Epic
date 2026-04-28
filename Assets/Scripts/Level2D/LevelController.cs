@@ -1,5 +1,8 @@
 using System;
+using System.Collections;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.AsyncOperations;
 
 public class LevelController : MonoBehaviour
 {
@@ -29,7 +32,6 @@ public class LevelController : MonoBehaviour
         }
 
         InitializePlayer();
-        InitializeMap();
     }
 
     private void Update()
@@ -50,19 +52,30 @@ public class LevelController : MonoBehaviour
     private void InitializePlayer()
     {
         if (playerCharacter != null)
-            return;
-
-        GameObject playerPrefab = Resources.Load<GameObject>("Level2D/Player Character 2D");
-        if (playerPrefab == null)
         {
-            Debug.LogError("Player prefab not found at Resources/Level2D/Player Character 2D");
+            InitializeMap();
             return;
         }
 
-        var player = Instantiate(playerPrefab, Vector3.zero, Quaternion.identity)
+        StartCoroutine(LoadPlayerAsync());
+    }
+
+    private IEnumerator LoadPlayerAsync()
+    {
+        var handle = Addressables.LoadAssetAsync<GameObject>("prefabs/player/PlayerCharacter2D");
+        yield return handle;
+
+        if (handle.Status != AsyncOperationStatus.Succeeded)
+        {
+            Debug.LogError($"[LevelController] 加载玩家 Prefab 失败：{handle.OperationException}");
+            yield break;
+        }
+
+        var player = Instantiate(handle.Result, Vector3.zero, Quaternion.identity)
             .GetComponent<PlayerCharacter>();
 
         SetPlayerCharacter(player);
+        InitializeMap();
     }
 
     private void InitializeMap()

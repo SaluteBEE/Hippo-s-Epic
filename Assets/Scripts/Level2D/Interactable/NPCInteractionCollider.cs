@@ -46,6 +46,6 @@ public class NPCInteractionCollider : SimpleInteractionObject
         afterExecuteText = "";
         afterExecuteButtonText = "";
 
-        DialogManager.Instance.StartDialog(startDialogId);
+        ManagerRegistry.GetOrCreate<DialogManager>()?.StartDialog(startDialogId);
     }
 }

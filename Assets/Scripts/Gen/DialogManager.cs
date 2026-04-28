@@ -14,17 +14,6 @@ public enum DialogState
 
 public class DialogManager : MonoBehaviour
 {
-    private static DialogManager _instance;
-    public static DialogManager Instance
-    {
-        get
-        {
-            if (_instance == null)
-                _instance = FindObjectOfType<DialogManager>();
-            return _instance;
-        }
-    }
-
     public DialogState State { get; private set; } = DialogState.Idle;
 
     public event Action<int, int> OnDialogStart;
@@ -42,10 +31,14 @@ public class DialogManager : MonoBehaviour
     private bool _endingDialog;
     private const int MaxTransitionDepth = 50;
 
+    private void Awake()
+    {
+        ManagerRegistry.Register(this);
+    }
+
     protected void OnDestroy()
     {
-        if (_instance == this)
-            _instance = null;
+        ManagerRegistry.Unregister<DialogManager>();
     }
 
     public void SetTables(cfg.Tables tables)

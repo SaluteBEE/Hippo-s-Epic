@@ -5,7 +5,9 @@
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
         "Luban.Runtime",
-        "LubanData.Gen"
+        "Core",
+        "LubanData.Gen",
+        "Manager"
     ],
     "includePlatforms": [
         "Editor"

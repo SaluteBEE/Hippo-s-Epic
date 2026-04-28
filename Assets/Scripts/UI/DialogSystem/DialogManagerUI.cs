@@ -37,35 +37,38 @@ public class DialogManagerUI : MonoBehaviour
             _scrollViewRect = _scrollRect.GetComponent<RectTransform>();
     }
 
+    private DialogManager _dialogManager;
+    private DialogCharacterManager _characterManager;
+
     private void OnEnable()
     {
-        var mgr = DialogManager.Instance;
-        if (mgr == null) return;
+        _dialogManager = ManagerRegistry.Get<DialogManager>();
+        _characterManager = ManagerRegistry.Get<DialogCharacterManager>();
+        if (_dialogManager == null) return;
 
-        mgr.OnContent += OnContent;
-        mgr.OnOptions += OnOptions;
-        mgr.OnDialogEnded += OnDialogEnded;
+        _dialogManager.OnContent += OnContent;
+        _dialogManager.OnOptions += OnOptions;
+        _dialogManager.OnDialogEnded += OnDialogEnded;
     }
 
     private void OnDisable()
     {
-        var mgr = DialogManager.Instance;
-        if (mgr == null) return;
+        if (_dialogManager == null) return;
 
-        mgr.OnContent -= OnContent;
-        mgr.OnOptions -= OnOptions;
-        mgr.OnDialogEnded -= OnDialogEnded;
+        _dialogManager.OnContent -= OnContent;
+        _dialogManager.OnOptions -= OnOptions;
+        _dialogManager.OnDialogEnded -= OnDialogEnded;
     }
 
     private void Update()
     {
-        if (DialogManager.Instance == null) return;
-        if (DialogManager.Instance.State != DialogState.Playing) return;
+        if (_dialogManager == null) return;
+        if (_dialogManager.State != DialogState.Playing) return;
         if (!IsClickOrTapBegan()) return;
         if (IsPointerOverButtonOrSelectable()) return;
         if (!IsPointerOverScrollView()) return;
 
-        DialogManager.Instance.Advance();
+        _dialogManager.Advance();
     }
 
     private void OnOptions(List<OptionInfo> options)
@@ -85,7 +88,7 @@ public class DialogManagerUI : MonoBehaviour
             opBubble.gameObject.SetActive(false);
             RemoveFromTints(opBubble.gameObject);
             Destroy(opBubble.gameObject);
-            DialogManager.Instance.ChooseOption(index);
+            _dialogManager.ChooseOption(index);
         });
 
         LayoutRebuilder.ForceRebuildLayoutImmediate(chatContent);
@@ -123,7 +126,7 @@ public class DialogManagerUI : MonoBehaviour
     private void OnDialogEnded()
     {
         ClearAllBubbles();
-        DialogCharacterManager.Instance?.CleanupDynamicCharacters();
+        _characterManager?.CleanupDynamicCharacters();
     }
 
     private void MarkAsLatest(GameObject bubbleRoot)

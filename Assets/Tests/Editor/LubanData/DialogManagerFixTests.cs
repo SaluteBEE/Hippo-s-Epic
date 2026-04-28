@@ -47,6 +47,7 @@ class DialogManagerFixTests
     {
         if (_mgr != null)
             UnityEngine.Object.DestroyImmediate(_mgr.gameObject);
+        ManagerRegistry.Clear();
     }
 
     #region BUG-3: 无订阅者时直接播放

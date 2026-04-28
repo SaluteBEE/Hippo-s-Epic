@@ -1,10 +1,7 @@
 {
-    "name": "LubanData.Gen",
+    "name": "Manager",
     "rootNamespace": "",
-    "references": [
-        "Luban.Runtime",
-        "Core"
-    ],
+    "references": ["Core", "LubanData.Gen", "Luban.Runtime"],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,

@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cad2e1a7fa4e62440b37555a4bbd5630, type: 3}
+  m_Name: Default Launcher Config
+  m_EditorClassIdentifier: 
+  LaunchTasks:
+  - {fileID: 11400000, guid: 956ceacb0496bc342bdf2b25e061f6b6, type: 2}
+  - {fileID: 11400000, guid: 56c0f8e8468e97f4590b7ce6a263b324, type: 2}
