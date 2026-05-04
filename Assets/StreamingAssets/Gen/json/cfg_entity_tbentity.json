@@ -1,0 +1,42 @@
+[
+  {
+    "id": "gym_main_npc_01",
+    "sceneId": 2,
+    "type": 0,
+    "dataId": 1,
+    "param1": "",
+    "param2": "",
+    "initialState": 0,
+    "storyState": 0
+  },
+  {
+    "id": "lounge_item_01",
+    "sceneId": 1,
+    "type": 1,
+    "dataId": 1,
+    "param1": "",
+    "param2": "",
+    "initialState": 0,
+    "storyState": 0
+  },
+  {
+    "id": "lounge_npc_01",
+    "sceneId": 1,
+    "type": 0,
+    "dataId": 2,
+    "param1": "",
+    "param2": "",
+    "initialState": 0,
+    "storyState": 0
+  },
+  {
+    "id": "gym_door_locked",
+    "sceneId": 2,
+    "type": 3,
+    "dataId": 0,
+    "param1": "",
+    "param2": "",
+    "initialState": 1,
+    "storyState": 0
+  }
+]

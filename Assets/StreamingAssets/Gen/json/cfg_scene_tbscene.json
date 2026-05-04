@@ -1,0 +1,23 @@
+[
+  {
+    "id": 1,
+    "name": "Scene_Staff_Lounge",
+    "displayName": "员工休息室",
+    "bgmId": 0,
+    "initialMap": ""
+  },
+  {
+    "id": 2,
+    "name": "Scene_Underground_Boxing_Gym",
+    "displayName": "地下拳击馆",
+    "bgmId": 0,
+    "initialMap": ""
+  },
+  {
+    "id": 3,
+    "name": "Scene_Dialogue",
+    "displayName": "对话场景",
+    "bgmId": 0,
+    "initialMap": ""
+  }
+]

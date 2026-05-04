@@ -6,7 +6,6 @@ set CONF_ROOT=.
 set GEN_DIR=..\Assets\Scripts\Gen
 
 echo === Backup non-generated files ===
-if exist "%GEN_DIR%\DataTableManager.cs" copy /y "%GEN_DIR%\DataTableManager.cs" "%TEMP%\DataTableManager.cs" >nul
 if exist "%GEN_DIR%\LubanData.Gen.asmdef" copy /y "%GEN_DIR%\LubanData.Gen.asmdef" "%TEMP%\LubanData.Gen.asmdef" >nul
 if exist "%GEN_DIR%\DialogManager.cs" copy /y "%GEN_DIR%\DialogManager.cs" "%TEMP%\DialogManager.cs" >nul
 if exist "%GEN_DIR%\SpeakerSide.cs" copy /y "%GEN_DIR%\SpeakerSide.cs" "%TEMP%\SpeakerSide.cs" >nul
@@ -22,7 +21,6 @@ if %errorlevel% neq 0 (
 )
 
 echo === Restore non-generated files ===
-if exist "%TEMP%\DataTableManager.cs" copy /y "%TEMP%\DataTableManager.cs" "%GEN_DIR%\DataTableManager.cs" >nul
 if exist "%TEMP%\LubanData.Gen.asmdef" copy /y "%TEMP%\LubanData.Gen.asmdef" "%GEN_DIR%\LubanData.Gen.asmdef" >nul
 if exist "%TEMP%\DialogManager.cs" copy /y "%TEMP%\DialogManager.cs" "%GEN_DIR%\DialogManager.cs" >nul
 if exist "%TEMP%\SpeakerSide.cs" copy /y "%TEMP%\SpeakerSide.cs" "%GEN_DIR%\SpeakerSide.cs" >nul
