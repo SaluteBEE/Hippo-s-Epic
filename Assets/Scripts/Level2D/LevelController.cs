@@ -87,6 +87,7 @@ public class LevelController : MonoBehaviour
         }
 
         mapManager.Initialize(playerCharacter);
+        EntityConfigLoader.InitializeScene(gameObject.scene.name);
     }
 
     private void HandleInput(out LevelInput levelInput)

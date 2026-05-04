@@ -18,8 +18,13 @@ public class NPCInteractionCollider : SimpleInteractionObject
     [Header("Dialogue")]
     [SerializeField] private int startDialogId = 1;
 
+    private const int StateDialogDone = 1;
+
     protected override void ExecuteInteraction()
     {
+        if (!string.IsNullOrEmpty(EntityId))
+            EntityConfigLoader.OnEntityInteracted(EntityId, StateDialogDone);
+
         switch (interactionType)
         {
             case NPCInteractionType.HintOnly:

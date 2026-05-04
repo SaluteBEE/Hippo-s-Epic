@@ -340,5 +340,5 @@ MonoBehaviour:
   MoveSpeed: 2.5
   interactionLayerMask:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 8
   faceRightByDefault: 1

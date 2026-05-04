@@ -71,8 +71,15 @@ public class SimpleInteractionObject : InteractionCollider
             interactHint.Show(enterText, enterButtonText);
     }
 
+    public bool HasBeenExecuted => hasExecuted;
+
+    public void SetExecuted(bool executed)
+    {
+        hasExecuted = executed;
+    }
+
     protected virtual void ExecuteInteraction()
     {
-        
+
     }
 }

@@ -285,8 +285,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a054fedabddf4541a701687085ced85, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  controller: {fileID: 327948622}
-  autoFindController: 1
+  autoFindControllers: 1
   autoInitializeOnStart: 0
   showUI: 1
   windowRect:
@@ -300,6 +299,9 @@ MonoBehaviour:
   compositionButtons: []
   autoShowCompositionsFromController: 1
   autoShowLayerControls: 1
+  testPersonId: 1
+  testPrefabType: 1
+  autoInitStateManager: 1
   logOperations: 1
 --- !u!4 &43570056
 Transform:
@@ -1005,17 +1007,6 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 2.23, y: 2.74}
   m_EdgeRadius: 0
---- !u!114 &327948622 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 5540068380807553075, guid: 05234a69a8ffea648af4da48217a29fc, type: 3}
-  m_PrefabInstance: {fileID: 185174478}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 60ee02cbe6949d7408cd1459d1dfa416, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &346253683
 GameObject:
   m_ObjectHideFlags: 0
@@ -2641,6 +2632,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e2d4d7902fc250947a2cd5dea93b5b42, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  entityId: 
   interactHint: {fileID: 1879658183}
   enterText: "\u6559\u7EC3\u7684\u8336\u676F"
   enterButtonText: "\u6309 E \u62FE\u53D6"
@@ -2949,6 +2941,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f094edb9c01a20b43a1d19427f9ded31, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  entityId: 
   interactHint: {fileID: 719805927}
   enterText: "\u4F60\u597D\u554A\u81ED\u5C0F\u5B50\uFF0C\u6709\u6CA1\u6709\u5174\u8DA3\u804A\u804A"
   enterButtonText: "\u6309 E \u4EA4\u4E92"
@@ -2959,9 +2952,7 @@ MonoBehaviour:
   interactionType: 0
   hintOnlyText: "\u6709\u6CA1\u6709\u80C6\u91CF\u53BB\u6311\u6218\u62F3\u738B\uFF1F"
   hintOnlyButtonText: "\u597D\u5427"
-  dialogueFileName: dialogues/npc_001.csv
-  startId: 1
-  autoAdvanceFirstLine: 1
+  startDialogId: 1
 --- !u!114 &1756637505 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 288248707596478797, guid: 7f2b4cc40ac313947a3f43421676553a, type: 3}
@@ -3067,6 +3058,100 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+--- !u!1 &1778317940
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1778317943}
+  - component: {fileID: 1778317942}
+  - component: {fileID: 1778317941}
+  m_Layer: 3
+  m_Name: Teleporter_To_Gym
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1778317941
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1778317940}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0a81e67fedfcebc469866af7e2ba7178, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  entityId: lounge_teleporter_gym
+  targetMapName: 
+  targetEntrance: {x: 0, y: 0}
+  targetSceneName: Scene_Underground_Boxing_Gym
+--- !u!61 &1778317942
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1778317940}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0, y: 0}
+    oldSize: {x: 0, y: 0}
+    newSize: {x: 0, y: 0}
+    adaptiveTilingThreshold: 0
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  serializedVersion: 2
+  m_Size: {x: 1, y: 1}
+  m_EdgeRadius: 0
+--- !u!4 &1778317943
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1778317940}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 3, y: -3.26, z: 0}
+  m_LocalScale: {x: 1, y: 2, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1879658180
 GameObject:
   m_ObjectHideFlags: 0
@@ -3149,8 +3234,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0a81e67fedfcebc469866af7e2ba7178, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  entityId: 
   targetMapName: Staff Lounge
   targetEntrance: {x: 6, y: -4}
+  targetSceneName: 
 --- !u!61 &1886808619
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -3203,7 +3290,7 @@ SpriteRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1886808617}
-  m_Enabled: 0
+  m_Enabled: 1
   m_CastShadows: 0
   m_ReceiveShadows: 0
   m_DynamicOccludee: 1
@@ -3393,8 +3480,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0a81e67fedfcebc469866af7e2ba7178, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  entityId: 
   targetMapName: Underground Boxing Gym
   targetEntrance: {x: -7, y: -4}
+  targetSceneName: 
 --- !u!61 &2002129718
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -3447,7 +3536,7 @@ SpriteRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2002129715}
-  m_Enabled: 0
+  m_Enabled: 1
   m_CastShadows: 0
   m_ReceiveShadows: 0
   m_DynamicOccludee: 1
@@ -7166,6 +7255,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 102ea0668200b1749ab18a3f38d676ec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  entityId: 
   interactHint: {fileID: 1215063496}
   enterText: "\u81ED\u81ED\u7684\u9A6C\u6876\u91CC\u4F1A\u4E0D\u4F1A\u53D1\u73B0\u5B9D\u85CF"
   enterButtonText: "\u6309 E \u63A2\u7D22"
@@ -7682,3 +7772,4 @@ SceneRoots:
   - {fileID: 49997215}
   - {fileID: 609264624}
   - {fileID: 43570056}
+  - {fileID: 1778317943}

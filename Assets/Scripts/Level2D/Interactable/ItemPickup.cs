@@ -6,14 +6,16 @@ public class ItemPickup : SimpleInteractionObject
     [SerializeField] private string itemId;
     [SerializeField] private bool destroyOnPickup = true;
 
+    private const int StatePickedUp = 2;
+
     public string ItemId => itemId;
 
     protected override void ExecuteInteraction()
     {
         Debug.Log($"获得了道具: {itemId}");
 
-        // TODO: 接入背包系统
-        // InventorySystem.Instance.AddItem(itemId);
+        if (!string.IsNullOrEmpty(EntityId))
+            EntityConfigLoader.OnEntityInteracted(EntityId, StatePickedUp);
 
         if (destroyOnPickup)
         {

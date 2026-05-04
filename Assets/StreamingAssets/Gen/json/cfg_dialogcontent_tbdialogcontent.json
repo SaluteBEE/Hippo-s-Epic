@@ -28,7 +28,7 @@
     "content": "想到这里一股无名怒火从你心里开始燃起，你的拳头给出了一个提议：“一拳打在他脸上！趁他两只手都在口袋里！”",
     "sortid": 3,
     "statename1": "think1",
-    "statename2": "angry",
+    "statename2": "idle",
     "slotstateid1": 0,
     "slotstateid2": 2001
   },
@@ -49,7 +49,7 @@
     "type": 0,
     "content": "你开始用右手酝酿自己的决心，是的，该向世界展示下你自己的伟大了。",
     "sortid": 5,
-    "statename1": "talk",
+    "statename1": "think1",
     "statename2": "idle",
     "slotstateid1": 0,
     "slotstateid2": 0
@@ -71,7 +71,7 @@
     "type": 2,
     "content": "我知道他们会说什么，哦，教练，哦···",
     "sortid": 7,
-    "statename1": "think2",
+    "statename1": "idle",
     "statename2": "talk",
     "slotstateid1": 0,
     "slotstateid2": 0
@@ -93,8 +93,8 @@
     "type": 2,
     "content": "但是我说这是一场溃败，现在已经没有多余的牙齿用了，真的已经完全找不见了。",
     "sortid": 9,
-    "statename1": "think3",
-    "statename2": "angry",
+    "statename1": "idle",
+    "statename2": "talk",
     "slotstateid1": 0,
     "slotstateid2": 2001
   },
@@ -104,8 +104,8 @@
     "type": 2,
     "content": "哦！哦，操，哦，哦，不，哦······",
     "sortid": 1,
-    "statename1": "",
-    "statename2": "",
+    "statename1": "idle",
+    "statename2": "angry",
     "slotstateid1": 0,
     "slotstateid2": 0
   },
@@ -115,8 +115,8 @@
     "type": 2,
     "content": "操你，唉，为什么！我是说，<color=red>嗯？</color>",
     "sortid": 2,
-    "statename1": "",
-    "statename2": "",
+    "statename1": "idle",
+    "statename2": "angry",
     "slotstateid1": 0,
     "slotstateid2": 0
   },
@@ -126,8 +126,8 @@
     "type": 2,
     "content": "新的参赛者！新的参赛者！",
     "sortid": 3,
-    "statename1": "",
-    "statename2": "",
+    "statename1": "idle",
+    "statename2": "talk",
     "slotstateid1": 0,
     "slotstateid2": 0
   },
@@ -137,8 +137,8 @@
     "type": 2,
     "content": "教练朝拳台方向大喊，你好像不该揍他这一拳的，现在后悔还来得及吗？",
     "sortid": 4,
-    "statename1": "",
-    "statename2": "",
+    "statename1": "think1",
+    "statename2": "idle",
     "slotstateid1": 0,
     "slotstateid2": 0
   },
@@ -148,8 +148,8 @@
     "type": 2,
     "content": "你绝对可以终结他的九连胜，我说真的，我上次吃到这么重的一拳还是在9年前。",
     "sortid": 5,
-    "statename1": "",
-    "statename2": "",
+    "statename1": "idle",
+    "statename2": "talk",
     "slotstateid1": 0,
     "slotstateid2": 0
   },
@@ -159,8 +159,8 @@
     "type": 2,
     "content": "我带你了解更多",
     "sortid": 6,
-    "statename1": "",
-    "statename2": "",
+    "statename1": "idle",
+    "statename2": "talk",
     "slotstateid1": 0,
     "slotstateid2": 0
   },
@@ -170,8 +170,8 @@
     "type": 2,
     "content": "是吗，那跳够了再来找我吧，记得别搞到台子上了，否则他们非让你吃回去不可。",
     "sortid": 1,
-    "statename1": "",
-    "statename2": "",
+    "statename1": "idle",
+    "statename2": "talk",
     "slotstateid1": 0,
     "slotstateid2": 0
   },
@@ -181,8 +181,8 @@
     "type": 2,
     "content": "是吗，我觉得至少不应该是9，不过我建议你藏好这个秘密，9之后的数字或许会在朋克城引起恐慌。",
     "sortid": 1,
-    "statename1": "",
-    "statename2": "",
+    "statename1": "idle",
+    "statename2": "talk",
     "slotstateid1": 0,
     "slotstateid2": 0
   },
@@ -513,8 +513,8 @@
     "sortid": 7,
     "statename1": "idle",
     "statename2": "",
-    "slotstateid1": 1,
-    "slotstateid2": 2
+    "slotstateid1": 0,
+    "slotstateid2": 0
   },
   {
     "id": 407,
@@ -524,7 +524,7 @@
     "sortid": 8,
     "statename1": "talk",
     "statename2": "",
-    "slotstateid1": 3,
-    "slotstateid2": 1
+    "slotstateid1": 0,
+    "slotstateid2": 0
   }
 ]

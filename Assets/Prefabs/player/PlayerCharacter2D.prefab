@@ -177,7 +177,7 @@ MonoBehaviour:
   MoveSpeed: 2.5
   interactionLayerMask:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 8
 --- !u!1001 &1600078727430105017
 PrefabInstance:
   m_ObjectHideFlags: 0

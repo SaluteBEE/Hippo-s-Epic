@@ -21,7 +21,7 @@ public class MapManager : MonoBehaviour
     {
         if (sceneMaps == null || sceneMaps.Length == 0)
         {
-            Debug.LogError("[MapManager] sceneMaps is empty.");
+            Debug.LogWarning("[MapManager] sceneMaps is empty, skipping map initialization.");
             return;
         }
 
