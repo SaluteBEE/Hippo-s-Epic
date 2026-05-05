@@ -59,23 +59,8 @@ MonoBehaviour:
     m_SerializedLabels:
     - ui_prefab
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 58205cf4c4e4fd245892ff403f4fe1c1
-    m_Address: dialog_images/test_red
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: f9e8667ecbb2b724e873f090ec933cf8
-    m_Address: dialog_images/test_blue
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 34ea404ffb23c3947bd4f8fe1c27d038
-    m_Address: dialog_images/test_green
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 42ef8ac3fc53d694f9147560df7ef491
-    m_Address: backgrounds/test_bg
+  - m_GUID: 6c87d922910b4e548b72984c8551337b
+    m_Address: backgrounds/catchdog
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

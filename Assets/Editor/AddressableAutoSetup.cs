@@ -19,8 +19,8 @@ public static class AddressableAutoSetup
 
         int added = 0;
 
-        added += SetupDirectory(settings, group, "Assets/Backgrounds", "backgrounds");
-        added += SetupDirectory(settings, group, "Assets/DialogImages", "dialog_images");
+        added += SetupDirectory(settings, group, "Assets/Art/Backgrounds", "backgrounds");
+        added += SetupDirectory(settings, group, "Assets/Art/DialogImages", "dialog_images");
 
         settings.SetDirty(AddressableAssetSettings.ModificationEvent.EntryMoved, null, true);
         AssetDatabase.SaveAssets();
