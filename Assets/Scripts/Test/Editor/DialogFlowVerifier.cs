@@ -41,17 +41,17 @@ public class DialogFlowVerifier
         sb.AppendLine("\n===== 对话C: 嵌套 ID=300 — 选2(转身离开) =====");
         WalkWithChoices(sb, tables, 300, new[] { 1 });
 
-        sb.AppendLine("\n===== 原始 ID=1 — 选1(跳舞→回选项) =====");
-        WalkWithChoices(sb, tables, 1, new[] { 0 });
+        sb.AppendLine("\n===== 原始 ID=1001001 — 选1(跳舞→回选项) =====");
+        WalkWithChoices(sb, tables, 1001001, new[] { 0 });
 
-        sb.AppendLine("\n===== 原始 ID=1 — 选2(一拳打脸→结束) =====");
-        WalkWithChoices(sb, tables, 1, new[] { 1 });
+        sb.AppendLine("\n===== 原始 ID=1001001 — 选2(一拳打脸→结束) =====");
+        WalkWithChoices(sb, tables, 1001001, new[] { 1 });
 
-        sb.AppendLine("\n===== 原始 ID=1 — 选3(9之后是10→回选项) =====");
-        WalkWithChoices(sb, tables, 1, new[] { 2 });
+        sb.AppendLine("\n===== 原始 ID=1001001 — 选3(9之后是10→回选项) =====");
+        WalkWithChoices(sb, tables, 1001001, new[] { 2 });
 
-        sb.AppendLine("\n===== 原始 ID=1 — 选1→选2(跳舞后一拳) =====");
-        WalkWithChoices(sb, tables, 1, new[] { 0, 1 });
+        sb.AppendLine("\n===== 原始 ID=1001001 — 选1→选2(跳舞后一拳) =====");
+        WalkWithChoices(sb, tables, 1001001, new[] { 0, 1 });
 
         foreach (var line in sb.ToString().Split('\n'))
             Debug.Log(line.TrimEnd('\r'));

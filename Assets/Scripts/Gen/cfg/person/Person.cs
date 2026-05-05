@@ -25,6 +25,7 @@ public sealed partial class Person : Luban.BeanBase
         Prefab2 = _buf.ReadString();
         {int n0 = _buf.ReadSize(); BuffIds = new System.Collections.Generic.List<int>(n0);for(var i0 = 0 ; i0 < n0 ; i0++) { int _e0;  _e0 = _buf.ReadInt(); BuffIds.Add(_e0);}}
         {int n0 = _buf.ReadSize(); Animconfigs = new System.Collections.Generic.List<string>(n0);for(var i0 = 0 ; i0 < n0 ; i0++) { string _e0;  _e0 = _buf.ReadString(); Animconfigs.Add(_e0);}}
+        Avatar = _buf.ReadString();
     }
 
     public static Person DeserializePerson(ByteBuf _buf)
@@ -69,6 +70,7 @@ public sealed partial class Person : Luban.BeanBase
     /// 动画配置名(对应prefab1|prefab2)
     /// </summary>
     public readonly System.Collections.Generic.List<string> Animconfigs;
+    public readonly string Avatar;
    
     public const int __ID__ = 944002084;
     public override int GetTypeId() => __ID__;
@@ -92,6 +94,7 @@ public sealed partial class Person : Luban.BeanBase
         + "prefab2:" + Prefab2 + ","
         + "buffIds:" + Luban.StringUtil.CollectionToString(BuffIds) + ","
         + "animconfigs:" + Luban.StringUtil.CollectionToString(Animconfigs) + ","
+        + "avatar:" + Avatar + ","
         + "}";
     }
 }

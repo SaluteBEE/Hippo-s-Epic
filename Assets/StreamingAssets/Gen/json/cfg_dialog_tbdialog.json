@@ -1,9 +1,9 @@
 [
   {
-    "id": 1,
+    "id": 1001001,
     "type": 1,
     "param1": [
-      2
+      1001002
     ],
     "param2": "",
     "selection_name": "",
@@ -11,23 +11,23 @@
     "speakerid2": 2
   },
   {
-    "id": 2,
+    "id": 1001002,
     "type": 2,
     "param1": [
-      3,
-      4,
-      5
+      1001003,
+      1001004,
+      1001005
     ],
-    "param2": "",
+    "param2": "1|2|1",
     "selection_name": "",
     "speakerid1": 1,
     "speakerid2": 2
   },
   {
-    "id": 3,
+    "id": 1001003,
     "type": 1,
     "param1": [
-      2
+      1001002
     ],
     "param2": "",
     "selection_name": "我是来患上一种病叫查尔斯顿狂<br>热，然后一直跳舞跳到屎尿横流为止",
@@ -35,7 +35,7 @@
     "speakerid2": 2
   },
   {
-    "id": 4,
+    "id": 1001004,
     "type": 1,
     "param1": [],
     "param2": "",
@@ -44,10 +44,10 @@
     "speakerid2": 2
   },
   {
-    "id": 5,
+    "id": 1001005,
     "type": 1,
     "param1": [
-      2
+      1001002
     ],
     "param2": "",
     "selection_name": "9之后的数字应该是10。",

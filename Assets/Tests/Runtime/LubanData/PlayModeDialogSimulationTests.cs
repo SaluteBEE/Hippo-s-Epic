@@ -28,7 +28,7 @@ class PlayModeDialogSimulationTests
     [Test]
     public void Dialog_SpeakerNames_Correct()
     {
-        var dialog = tables.TbDialog.Get(1);
+        var dialog = tables.TbDialog.Get(1001001);
         var speaker1 = tables.TbPerson.Get(dialog.Speakerid1);
         var speaker2 = tables.TbPerson.Get(dialog.Speakerid2);
         Assert.AreEqual("河马", speaker1.Name);
@@ -39,7 +39,7 @@ class PlayModeDialogSimulationTests
     public void DialogContent_ByDialogId_SortedBySortid()
     {
         var contents = tables.TbDialogcontent.DataList
-            .Where(d => d.Dialogid == 1)
+            .Where(d => d.Dialogid == 1001001)
             .OrderBy(d => d.Sortid).ToList();
         Assert.AreEqual(9, contents.Count);
         Assert.AreEqual(1, contents[0].Sortid);
@@ -56,16 +56,16 @@ class PlayModeDialogSimulationTests
     [Test]
     public void Dialog_BranchType_HasMultipleParams()
     {
-        var dialog = tables.TbDialog.Get(2);
+        var dialog = tables.TbDialog.Get(1001002);
         Assert.AreEqual(2, dialog.Type);
         Assert.AreEqual(3, dialog.Param1.Count);
-        CollectionAssert.AreEqual(new List<int> { 3, 4, 5 }, dialog.Param1);
+        CollectionAssert.AreEqual(new List<int> { 1001003, 1001004, 1001005 }, dialog.Param1);
     }
 
     [Test]
     public void Dialog_LinearType_SingleParam()
     {
-        var dialog = tables.TbDialog.Get(1);
+        var dialog = tables.TbDialog.Get(1001001);
         Assert.AreEqual(1, dialog.Type);
         Assert.AreEqual(1, dialog.Param1.Count);
     }
@@ -73,17 +73,17 @@ class PlayModeDialogSimulationTests
     [Test]
     public void SimulateDialogFlow_StartToEnd()
     {
-        var dialog1 = tables.TbDialog.Get(1);
+        var dialog1 = tables.TbDialog.Get(1001001);
         Assert.AreEqual(1, dialog1.Type);
-        Assert.AreEqual(2, dialog1.Param1[0]);
+        Assert.AreEqual(1001002, dialog1.Param1[0]);
 
         var contents1 = tables.TbDialogcontent.DataList
-            .Where(d => d.Dialogid == 1)
+            .Where(d => d.Dialogid == 1001001)
             .OrderBy(d => d.Sortid).ToList();
         Assert.AreEqual(9, contents1.Count);
 
         var nextDialogId = dialog1.Param1[0];
-        Assert.AreEqual(2, nextDialogId);
+        Assert.AreEqual(1001002, nextDialogId);
 
         var dialog2 = tables.TbDialog.Get(nextDialogId);
         Assert.AreEqual(2, dialog2.Type);
@@ -95,6 +95,6 @@ class PlayModeDialogSimulationTests
 
         var contents3 = tables.TbDialogcontent.DataList
             .Where(d => d.Dialogid == dialog3.Id).ToList();
-        Assert.AreEqual(1, contents3.Count);
+        Assert.AreEqual(2, contents3.Count);
     }
 }

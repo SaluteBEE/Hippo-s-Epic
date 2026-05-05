@@ -38,7 +38,7 @@ class RefResolveTests
             Assert.IsNotNull(dialog.Speakerid2_Ref,
                 $"Dialog {dialog.Id} Speakerid2_Ref 不应为 null");
         }
-        var d1 = tables.TbDialog.Get(1);
+        var d1 = tables.TbDialog.Get(1001001);
         Assert.AreEqual("河马", d1.Speakerid1_Ref.Name);
         Assert.AreEqual("教练", d1.Speakerid2_Ref.Name);
     }

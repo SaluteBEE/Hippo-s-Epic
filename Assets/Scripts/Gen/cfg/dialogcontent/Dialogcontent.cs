@@ -26,6 +26,13 @@ public sealed partial class Dialogcontent : Luban.BeanBase
         Statename2 = _buf.ReadString();
         Slotstateid1 = _buf.ReadInt();
         Slotstateid2 = _buf.ReadInt();
+        RightSlot1Personid = _buf.ReadInt();
+        RightSlot1Image = _buf.ReadString();
+        RightSlot2Personid = _buf.ReadInt();
+        RightSlot2Image = _buf.ReadString();
+        RightSlot3Personid = _buf.ReadInt();
+        RightSlot3Image = _buf.ReadString();
+        Background = _buf.ReadString();
     }
 
     public static Dialogcontent DeserializeDialogcontent(ByteBuf _buf)
@@ -70,6 +77,13 @@ public sealed partial class Dialogcontent : Luban.BeanBase
     /// 说话人2插槽状态外键
     /// </summary>
     public readonly int Slotstateid2;
+    public readonly int RightSlot1Personid;
+    public readonly string RightSlot1Image;
+    public readonly int RightSlot2Personid;
+    public readonly string RightSlot2Image;
+    public readonly int RightSlot3Personid;
+    public readonly string RightSlot3Image;
+    public readonly string Background;
    
     public const int __ID__ = 780059274;
     public override int GetTypeId() => __ID__;
@@ -91,6 +105,13 @@ public sealed partial class Dialogcontent : Luban.BeanBase
         + "statename2:" + Statename2 + ","
         + "slotstateid1:" + Slotstateid1 + ","
         + "slotstateid2:" + Slotstateid2 + ","
+        + "rightSlot1Personid:" + RightSlot1Personid + ","
+        + "rightSlot1Image:" + RightSlot1Image + ","
+        + "rightSlot2Personid:" + RightSlot2Personid + ","
+        + "rightSlot2Image:" + RightSlot2Image + ","
+        + "rightSlot3Personid:" + RightSlot3Personid + ","
+        + "rightSlot3Image:" + RightSlot3Image + ","
+        + "background:" + Background + ","
         + "}";
     }
 }

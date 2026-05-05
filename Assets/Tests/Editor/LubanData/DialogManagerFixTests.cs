@@ -55,7 +55,7 @@ class DialogManagerFixTests
     [Test]
     public void StartDialog_NoSubscriber_PlaysDirectly()
     {
-        _mgr.StartDialog(1);
+        _mgr.StartDialog(1001001);
         Assert.AreEqual(DialogState.Playing, _mgr.State);
         Assert.AreEqual(1, _contentLog.Count, "无 OnDialogStart 订阅者时应直接播放第一条");
     }
@@ -63,10 +63,10 @@ class DialogManagerFixTests
     [Test]
     public void StartDialog_NoSubscriber_AllContentPlayable()
     {
-        _mgr.StartDialog(1);
+        _mgr.StartDialog(1001001);
         for (int i = 1; i < 9; i++)
             _mgr.Advance();
-        Assert.AreEqual(9, _contentLog.Count, "Dialog 1 应有 9 条内容全部可播放");
+        Assert.AreEqual(9, _contentLog.Count, "Dialog 1001001 应有 9 条内容全部可播放");
     }
 
     #endregion
@@ -76,7 +76,7 @@ class DialogManagerFixTests
     [Test]
     public void StartDialog_WhilePlaying_EndsPreviousFirst()
     {
-        _mgr.StartDialog(1);
+        _mgr.StartDialog(1001001);
         _mgr.StartDialog(100);
         Assert.AreEqual(1, _dialogEndedCount, "重新开始对话时应触发 OnDialogEnded");
         Assert.AreEqual(DialogState.Playing, _mgr.State);
@@ -85,7 +85,7 @@ class DialogManagerFixTests
     [Test]
     public void StartDialog_WhilePlaying_ClearsOldContent()
     {
-        _mgr.StartDialog(1);
+        _mgr.StartDialog(1001001);
         _mgr.StartDialog(100);
         _contentLog.Clear();
         _mgr.Advance();
@@ -95,11 +95,11 @@ class DialogManagerFixTests
     [Test]
     public void StartDialog_9Advances_ReachesOptions()
     {
-        _mgr.StartDialog(1);
+        _mgr.StartDialog(1001001);
         int safety = 30;
         while (_mgr.State == DialogState.Playing && _optionsLog.Count == 0 && safety-- > 0)
             _mgr.Advance();
-        Assert.AreEqual(DialogState.Playing, _mgr.State, "Dialog 1 播完应进入选项");
+        Assert.AreEqual(DialogState.Playing, _mgr.State, "Dialog 1001001 播完应进入选项");
         Assert.AreEqual(1, _optionsLog.Count);
     }
 
@@ -111,7 +111,7 @@ class DialogManagerFixTests
     public void StartDialog_WithSubscriber_WaitsForNotify()
     {
         _mgr.OnDialogStart += (s1, s2) => _dialogStartLog.Add((s1, s2));
-        _mgr.StartDialog(1);
+        _mgr.StartDialog(1001001);
 
         Assert.AreEqual(0, _contentLog.Count, "有订阅者时应等待");
         Assert.AreEqual(1, _dialogStartLog.Count);
@@ -139,7 +139,7 @@ class DialogManagerFixTests
     public void ChooseOption_SameSpeakers_NoExtraDialogStart()
     {
         _mgr.OnDialogStart += (s1, s2) => _dialogStartLog.Add((s1, s2));
-        _mgr.StartDialog(1);
+        _mgr.StartDialog(1001001);
         _mgr.NotifyCharactersReady();
         int safety = 30;
         while (_mgr.State == DialogState.Playing && _optionsLog.Count == 0 && safety-- > 0)
@@ -261,7 +261,7 @@ class DialogManagerFixTests
     [Test]
     public void ChooseOption_InvalidIndex_DoesNotThrow()
     {
-        _mgr.StartDialog(1);
+        _mgr.StartDialog(1001001);
         Assert.DoesNotThrow(() => _mgr.ChooseOption(-1));
         Assert.DoesNotThrow(() => _mgr.ChooseOption(99));
     }
@@ -276,7 +276,7 @@ class DialogManagerFixTests
     [Test]
     public void ChooseOption_OnLinearDialog_Ignored()
     {
-        _mgr.StartDialog(1);
+        _mgr.StartDialog(1001001);
         int before = _contentLog.Count;
         _mgr.ChooseOption(0);
         Assert.AreEqual(before, _contentLog.Count);
@@ -285,7 +285,7 @@ class DialogManagerFixTests
     [Test]
     public void ChooseOption_OnOptionDialog_Transitions()
     {
-        _mgr.StartDialog(1);
+        _mgr.StartDialog(1001001);
         int safety = 30;
         while (_mgr.State == DialogState.Playing && _optionsLog.Count == 0 && safety-- > 0)
             _mgr.Advance();
@@ -301,7 +301,7 @@ class DialogManagerFixTests
     [Test]
     public void Advance_WhileEnded_Ignored()
     {
-        _mgr.StartDialog(4);
+        _mgr.StartDialog(1001004);
         int safety = 30;
         while (_mgr.State == DialogState.Playing && safety-- > 0)
             _mgr.Advance();
@@ -321,12 +321,12 @@ class DialogManagerFixTests
     public void PlayNextContent_FiresEmotion_WhenStatenamePresent()
     {
         var contents = _tables.TbDialogcontent.DataList
-            .Where(c => c.Dialogid == 1).OrderBy(c => c.Sortid).ToList();
+            .Where(c => c.Dialogid == 1001001).OrderBy(c => c.Sortid).ToList();
         bool hasStatename = contents.Any(c =>
             !string.IsNullOrEmpty(c.Statename1) || !string.IsNullOrEmpty(c.Statename2));
         if (!hasStatename) Assert.Pass("无 statename 数据，跳过");
 
-        _mgr.StartDialog(1);
+        _mgr.StartDialog(1001001);
         Assert.Greater(_emotionLog.Count, 0, "有 statename 应触发 OnEmotion");
     }
 
@@ -334,11 +334,11 @@ class DialogManagerFixTests
     public void PlayNextContent_FiresSlotState_WhenSlotstateidNonZero()
     {
         var contents = _tables.TbDialogcontent.DataList
-            .Where(c => c.Dialogid == 1).OrderBy(c => c.Sortid).ToList();
+            .Where(c => c.Dialogid == 1001001).OrderBy(c => c.Sortid).ToList();
         bool hasSlotState = contents.Any(c => c.Slotstateid1 != 0 || c.Slotstateid2 != 0);
         if (!hasSlotState) Assert.Pass("无 slotstateid 数据，跳过");
 
-        _mgr.StartDialog(1);
+        _mgr.StartDialog(1001001);
         int safety = 30;
         while (_mgr.State == DialogState.Playing && _slotStateLog.Count == 0 && safety-- > 0)
             _mgr.Advance();
@@ -353,14 +353,14 @@ class DialogManagerFixTests
     [Test]
     public void EndDialog_CanRestartNewDialog()
     {
-        _mgr.StartDialog(4);
+        _mgr.StartDialog(1001004);
         int safety = 30;
         while (_mgr.State == DialogState.Playing && safety-- > 0)
             _mgr.Advance();
         Assert.AreEqual(DialogState.Ended, _mgr.State);
 
         _contentLog.Clear();
-        _mgr.StartDialog(1);
+        _mgr.StartDialog(1001001);
         Assert.AreEqual(DialogState.Playing, _mgr.State);
         Assert.AreEqual(1, _contentLog.Count, "结束后应能重新开始");
     }
@@ -370,9 +370,9 @@ class DialogManagerFixTests
     #region 完整流程
 
     [Test]
-    public void FullFlow_Dialog1_Choose1_ReturnsToOptions()
+    public void FullFlow_Dialog1001001_Choose1_ReturnsToOptions()
     {
-        _mgr.StartDialog(1);
+        _mgr.StartDialog(1001001);
         int safety = 30;
         while (_mgr.State == DialogState.Playing && _optionsLog.Count == 0 && safety-- > 0)
             _mgr.Advance();
@@ -385,13 +385,13 @@ class DialogManagerFixTests
         safety = 30;
         while (_mgr.State == DialogState.Playing && _optionsLog.Count == 0 && safety-- > 0)
             _mgr.Advance();
-        Assert.AreEqual(1, _optionsLog.Count, "分支3播完应回到选项");
+        Assert.AreEqual(1, _optionsLog.Count, "分支1001003播完应回到选项");
     }
 
     [Test]
-    public void FullFlow_Dialog1_Choose2_Ends()
+    public void FullFlow_Dialog1001001_Choose2_Ends()
     {
-        _mgr.StartDialog(1);
+        _mgr.StartDialog(1001001);
         int safety = 30;
         while (_mgr.State == DialogState.Playing && _optionsLog.Count == 0 && safety-- > 0)
             _mgr.Advance();

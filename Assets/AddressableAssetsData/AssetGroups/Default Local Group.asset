@@ -59,6 +59,21 @@ MonoBehaviour:
     m_SerializedLabels:
     - ui_prefab
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 58205cf4c4e4fd245892ff403f4fe1c1
+    m_Address: dialog_images/test_red
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f9e8667ecbb2b724e873f090ec933cf8
+    m_Address: dialog_images/test_blue
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 34ea404ffb23c3947bd4f8fe1c27d038
+    m_Address: dialog_images/test_green
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: dd90b6ecff8020e40aa537a3ddf43594, type: 2}
   m_SchemaSet:

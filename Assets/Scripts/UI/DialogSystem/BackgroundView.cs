@@ -10,7 +10,7 @@ public sealed class BackgroundView : MonoBehaviour
     [SerializeField] private string addressableRoot = "backgrounds";
 
     private readonly Dictionary<string, Sprite> _cache = new Dictionary<string, Sprite>();
-    private readonly Dictionary<string, AsyncOperationHandle<Sprite>> _handles = new Dictionary<string, AsyncOperationHandle<Sprite>>();
+    private readonly Dictionary<string, AsyncOperationHandle<Texture2D>> _handles = new Dictionary<string, AsyncOperationHandle<Texture2D>>();
 
     public async void Apply(string normalizedName)
     {
@@ -28,24 +28,31 @@ public sealed class BackgroundView : MonoBehaviour
         if (_handles.TryGetValue(key, out var existing))
         {
             if (!existing.IsDone) return;
-            sp = existing.Result;
+            sp = CreateSprite(existing.Result, key);
         }
         else
         {
-            var handle = Addressables.LoadAssetAsync<Sprite>(address);
+            var handle = Addressables.LoadAssetAsync<Texture2D>(address);
             _handles[key] = handle;
             await handle.Task;
-            sp = handle.Status == AsyncOperationStatus.Succeeded ? handle.Result : null;
+            if (handle.Status != AsyncOperationStatus.Succeeded || handle.Result == null)
+            {
+                Debug.LogWarning($"[BackgroundView] 未找到背景图：{address}");
+                return;
+            }
+            sp = CreateSprite(handle.Result, key);
         }
 
-        if (sp == null)
-        {
-            Debug.LogWarning($"[BackgroundView] 未找到背景图：{address}");
-            return;
-        }
+        if (sp == null) return;
 
         _cache[key] = sp;
         target.sprite = sp;
+    }
+
+    private Sprite CreateSprite(Texture2D tex, string key)
+    {
+        if (tex == null) return null;
+        return Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f), 100f, 0u, SpriteMeshType.FullRect);
     }
 
     private void OnDestroy()

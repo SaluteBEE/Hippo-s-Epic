@@ -52,20 +52,49 @@ public sealed class ChatBubbleOptionView : MonoBehaviour
 
         if (texts.Length > 0 && !string.IsNullOrEmpty(texts[0]))
         {
-            op1Button.onClick.AddListener(() => onChoose?.Invoke(0));
-            op1eButton.onClick.AddListener(() => onChoose?.Invoke(0));
+            if (op1.activeInHierarchy)
+                op1Button.onClick.AddListener(() => onChoose?.Invoke(0));
+            else if (op1e.activeInHierarchy)
+                op1eButton.onClick.AddListener(() => onChoose?.Invoke(0));
         }
 
         if (texts.Length > 1 && !string.IsNullOrEmpty(texts[1]))
         {
-            op2Button.onClick.AddListener(() => onChoose?.Invoke(1));
-            op2eButton.onClick.AddListener(() => onChoose?.Invoke(1));
+            if (op2.activeInHierarchy)
+                op2Button.onClick.AddListener(() => onChoose?.Invoke(1));
+            else if (op2e.activeInHierarchy)
+                op2eButton.onClick.AddListener(() => onChoose?.Invoke(1));
         }
 
         if (texts.Length > 2 && !string.IsNullOrEmpty(texts[2]))
         {
-            op3Button.onClick.AddListener(() => onChoose?.Invoke(2));
-            op3eButton.onClick.AddListener(() => onChoose?.Invoke(2));
+            if (op3.activeInHierarchy)
+                op3Button.onClick.AddListener(() => onChoose?.Invoke(2));
+            else if (op3e.activeInHierarchy)
+                op3eButton.onClick.AddListener(() => onChoose?.Invoke(2));
+        }
+
+        ApplyHalfHeight();
+    }
+
+    private void ApplyHalfHeight()
+    {
+        var rectTransform = (RectTransform)transform;
+        LayoutRebuilder.ForceRebuildLayoutImmediate(rectTransform);
+
+        var fitter = GetComponent<ContentSizeFitter>();
+        if (fitter != null && fitter.enabled)
+        {
+            float fullHeight = rectTransform.rect.height;
+            fitter.enabled = false;
+
+            float halfHeight = fullHeight / 2f;
+            rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, halfHeight);
+
+            var layoutElement = GetComponent<LayoutElement>();
+            if (layoutElement == null)
+                layoutElement = gameObject.AddComponent<LayoutElement>();
+            layoutElement.preferredHeight = halfHeight;
         }
     }
 

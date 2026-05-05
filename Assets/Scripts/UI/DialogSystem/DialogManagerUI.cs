@@ -18,6 +18,8 @@ public class DialogManagerUI : MonoBehaviour
     private PointerEventData _pointerEventData;
     private ScrollRect _scrollRect;
     private RectTransform _scrollViewRect;
+    private bool _blockAdvance;
+    private bool _optionChosen;
 
     public void Initialize(
         RectTransform contentRect,
@@ -38,12 +40,10 @@ public class DialogManagerUI : MonoBehaviour
     }
 
     private DialogManager _dialogManager;
-    private DialogCharacterManager _characterManager;
 
     private void OnEnable()
     {
         _dialogManager = ManagerRegistry.Get<DialogManager>();
-        _characterManager = ManagerRegistry.Get<DialogCharacterManager>();
         if (_dialogManager == null) return;
 
         _dialogManager.OnContent += OnContent;
@@ -64,6 +64,13 @@ public class DialogManagerUI : MonoBehaviour
     {
         if (_dialogManager == null) return;
         if (_dialogManager.State != DialogState.Playing) return;
+
+        if (_blockAdvance)
+        {
+            _blockAdvance = false;
+            return;
+        }
+
         if (!IsClickOrTapBegan()) return;
         if (IsPointerOverButtonOrSelectable()) return;
         if (!IsPointerOverScrollView()) return;
@@ -73,6 +80,8 @@ public class DialogManagerUI : MonoBehaviour
 
     private void OnOptions(List<OptionInfo> options)
     {
+        _optionChosen = false;
+
         var opBubble = Instantiate(optionBubblePrefab, chatContent);
 
         var texts = new string[options.Count];
@@ -80,14 +89,21 @@ public class DialogManagerUI : MonoBehaviour
         for (int i = 0; i < options.Count; i++)
         {
             texts[i] = options[i].Text;
-            extends[i] = "";
+            extends[i] = options[i].FirstContentType == 0 ? "narrator" : "";
         }
 
         opBubble.Bind(texts, extends, index =>
         {
-            opBubble.gameObject.SetActive(false);
+            if (_optionChosen) return;
+            _optionChosen = true;
+            _blockAdvance = true;
+
             RemoveFromTints(opBubble.gameObject);
-            Destroy(opBubble.gameObject);
+            DestroyImmediate(opBubble.gameObject);
+
+            LayoutRebuilder.ForceRebuildLayoutImmediate(chatContent);
+            ScrollToBottom();
+
             _dialogManager.ChooseOption(index);
         });
 
@@ -126,7 +142,9 @@ public class DialogManagerUI : MonoBehaviour
     private void OnDialogEnded()
     {
         ClearAllBubbles();
-        _characterManager?.CleanupDynamicCharacters();
+        var uiManager = ManagerRegistry.Get<UIManager>();
+        if (uiManager != null && uiManager.IsOpen<DialogWindow>())
+            uiManager.Close<DialogWindow>();
     }
 
     private void MarkAsLatest(GameObject bubbleRoot)

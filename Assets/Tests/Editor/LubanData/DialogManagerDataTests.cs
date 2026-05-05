@@ -13,10 +13,10 @@ class DialogManagerDataTests
     }
 
     [Test]
-    public void Dialog_Id1_NineContents_SortedCorrectly()
+    public void Dialog_1001001_NineContents_SortedCorrectly()
     {
         var contents = tables.TbDialogcontent.DataList
-            .Where(c => c.Dialogid == 1)
+            .Where(c => c.Dialogid == 1001001)
             .OrderBy(c => c.Sortid).ToList();
 
         Assert.AreEqual(9, contents.Count);
@@ -25,10 +25,10 @@ class DialogManagerDataTests
     }
 
     [Test]
-    public void Dialog_Id1_ContentTypes_MixOfNarrationAndDialogue()
+    public void Dialog_1001001_ContentTypes_MixOfNarrationAndDialogue()
     {
         var contents = tables.TbDialogcontent.DataList
-            .Where(c => c.Dialogid == 1)
+            .Where(c => c.Dialogid == 1001001)
             .OrderBy(c => c.Sortid).ToList();
 
         int narration = contents.Count(c => c.Type == 0);
@@ -39,17 +39,17 @@ class DialogManagerDataTests
     }
 
     [Test]
-    public void Dialog_Id1_NormalType_NextDialogIs2()
+    public void Dialog_1001001_NormalType_NextDialogIs1001002()
     {
-        var dialog = tables.TbDialog.Get(1);
+        var dialog = tables.TbDialog.Get(1001001);
         Assert.AreEqual(1, dialog.Type);
-        Assert.AreEqual(new List<int> { 2 }, dialog.Param1);
+        Assert.AreEqual(new List<int> { 1001002 }, dialog.Param1);
     }
 
     [Test]
-    public void Dialog_Id2_OptionType_ThreeBranches()
+    public void Dialog_1001002_OptionType_ThreeBranches()
     {
-        var dialog = tables.TbDialog.Get(2);
+        var dialog = tables.TbDialog.Get(1001002);
         Assert.AreEqual(2, dialog.Type);
         Assert.AreEqual(3, dialog.Param1.Count);
 
@@ -61,45 +61,45 @@ class DialogManagerDataTests
     }
 
     [Test]
-    public void Dialog_Branch3_SelectionNameNotEmpty()
+    public void Dialog_Branch1001003_SelectionNameNotEmpty()
     {
-        var dialog = tables.TbDialog.Get(3);
+        var dialog = tables.TbDialog.Get(1001003);
         Assert.IsNotEmpty(dialog.SelectionName, "选项 Dialog 应有 SelectionName");
     }
 
     [Test]
-    public void Dialog_Branch4_SelectionNameNotEmpty()
+    public void Dialog_Branch1001004_SelectionNameNotEmpty()
     {
-        var dialog = tables.TbDialog.Get(4);
+        var dialog = tables.TbDialog.Get(1001004);
         Assert.IsNotEmpty(dialog.SelectionName);
     }
 
     [Test]
-    public void Dialog_Branch5_SelectionNameNotEmpty()
+    public void Dialog_Branch1001005_SelectionNameNotEmpty()
     {
-        var dialog = tables.TbDialog.Get(5);
+        var dialog = tables.TbDialog.Get(1001005);
         Assert.IsNotEmpty(dialog.SelectionName);
     }
 
     [Test]
-    public void Dialog_Branch4_EmptyParam1_IsTerminal()
+    public void Dialog_Branch1001004_EmptyParam1_IsTerminal()
     {
-        var dialog = tables.TbDialog.Get(4);
-        Assert.AreEqual(0, dialog.Param1.Count, "Dialog 4 无跳转目标，应为终端节点");
+        var dialog = tables.TbDialog.Get(1001004);
+        Assert.AreEqual(0, dialog.Param1.Count, "Dialog 1001004 无跳转目标，应为终端节点");
     }
 
     [Test]
-    public void Dialog_Branch3_Param1PointsTo2()
+    public void Dialog_Branch1001003_Param1PointsTo1001002()
     {
-        var dialog = tables.TbDialog.Get(3);
-        Assert.AreEqual(new List<int> { 2 }, dialog.Param1);
+        var dialog = tables.TbDialog.Get(1001003);
+        Assert.AreEqual(new List<int> { 1001002 }, dialog.Param1);
     }
 
     [Test]
-    public void Dialog_Branch5_Param1PointsTo2()
+    public void Dialog_Branch1001005_Param1PointsTo1001002()
     {
-        var dialog = tables.TbDialog.Get(5);
-        Assert.AreEqual(new List<int> { 2 }, dialog.Param1);
+        var dialog = tables.TbDialog.Get(1001005);
+        Assert.AreEqual(new List<int> { 1001002 }, dialog.Param1);
     }
 
     [Test]
@@ -115,9 +115,9 @@ class DialogManagerDataTests
     }
 
     [Test]
-    public void Dialog_Id1_Speaker1IsHippo_Speaker2IsCoach()
+    public void Dialog_1001001_Speaker1IsHippo_Speaker2IsCoach()
     {
-        var dialog = tables.TbDialog.Get(1);
+        var dialog = tables.TbDialog.Get(1001001);
         Assert.AreEqual("河马", dialog.Speakerid1_Ref.Name);
         Assert.AreEqual("教练", dialog.Speakerid2_Ref.Name);
     }
@@ -141,9 +141,9 @@ class DialogManagerDataTests
     [Test]
     public void Dialog_FullFlow_LinearPath_DataIntegrity()
     {
-        var dialog1 = tables.TbDialog.Get(1);
+        var dialog1 = tables.TbDialog.Get(1001001);
         var contents1 = tables.TbDialogcontent.DataList
-            .Where(c => c.Dialogid == 1).OrderBy(c => c.Sortid).ToList();
+            .Where(c => c.Dialogid == 1001001).OrderBy(c => c.Sortid).ToList();
         Assert.AreEqual(9, contents1.Count);
 
         int nextId = dialog1.Param1[0];
@@ -157,7 +157,7 @@ class DialogManagerDataTests
 
         var contents3 = tables.TbDialogcontent.DataList
             .Where(c => c.Dialogid == dialog3.Id).ToList();
-        Assert.AreEqual(1, contents3.Count);
+        Assert.AreEqual(2, contents3.Count);
     }
 
     [Test]

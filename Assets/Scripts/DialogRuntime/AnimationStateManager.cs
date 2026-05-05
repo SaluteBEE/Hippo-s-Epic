@@ -176,8 +176,6 @@ public class AnimationStateManager : MonoBehaviour
             return;
 
         var animState = FindAnimState(personId, stateName, prefabType);
-        if (animState == null)
-            animState = FindAnimState(personId, stateName, 0);
 
         if (animState == null)
         {
@@ -197,8 +195,33 @@ public class AnimationStateManager : MonoBehaviour
 
     private Animationstate FindAnimState(int personId, string stateName, int prefabType)
     {
-        _animStateIndex.TryGetValue((personId, stateName, prefabType), out var result);
-        return result;
+        if (_animStateIndex.TryGetValue((personId, stateName, prefabType), out var result))
+            return result;
+
+        if (prefabType != 0)
+        {
+            if (_animStateIndex.TryGetValue((personId, stateName, 0), out result))
+                return result;
+        }
+
+        foreach (var kvp in _animStateIndex)
+        {
+            if (kvp.Key.Item1 == personId && kvp.Key.Item3 == prefabType
+                && kvp.Value.Statename.StartsWith(stateName))
+            {
+                return kvp.Value;
+            }
+        }
+
+        foreach (var kvp in _animStateIndex)
+        {
+            if (kvp.Key.Item1 == personId && kvp.Key.Item3 == prefabType)
+            {
+                return kvp.Value;
+            }
+        }
+
+        return null;
     }
 
     #endregion

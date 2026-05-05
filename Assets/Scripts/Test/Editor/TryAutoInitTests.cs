@@ -286,7 +286,7 @@ public class TryAutoInitTests
         _cleanup.Add(dm.gameObject);
 
         UnityEngine.TestTools.LogAssert.Expect(LogType.Error, "[DialogManager] Tables 未初始化");
-        dm.StartDialog(1);
+        dm.StartDialog(1001001);
         Assert.AreEqual(DialogState.Idle, dm.State,
             "_tables 为 null 时 State 应保持 Idle");
     }

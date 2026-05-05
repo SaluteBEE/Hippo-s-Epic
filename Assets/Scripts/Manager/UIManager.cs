@@ -12,6 +12,8 @@ public class UIManager : MonoBehaviour
 
     private void Awake()
     {
+        ManagerRegistry.Register(this);
+
         if (rootCanvas == null)
             rootCanvas = GetComponentInChildren<Canvas>(true);
 
@@ -22,13 +24,17 @@ public class UIManager : MonoBehaviour
         {
             if (window == null) continue;
 
-            var type = window.GetType();
+            var instance = !window.gameObject.scene.IsValid()
+                ? Instantiate(window, rootCanvas.transform, false)
+                : window;
+
+            var type = instance.GetType();
             if (windowMap.ContainsKey(type)) continue;
 
-            windowMap.Add(type, window);
+            windowMap.Add(type, instance);
 
-            PlaceWindow(window);
-            window.gameObject.SetActive(false);
+            PlaceWindow(instance);
+            instance.gameObject.SetActive(false);
         }
     }
 
@@ -42,13 +48,14 @@ public class UIManager : MonoBehaviour
 
         PlaceWindow(window);
 
+        window.gameObject.SetActive(true);
+
         if (!createdSet.Contains(typeof(T)))
         {
             window.OnCreate(args);
             createdSet.Add(typeof(T));
         }
 
-        window.gameObject.SetActive(true);
         window.OnOpen(args);
         return (T)window;
     }
@@ -72,6 +79,11 @@ public class UIManager : MonoBehaviour
         if (windowMap.TryGetValue(typeof(T), out var window))
             return (T)window;
         return null;
+    }
+
+    private void OnDestroy()
+    {
+        ManagerRegistry.Unregister<UIManager>();
     }
 
     private void PlaceWindow(UIWindow window)

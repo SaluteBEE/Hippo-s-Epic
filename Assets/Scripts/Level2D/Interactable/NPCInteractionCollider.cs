@@ -16,7 +16,7 @@ public class NPCInteractionCollider : SimpleInteractionObject
     [SerializeField] private string hintOnlyButtonText = "好吧";
 
     [Header("Dialogue")]
-    [SerializeField] private int startDialogId = 1;
+    [SerializeField] private int startDialogId = 1001001;
 
     private const int StateDialogDone = 1;
 
@@ -51,6 +51,10 @@ public class NPCInteractionCollider : SimpleInteractionObject
         afterExecuteText = "";
         afterExecuteButtonText = "";
 
-        ManagerRegistry.GetOrCreate<DialogManager>()?.StartDialog(startDialogId);
+        var uiManager = ManagerRegistry.Get<UIManager>();
+        if (uiManager != null)
+        {
+            uiManager.Open<DialogWindow>(startDialogId);
+        }
     }
 }

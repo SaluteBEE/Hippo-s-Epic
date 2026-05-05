@@ -1,127 +1,72 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.AddressableAssets;
-using UnityEngine.ResourceManagement.AsyncOperations;
-using UnityEngine.UI;
 
 public class DialogTestLauncher : MonoBehaviour
 {
     [Header("测试配置")]
-    [SerializeField] private int startDialogId = 1;
+    [SerializeField] private int startDialogId = 1001001;
     [SerializeField] private bool autoStart = true;
 
     private DataTableManager _dataTable;
     private DialogManager _dialogManager;
     private AnimationStateManager _stateMgr;
     private DialogCharacterManager _charMgr;
-    private DialogManagerUI _dialogUI;
     private string _statusText = "等待初始化...";
 
-    private static readonly int[] TestDialogIds = { 1, 100, 200, 300, 400 };
+    private static readonly int[] TestDialogIds = { 1001001, 100, 200, 300, 400 };
     private static readonly string[] TestDialogNames =
     {
-        "1: 原始对话（选项循环）",
+        "1001001: 原始对话（选项循环）",
         "100: 线性对话（自动推进）",
         "200: 循环选项（可回退）",
         "300: 嵌套选项（多层分支）",
         "400: 纯旁白（无角色）"
     };
     private int _currentTestIndex;
+    private bool _initialized;
 
     private void Awake()
     {
-        var dtObj = new GameObject("DataTableManager");
-        dtObj.transform.SetParent(transform);
-        _dataTable = dtObj.AddComponent<DataTableManager>();
-        _dataTable.LoadTables();
+        _dataTable = ManagerRegistry.Get<DataTableManager>();
+        if (_dataTable == null)
+        {
+            var dtObj = new GameObject("DataTableManager");
+            dtObj.transform.SetParent(transform);
+            _dataTable = dtObj.AddComponent<DataTableManager>();
+        }
+        if (!_dataTable.IsLoaded)
+            _dataTable.LoadTables();
 
-        var dmObj = new GameObject("DialogManager");
-        dmObj.transform.SetParent(transform);
-        _dialogManager = dmObj.AddComponent<DialogManager>();
+        _dialogManager = ManagerRegistry.Get<DialogManager>();
+        if (_dialogManager == null)
+        {
+            var dmObj = new GameObject("DialogManager");
+            dmObj.transform.SetParent(transform);
+            _dialogManager = dmObj.AddComponent<DialogManager>();
+        }
         _dialogManager.SetTables(_dataTable.Tables);
-
         _dialogManager.OnOptions += OnOptions;
         _dialogManager.OnDialogEnded += OnDialogEnded;
 
-        var smObj = new GameObject("AnimationStateManager");
-        smObj.transform.SetParent(transform);
-        _stateMgr = smObj.AddComponent<AnimationStateManager>();
+        _stateMgr = ManagerRegistry.Get<AnimationStateManager>();
+        if (_stateMgr == null)
+        {
+            var smObj = new GameObject("AnimationStateManager");
+            smObj.transform.SetParent(transform);
+            _stateMgr = smObj.AddComponent<AnimationStateManager>();
+        }
         _stateMgr.SetTables(_dataTable.Tables);
 
-        var cmObj = new GameObject("DialogCharacterManager");
-        cmObj.transform.SetParent(transform);
-        _charMgr = cmObj.AddComponent<DialogCharacterManager>();
-
-        StartCoroutine(SetupCanvasCoroutine());
-    }
-
-    private IEnumerator SetupCanvasCoroutine()
-    {
-        var canvasObj = new GameObject("DialogCanvas");
-        canvasObj.transform.SetParent(transform);
-        var canvas = canvasObj.AddComponent<Canvas>();
-        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-        canvas.sortingOrder = 100;
-        var scaler = canvasObj.AddComponent<CanvasScaler>();
-        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-        scaler.referenceResolution = new Vector2(1920, 1080);
-        canvasObj.AddComponent<GraphicRaycaster>();
-
-        var panelHandle = Addressables.LoadAssetAsync<GameObject>("ui/DialoguePanel");
-        yield return panelHandle;
-        if (panelHandle.Status != AsyncOperationStatus.Succeeded)
+        _charMgr = ManagerRegistry.Get<DialogCharacterManager>();
+        if (_charMgr == null)
         {
-            Debug.LogError($"[DialogTestLauncher] 未找到 DialoguePanel：{panelHandle.OperationException}");
-            yield break;
+            var cmObj = new GameObject("DialogCharacterManager");
+            cmObj.transform.SetParent(transform);
+            _charMgr = cmObj.AddComponent<DialogCharacterManager>();
         }
-
-        var panel = Instantiate(panelHandle.Result, canvasObj.transform, false);
-        panel.name = "DialoguePanel";
-
-        var panelRect = panel.GetComponent<RectTransform>();
-        panelRect.anchorMin = new Vector2(0.15f, 0.08f);
-        panelRect.anchorMax = new Vector2(0.85f, 1f);
-        panelRect.offsetMin = Vector2.zero;
-        panelRect.offsetMax = Vector2.zero;
-
-        var content = panel.transform.Find("Scroll View/Viewport/Content");
-        if (content == null)
-        {
-            Debug.LogError("[DialogTestLauncher] 未找到 Content 节点");
-            yield break;
-        }
-
-        var leftHandle = Addressables.LoadAssetAsync<GameObject>("ui/BubbleLeft");
-        var middleHandle = Addressables.LoadAssetAsync<GameObject>("ui/BubbleMiddle");
-        var rightHandle = Addressables.LoadAssetAsync<GameObject>("ui/BubbleRight");
-        var optionHandle = Addressables.LoadAssetAsync<GameObject>("ui/BubbleOption");
-        yield return leftHandle;
-        yield return middleHandle;
-        yield return rightHandle;
-        yield return optionHandle;
-
-        DestroyExistingBubbles(content);
-
-        _dialogUI = panel.AddComponent<DialogManagerUI>();
-        _dialogUI.Initialize(
-            content as RectTransform,
-            leftHandle.Result.GetComponent<ChatBubbleLeftView>(),
-            middleHandle.Result.GetComponent<ChatBubbleMiddleView>(),
-            rightHandle.Result.GetComponent<ChatBubbleRightView>(),
-            optionHandle.Result.GetComponent<ChatBubbleOptionView>()
-        );
-
         _charMgr.Initialize(_dataTable.Tables);
 
-        if (autoStart)
-            StartDialog();
-    }
-
-    private void DestroyExistingBubbles(Transform content)
-    {
-        for (int i = content.childCount - 1; i >= 0; i--)
-            Destroy(content.GetChild(i).gameObject);
+        _initialized = true;
     }
 
     private void Start()
@@ -132,7 +77,7 @@ public class DialogTestLauncher : MonoBehaviour
 
         Debug.Log($"[DialogTestLauncher] 初始化完成, 当前对话ID={startDialogId}, autoStart={autoStart}");
 
-        if (autoStart && _dialogUI != null)
+        if (autoStart)
             StartDialog();
     }
 
@@ -148,24 +93,11 @@ public class DialogTestLauncher : MonoBehaviour
 
     private void Update()
     {
+        if (!_initialized) return;
         if (_searchFocused) return;
 
         if (Input.GetKeyDown(KeyCode.Space))
-        {
-            if (_dialogManager.State == DialogState.Idle
-                || _dialogManager.State == DialogState.Ended)
-            {
-                StartDialog();
-            }
-            else
-            {
-                _dialogManager.Advance();
-            }
-        }
-
-        if (Input.GetKeyDown(KeyCode.Alpha1)) _dialogManager.ChooseOption(0);
-        if (Input.GetKeyDown(KeyCode.Alpha2)) _dialogManager.ChooseOption(1);
-        if (Input.GetKeyDown(KeyCode.Alpha3)) _dialogManager.ChooseOption(2);
+            StartDialog();
 
         if (Input.GetKeyDown(KeyCode.Tab))
             SwitchToNextTest();
@@ -178,9 +110,20 @@ public class DialogTestLauncher : MonoBehaviour
 
     private void StartDialog()
     {
+        if (_dialogManager.State == DialogState.Playing)
+            _dialogManager.ForceEndDialog();
+
         _statusText = "对话进行中...";
-        Debug.Log($"[DialogTestLauncher] 开始对话 ID={startDialogId}");
-        _dialogManager.StartDialog(startDialogId);
+
+        var uiManager = ManagerRegistry.Get<UIManager>();
+        if (uiManager != null)
+        {
+            uiManager.Open<DialogWindow>(startDialogId);
+        }
+        else
+        {
+            _dialogManager.StartDialog(startDialogId);
+        }
     }
 
     private void SwitchToNextTest()
@@ -188,6 +131,7 @@ public class DialogTestLauncher : MonoBehaviour
         _currentTestIndex = (_currentTestIndex + 1) % TestDialogIds.Length;
         startDialogId = TestDialogIds[_currentTestIndex];
         _statusText = $"切换到测试对话: {TestDialogNames[_currentTestIndex]}";
+        StartDialog();
     }
 
     private void SwitchTest(int delta)
@@ -195,6 +139,7 @@ public class DialogTestLauncher : MonoBehaviour
         _currentTestIndex = (_currentTestIndex + delta + TestDialogIds.Length) % TestDialogIds.Length;
         startDialogId = TestDialogIds[_currentTestIndex];
         _statusText = $"切换到测试对话: {TestDialogNames[_currentTestIndex]}";
+        StartDialog();
     }
 
     private void OnOptions(List<OptionInfo> options)
@@ -239,7 +184,7 @@ public class DialogTestLauncher : MonoBehaviour
         GUILayout.Space(2);
         GUILayout.Label($"状态: {_dialogManager.State}  |  {_statusText}", _labelStyle);
         GUILayout.Space(2);
-        GUILayout.Label("Space=推进/重开 | 1/2/3=选项 | Tab/左右=切换对话", _labelStyle);
+        GUILayout.Label("Space=重开 | Tab/左右=切换对话", _labelStyle);
 
         GUILayout.Space(4);
         GUILayout.BeginHorizontal();

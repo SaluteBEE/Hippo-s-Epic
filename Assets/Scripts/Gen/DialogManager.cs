@@ -22,6 +22,9 @@ public class DialogManager : MonoBehaviour
     public event Action OnDialogEnded;
     public event Action<int, string> OnEmotion;
     public event Action<int, int> OnSlotState;
+    public event Action<cfg.cfg.dialogcontent.Dialogcontent> OnRightSlotUpdate;
+    public event Action<string> OnBackgroundChange;
+    public event Action<string> OnSpeakerAvatar;
 
     private cfg.Tables _tables;
     private Queue<Dialogcontent> _contentQueue;
@@ -30,6 +33,9 @@ public class DialogManager : MonoBehaviour
     private int _transitionDepth;
     private bool _endingDialog;
     private const int MaxTransitionDepth = 50;
+
+    public int CurrentSpeakerId1 => _currentDialog?.Speakerid1 ?? 0;
+    public int CurrentSpeakerId2 => _currentDialog?.Speakerid2 ?? 0;
 
     private void Awake()
     {
@@ -98,10 +104,17 @@ public class DialogManager : MonoBehaviour
         PlayCurrentDialog();
     }
 
+    public void ForceEndDialog()
+    {
+        if (State != DialogState.Playing) return;
+        EndDialog();
+    }
+
     public void Advance()
     {
         if (State != DialogState.Playing) return;
         if (_waitingCharacters) return;
+        if (_currentDialog != null && _currentDialog.Type == 2) return;
 
         if (_contentQueue != null && _contentQueue.Count > 0)
         {
@@ -193,6 +206,15 @@ public class DialogManager : MonoBehaviour
         var dialog = _currentDialog;
         if (dialog == null) return;
 
+        int speakerId = side == SpeakerSide.Left ? dialog.Speakerid1
+            : side == SpeakerSide.Right ? dialog.Speakerid2 : 0;
+        if (speakerId != 0)
+        {
+            var person = _tables.TbPerson.GetOrDefault(speakerId);
+            if (person != null && !string.IsNullOrEmpty(person.Avatar))
+                OnSpeakerAvatar?.Invoke(person.Avatar);
+        }
+
         if (!string.IsNullOrEmpty(content.Statename1) && dialog.Speakerid1 != 0)
             OnEmotion?.Invoke(dialog.Speakerid1, content.Statename1);
 
@@ -203,6 +225,11 @@ public class DialogManager : MonoBehaviour
             OnSlotState?.Invoke(dialog.Speakerid1, content.Slotstateid1);
         if (content.Slotstateid2 != 0 && dialog.Speakerid2 != 0)
             OnSlotState?.Invoke(dialog.Speakerid2, content.Slotstateid2);
+
+        OnRightSlotUpdate?.Invoke(content);
+
+        if (!string.IsNullOrEmpty(content.Background))
+            OnBackgroundChange?.Invoke(content.Background);
     }
 
     private void ProcessCurrentDialogFlow()
@@ -230,10 +257,23 @@ public class DialogManager : MonoBehaviour
         {
             var child = _tables.TbDialog.GetOrDefault(childId);
             if (child != null)
-                options.Add(new OptionInfo(child.SelectionName, childId));
+            {
+                int firstContentType = GetFirstContentType(childId);
+                options.Add(new OptionInfo(child.SelectionName, childId, firstContentType));
+            }
         }
 
         OnOptions?.Invoke(options);
+    }
+
+    private int GetFirstContentType(int dialogId)
+    {
+        var first = _tables.TbDialogcontent.DataList
+            .Where(c => c.Dialogid == dialogId)
+            .OrderBy(c => c.Sortid)
+            .FirstOrDefault();
+
+        return first != null ? first.Type : 0;
     }
 
     private void EndDialog()

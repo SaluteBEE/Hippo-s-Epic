@@ -1,0 +1,56 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &1277004295956012417
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1033050930932966442}
+  - component: {fileID: 8822420684512519431}
+  m_Layer: 0
+  m_Name: DialogWindow
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1033050930932966442
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1277004295956012417}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 3.4735417, y: 3.4735417, z: 3.4735417}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -1280.0001, y: -720.7599}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &8822420684512519431
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1277004295956012417}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 098e7ebf4479ca945a98e781bda3ce1b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dialoguePanelPrefab: {fileID: 3589138466992030107, guid: d9f082591a7dd534d8201345555b871d, type: 3}
+  bubbleLeftPrefab: {fileID: 8826630810653325897, guid: ab105f16188c31b4a8edfcd8de2fe12f, type: 3}
+  bubbleMiddlePrefab: {fileID: 3205640052348488924, guid: c73df702408772b42b68a4b0d89e3205, type: 3}
+  bubbleRightPrefab: {fileID: 1025996837880895856, guid: cbba89dd17a70de4e83ec9117ea420e3, type: 3}
+  bubbleOptionPrefab: {fileID: 792435845803747672, guid: 5e0861a17eabd3a4db06b3cfc207ce42, type: 3}
+  dialogCameraRootPrefab: {fileID: 1392027774241261853, guid: 50f3289f4bcdb4c48932defb3daf3d23, type: 3}

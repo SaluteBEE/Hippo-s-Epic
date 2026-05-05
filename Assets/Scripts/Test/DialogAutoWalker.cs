@@ -39,9 +39,9 @@ public class DialogAutoWalker : MonoBehaviour
         _testQueue.Enqueue(() => RunChoices("===== 对话C: 嵌套 ID=300 (选1→选1关于拳王) =====", 300, new[] { 0, 0 }));
         _testQueue.Enqueue(() => RunChoices("===== 对话C: 嵌套 ID=300 (选1→选2关于小镇) =====", 300, new[] { 0, 1 }));
         _testQueue.Enqueue(() => RunChoices("===== 对话C: 嵌套 ID=300 (选2转身离开) =====", 300, new[] { 1 }));
-        _testQueue.Enqueue(() => RunChoices("===== 原始 ID=1 (选1跳舞) =====", 1, new[] { 0 }));
-        _testQueue.Enqueue(() => RunChoices("===== 原始 ID=1 (选2一拳) =====", 1, new[] { 1 }));
-        _testQueue.Enqueue(() => RunChoices("===== 原始 ID=1 (选3→9之后是10) =====", 1, new[] { 2 }));
+        _testQueue.Enqueue(() => RunChoices("===== 原始 ID=1001001 (选1跳舞) =====", 1001001, new[] { 0 }));
+        _testQueue.Enqueue(() => RunChoices("===== 原始 ID=1001001 (选2一拳) =====", 1001001, new[] { 1 }));
+        _testQueue.Enqueue(() => RunChoices("===== 原始 ID=1001001 (选3→9之后是10) =====", 1001001, new[] { 2 }));
 
         NextTest();
     }

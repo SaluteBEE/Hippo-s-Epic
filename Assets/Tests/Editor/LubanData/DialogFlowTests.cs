@@ -13,9 +13,9 @@ class DialogFlowTests
     }
 
     [Test]
-    public void StartDialog_Id1_PlaysNineContents_InSortOrder()
+    public void StartDialog_1001001_PlaysNineContents_InSortOrder()
     {
-        var contents = GetSortedContents(1);
+        var contents = GetSortedContents(1001001);
         Assert.AreEqual(9, contents.Count);
 
         for (int i = 0; i < contents.Count; i++)
@@ -23,35 +23,35 @@ class DialogFlowTests
     }
 
     [Test]
-    public void StartDialog_Id1_ContentTypes_NarrationAndDialogue()
+    public void StartDialog_1001001_ContentTypes_NarrationAndDialogue()
     {
-        var contents = GetSortedContents(1);
+        var contents = GetSortedContents(1001001);
 
-        Assert.AreEqual(SpeakerSide.Middle, ResolveSide(contents[0], tables.TbDialog.Get(1)), "sortid=1 应为旁白");
-        Assert.AreEqual(SpeakerSide.Middle, ResolveSide(contents[1], tables.TbDialog.Get(1)), "sortid=2 应为旁白");
-        Assert.AreEqual(SpeakerSide.Middle, ResolveSide(contents[2], tables.TbDialog.Get(1)), "sortid=3 应为旁白");
+        Assert.AreEqual(SpeakerSide.Middle, ResolveSide(contents[0], tables.TbDialog.Get(1001001)), "sortid=1 应为旁白");
+        Assert.AreEqual(SpeakerSide.Middle, ResolveSide(contents[1], tables.TbDialog.Get(1001001)), "sortid=2 应为旁白");
+        Assert.AreEqual(SpeakerSide.Middle, ResolveSide(contents[2], tables.TbDialog.Get(1001001)), "sortid=3 应为旁白");
     }
 
     [Test]
-    public void Dialog_Id1_AfterContents_NextDialogIsId2()
+    public void Dialog_1001001_AfterContents_NextDialogIs1001002()
     {
-        var dialog = tables.TbDialog.Get(1);
+        var dialog = tables.TbDialog.Get(1001001);
         Assert.AreEqual(1, dialog.Type);
-        Assert.AreEqual(2, dialog.Param1[0]);
+        Assert.AreEqual(1001002, dialog.Param1[0]);
     }
 
     [Test]
-    public void Dialog_Id2_IsOptionType_WithThreeBranches()
+    public void Dialog_1001002_IsOptionType_WithThreeBranches()
     {
-        var dialog = tables.TbDialog.Get(2);
+        var dialog = tables.TbDialog.Get(1001002);
         Assert.AreEqual(2, dialog.Type);
         Assert.AreEqual(3, dialog.Param1.Count);
     }
 
     [Test]
-    public void Dialog_Id2_Options_HaveSelectionNames()
+    public void Dialog_1001002_Options_HaveSelectionNames()
     {
-        var dialog = tables.TbDialog.Get(2);
+        var dialog = tables.TbDialog.Get(1001002);
 
         foreach (int childId in dialog.Param1)
         {
@@ -62,35 +62,35 @@ class DialogFlowTests
     }
 
     [Test]
-    public void Dialog_ChooseBranch3_PlaysContentThenReturnsTo2()
+    public void Dialog_ChooseBranch1001003_PlaysContentThenReturnsTo1001002()
     {
-        var dialog3 = tables.TbDialog.Get(3);
+        var dialog3 = tables.TbDialog.Get(1001003);
         Assert.AreEqual(1, dialog3.Type);
         Assert.AreEqual(1, dialog3.Param1.Count);
-        Assert.AreEqual(2, dialog3.Param1[0], "分支3播放完后应回到Dialog 2");
+        Assert.AreEqual(1001002, dialog3.Param1[0], "分支1001003播放完后应回到Dialog 1001002");
 
-        var contents = GetSortedContents(3);
-        Assert.AreEqual(1, contents.Count, "Dialog 3 应有1条副表内容");
+        var contents = GetSortedContents(1001003);
+        Assert.AreEqual(2, contents.Count, "Dialog 1001003 应有2条副表内容");
     }
 
     [Test]
-    public void Dialog_ChooseBranch4_IsTerminal()
+    public void Dialog_ChooseBranch1001004_IsTerminal()
     {
-        var dialog4 = tables.TbDialog.Get(4);
-        Assert.AreEqual(0, dialog4.Param1.Count, "Dialog 4 无跳转，应为终端");
+        var dialog4 = tables.TbDialog.Get(1001004);
+        Assert.AreEqual(0, dialog4.Param1.Count, "Dialog 1001004 无跳转，应为终端");
 
-        var contents = GetSortedContents(4);
-        Assert.AreEqual(6, contents.Count, "Dialog 4 应有6条副表内容");
+        var contents = GetSortedContents(1001004);
+        Assert.AreEqual(7, contents.Count, "Dialog 1001004 应有7条副表内容");
     }
 
     [Test]
-    public void Dialog_ChooseBranch5_PlaysContentThenReturnsTo2()
+    public void Dialog_ChooseBranch1001005_PlaysContentThenReturnsTo1001002()
     {
-        var dialog5 = tables.TbDialog.Get(5);
-        Assert.AreEqual(2, dialog5.Param1[0], "分支5播放完后应回到Dialog 2");
+        var dialog5 = tables.TbDialog.Get(1001005);
+        Assert.AreEqual(1001002, dialog5.Param1[0], "分支1001005播放完后应回到Dialog 1001002");
 
-        var contents = GetSortedContents(5);
-        Assert.AreEqual(1, contents.Count);
+        var contents = GetSortedContents(1001005);
+        Assert.AreEqual(2, contents.Count);
     }
 
     [Test]
@@ -121,13 +121,13 @@ class DialogFlowTests
     [Test]
     public void DialogFlow_FullSimulation_LinearPath()
     {
-        var contents1 = GetSortedContents(1);
+        var contents1 = GetSortedContents(1001001);
         Assert.AreEqual(9, contents1.Count);
 
-        var dialog1 = tables.TbDialog.Get(1);
-        Assert.AreEqual(2, dialog1.Param1[0]);
+        var dialog1 = tables.TbDialog.Get(1001001);
+        Assert.AreEqual(1001002, dialog1.Param1[0]);
 
-        var dialog2 = tables.TbDialog.Get(2);
+        var dialog2 = tables.TbDialog.Get(1001002);
         Assert.AreEqual(2, dialog2.Type);
 
         int branchId = dialog2.Param1[0];
@@ -169,19 +169,19 @@ class DialogFlowTests
     }
 
     [Test]
-    public void Dialog_Id4_AllSixContents_AreDialogue()
+    public void Dialog_1001004_FirstContentIsNarration()
     {
-        var contents = GetSortedContents(4);
-        Assert.AreEqual(6, contents.Count);
-
-        foreach (var dc in contents)
-            Assert.AreEqual(2, dc.Type, $"Dialog4 副表 id={dc.Id} 应为对话(type=2)");
+        var contents = GetSortedContents(1001004);
+        Assert.AreEqual(7, contents.Count);
+        Assert.AreEqual(0, contents[0].Type, "第一条应为旁白(type=0)");
+        for (int i = 1; i < contents.Count; i++)
+            Assert.AreEqual(2, contents[i].Type, $"Dialog1001004 副表 id={contents[i].Id} 应为对话(type=2)");
     }
 
     [Test]
-    public void Dialog_Id4_Contents_SortedBySortid()
+    public void Dialog_1001004_Contents_SortedBySortid()
     {
-        var contents = GetSortedContents(4);
+        var contents = GetSortedContents(1001004);
         for (int i = 0; i < contents.Count - 1; i++)
             Assert.Less(contents[i].Sortid, contents[i + 1].Sortid);
     }
@@ -194,10 +194,10 @@ class DialogFlowTests
     }
 
     [Test]
-    public void DialogContent_NoContentForDialog2()
+    public void DialogContent_NoContentForDialog1001002()
     {
-        var contents = GetSortedContents(2);
-        Assert.AreEqual(0, contents.Count, "Dialog 2 是选项类型，不应有副表内容");
+        var contents = GetSortedContents(1001002);
+        Assert.AreEqual(0, contents.Count, "Dialog 1001002 是选项类型，不应有副表内容");
     }
 
     private List<cfg.cfg.dialogcontent.Dialogcontent> GetSortedContents(int dialogId)

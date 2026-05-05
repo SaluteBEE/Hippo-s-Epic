@@ -13,7 +13,8 @@
     "animconfigs": [
       "homo_talk",
       "homo_move"
-    ]
+    ],
+    "avatar": "avatar_hippo"
   },
   {
     "id": 2,
@@ -28,7 +29,8 @@
     ],
     "animconfigs": [
       "coach"
-    ]
+    ],
+    "avatar": "avatar_coach"
   },
   {
     "id": 3,
@@ -41,7 +43,8 @@
     "buffIds": [],
     "animconfigs": [
       "quanwang_bk"
-    ]
+    ],
+    "avatar": "avatar_quanwang"
   },
   {
     "id": 4,
@@ -54,7 +57,8 @@
     "buffIds": [],
     "animconfigs": [
       "npc_01"
-    ]
+    ],
+    "avatar": "avatar_mob1"
   },
   {
     "id": 5,
@@ -67,6 +71,7 @@
     "buffIds": [],
     "animconfigs": [
       "npc_02"
-    ]
+    ],
+    "avatar": "avatar_mob2"
   }
 ]

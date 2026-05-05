@@ -12,9 +12,9 @@ class DialogcontentDataTests
     }
 
     [Test]
-    public void Dialogcontent_Count_IsFortyEight()
+    public void Dialogcontent_Count_IsFiftyOne()
     {
-        Assert.AreEqual(48, tables.TbDialogcontent.DataList.Count);
+        Assert.AreEqual(51, tables.TbDialogcontent.DataList.Count);
     }
 
     [Test]
@@ -22,12 +22,12 @@ class DialogcontentDataTests
     {
         var dc = tables.TbDialogcontent.Get(1);
         Assert.AreEqual(1, dc.Id);
-        Assert.AreEqual(1, dc.Dialogid);
+        Assert.AreEqual(1001001, dc.Dialogid);
         Assert.AreEqual(0, dc.Type);
         Assert.AreEqual("教练双手揣在口袋里，假装自己是洛奇·巴尔博亚的教练米奇，或者是米老鼠，米老头，米什么玩意儿。", dc.Content);
         Assert.AreEqual(1, dc.Sortid);
-        Assert.AreEqual("", dc.Statename1);
-        Assert.AreEqual("", dc.Statename2);
+        Assert.AreEqual("idle", dc.Statename1);
+        Assert.AreEqual("idle", dc.Statename2);
     }
 
     [Test]
@@ -39,31 +39,31 @@ class DialogcontentDataTests
     }
 
     [Test]
-    public void Dialogcontent_ByDialogId1_CorrectCount()
+    public void Dialogcontent_ByDialogId1001001_CorrectCount()
     {
-        var contents = tables.TbDialogcontent.DataList.Where(d => d.Dialogid == 1).ToList();
+        var contents = tables.TbDialogcontent.DataList.Where(d => d.Dialogid == 1001001).ToList();
         Assert.AreEqual(9, contents.Count);
     }
 
     [Test]
-    public void Dialogcontent_ByDialogId4_CorrectCount()
+    public void Dialogcontent_ByDialogId1001004_CorrectCount()
     {
-        var contents = tables.TbDialogcontent.DataList.Where(d => d.Dialogid == 4).ToList();
-        Assert.AreEqual(6, contents.Count);
+        var contents = tables.TbDialogcontent.DataList.Where(d => d.Dialogid == 1001004).ToList();
+        Assert.AreEqual(7, contents.Count);
     }
 
     [Test]
-    public void Dialogcontent_ByDialogId3_CorrectCount()
+    public void Dialogcontent_ByDialogId1001003_CorrectCount()
     {
-        var contents = tables.TbDialogcontent.DataList.Where(d => d.Dialogid == 3).ToList();
-        Assert.AreEqual(1, contents.Count);
+        var contents = tables.TbDialogcontent.DataList.Where(d => d.Dialogid == 1001003).ToList();
+        Assert.AreEqual(2, contents.Count);
     }
 
     [Test]
-    public void Dialogcontent_ByDialogId5_CorrectCount()
+    public void Dialogcontent_ByDialogId1001005_CorrectCount()
     {
-        var contents = tables.TbDialogcontent.DataList.Where(d => d.Dialogid == 5).ToList();
-        Assert.AreEqual(1, contents.Count);
+        var contents = tables.TbDialogcontent.DataList.Where(d => d.Dialogid == 1001005).ToList();
+        Assert.AreEqual(2, contents.Count);
     }
 
     [Test]
