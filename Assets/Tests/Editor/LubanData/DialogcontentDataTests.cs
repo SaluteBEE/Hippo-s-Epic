@@ -12,9 +12,9 @@ class DialogcontentDataTests
     }
 
     [Test]
-    public void Dialogcontent_Count_IsFiftyOne()
+    public void Dialogcontent_Count_IsFiftySeven()
     {
-        Assert.AreEqual(51, tables.TbDialogcontent.DataList.Count);
+        Assert.AreEqual(57, tables.TbDialogcontent.DataList.Count);
     }
 
     [Test]

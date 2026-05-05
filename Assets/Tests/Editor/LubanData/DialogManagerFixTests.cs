@@ -7,7 +7,7 @@ class DialogManagerFixTests
     private DialogManager _mgr;
     private cfg.Tables _tables;
 
-    private List<(SpeakerSide side, string text, string speaker)> _contentLog;
+    private List<(SpeakerSide side, string text, string speaker, string gainItemText)> _contentLog;
     private List<List<OptionInfo>> _optionsLog;
     private List<(int speakerid1, int speakerid2)> _dialogStartLog;
     private int _dialogEndedCount;
@@ -28,14 +28,14 @@ class DialogManagerFixTests
 
         _mgr.SetTables(_tables);
 
-        _contentLog = new List<(SpeakerSide, string, string)>();
+        _contentLog = new List<(SpeakerSide, string, string, string)>();
         _optionsLog = new List<List<OptionInfo>>();
         _dialogStartLog = new List<(int, int)>();
         _dialogEndedCount = 0;
         _emotionLog = new List<(int, string)>();
         _slotStateLog = new List<(int, int)>();
 
-        _mgr.OnContent += (side, text, speaker) => _contentLog.Add((side, text, speaker));
+        _mgr.OnContent += (side, text, speaker, gainItemText) => _contentLog.Add((side, text, speaker, gainItemText));
         _mgr.OnOptions += opts => _optionsLog.Add(opts);
         _mgr.OnDialogEnded += () => _dialogEndedCount++;
         _mgr.OnEmotion += (pid, state) => _emotionLog.Add((pid, state));

@@ -25,6 +25,7 @@ public sealed partial class Dialog : Luban.BeanBase
         Speakerid1_Ref = null;
         Speakerid2 = _buf.ReadInt();
         Speakerid2_Ref = null;
+        GainItemId = _buf.ReadInt();
     }
 
     public static Dialog DeserializeDialog(ByteBuf _buf)
@@ -62,6 +63,10 @@ public sealed partial class Dialog : Luban.BeanBase
     /// </summary>
     public readonly int Speakerid2;
     public cfg.person.Person Speakerid2_Ref;
+    /// <summary>
+    /// 对话结束后获得的物品ID(0=无)
+    /// </summary>
+    public readonly int GainItemId;
    
     public const int __ID__ = -1404908348;
     public override int GetTypeId() => __ID__;
@@ -82,6 +87,7 @@ public sealed partial class Dialog : Luban.BeanBase
         + "selectionName:" + SelectionName + ","
         + "speakerid1:" + Speakerid1 + ","
         + "speakerid2:" + Speakerid2 + ","
+        + "gainItemId:" + GainItemId + ","
         + "}";
     }
 }

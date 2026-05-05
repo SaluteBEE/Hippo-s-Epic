@@ -99,7 +99,7 @@ public class DialogAutoWalker : MonoBehaviour
         _dialogManager.Advance();
     }
 
-    private void OnContent(SpeakerSide side, string text, string speaker)
+    private void OnContent(SpeakerSide side, string text, string speaker, string gainItemText)
     {
         string pos = side == SpeakerSide.Left ? "左" : side == SpeakerSide.Right ? "右" : "中";
         string prefix = string.IsNullOrEmpty(speaker) ? $"[{pos}]" : $"[{pos}-{speaker}]";

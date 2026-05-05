@@ -104,7 +104,7 @@ public class DialogCharacterManager : MonoBehaviour
         _prepareCoroutine = StartCoroutine(PrepareCharactersCoroutine(speakerid1, speakerid2, seq));
     }
 
-    private void OnContent(SpeakerSide side, string text, string speakerName)
+    private void OnContent(SpeakerSide side, string text, string speakerName, string gainItemText)
     {
         if (_renderer == null) return;
         if (side != SpeakerSide.Right) return;

@@ -17,7 +17,7 @@ public class DialogManager : MonoBehaviour
     public DialogState State { get; private set; } = DialogState.Idle;
 
     public event Action<int, int> OnDialogStart;
-    public event Action<SpeakerSide, string, string> OnContent;
+    public event Action<SpeakerSide, string, string, string> OnContent;
     public event Action<List<OptionInfo>> OnOptions;
     public event Action OnDialogEnded;
     public event Action<int, string> OnEmotion;
@@ -201,7 +201,7 @@ public class DialogManager : MonoBehaviour
         var side = ResolveSide(content);
         string speakerName = ResolveSpeakerName(content, side);
 
-        OnContent?.Invoke(side, content.Content, speakerName);
+        OnContent?.Invoke(side, content.Content, speakerName, content.GainItemText ?? "");
 
         var dialog = _currentDialog;
         if (dialog == null) return;

@@ -111,24 +111,24 @@ public class DialogManagerUI : MonoBehaviour
         ScrollToBottom();
     }
 
-    private void OnContent(SpeakerSide side, string text, string speakerName)
+    private void OnContent(SpeakerSide side, string text, string speakerName, string gainItemText)
     {
         GameObject bubbleRoot;
         switch (side)
         {
             case SpeakerSide.Left:
                 var leftBubble = Instantiate(leftBubblePrefab, chatContent);
-                leftBubble.SetText(text);
+                leftBubble.SetText(text, gainItemText);
                 bubbleRoot = leftBubble.gameObject;
                 break;
             case SpeakerSide.Right:
                 var rightBubble = Instantiate(rightBubblePrefab, chatContent);
-                rightBubble.SetText(text);
+                rightBubble.SetText(text, gainItemText);
                 bubbleRoot = rightBubble.gameObject;
                 break;
             default:
                 var middleBubble = Instantiate(middleBubblePrefab, chatContent);
-                middleBubble.SetText(text);
+                middleBubble.SetText(text, gainItemText);
                 bubbleRoot = middleBubble.gameObject;
                 break;
         }

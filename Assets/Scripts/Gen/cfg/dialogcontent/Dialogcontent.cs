@@ -33,6 +33,7 @@ public sealed partial class Dialogcontent : Luban.BeanBase
         RightSlot3Personid = _buf.ReadInt();
         RightSlot3Image = _buf.ReadString();
         Background = _buf.ReadString();
+        GainItemText = _buf.ReadString();
     }
 
     public static Dialogcontent DeserializeDialogcontent(ByteBuf _buf)
@@ -84,6 +85,10 @@ public sealed partial class Dialogcontent : Luban.BeanBase
     public readonly int RightSlot3Personid;
     public readonly string RightSlot3Image;
     public readonly string Background;
+    /// <summary>
+    /// 获得物品提示文本
+    /// </summary>
+    public readonly string GainItemText;
    
     public const int __ID__ = 780059274;
     public override int GetTypeId() => __ID__;
@@ -112,6 +117,7 @@ public sealed partial class Dialogcontent : Luban.BeanBase
         + "rightSlot3Personid:" + RightSlot3Personid + ","
         + "rightSlot3Image:" + RightSlot3Image + ","
         + "background:" + Background + ","
+        + "gainItemText:" + GainItemText + ","
         + "}";
     }
 }

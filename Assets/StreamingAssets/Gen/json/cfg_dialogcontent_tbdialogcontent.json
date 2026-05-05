@@ -15,7 +15,8 @@
     "right_slot2_image": "",
     "right_slot3_personid": 0,
     "right_slot3_image": "",
-    "background": ""
+    "background": "",
+    "gain_item_text": ""
   },
   {
     "id": 2,
@@ -33,7 +34,8 @@
     "right_slot2_image": "",
     "right_slot3_personid": 0,
     "right_slot3_image": "",
-    "background": ""
+    "background": "",
+    "gain_item_text": ""
   },
   {
     "id": 3,
@@ -51,7 +53,8 @@
     "right_slot2_image": "",
     "right_slot3_personid": 0,
     "right_slot3_image": "",
-    "background": ""
+    "background": "",
+    "gain_item_text": ""
   },
   {
     "id": 4,
@@ -69,7 +72,8 @@
     "right_slot2_image": "",
     "right_slot3_personid": 0,
     "right_slot3_image": "",
-    "background": ""
+    "background": "",
+    "gain_item_text": ""
   },
   {
     "id": 5,
@@ -87,7 +91,8 @@
     "right_slot2_image": "",
     "right_slot3_personid": 0,
     "right_slot3_image": "",
-    "background": ""
+    "background": "",
+    "gain_item_text": ""
   },
   {
     "id": 6,
@@ -105,7 +110,8 @@
     "right_slot2_image": "",
     "right_slot3_personid": 0,
     "right_slot3_image": "",
-    "background": ""
+    "background": "",
+    "gain_item_text": ""
   },
   {
     "id": 7,
@@ -123,7 +129,8 @@
     "right_slot2_image": "",
     "right_slot3_personid": 0,
     "right_slot3_image": "",
-    "background": ""
+    "background": "",
+    "gain_item_text": ""
   },
   {
     "id": 8,
@@ -141,7 +148,8 @@
     "right_slot2_image": "",
     "right_slot3_personid": 0,
     "right_slot3_image": "",
-    "background": ""
+    "background": "",
+    "gain_item_text": ""
   },
   {
     "id": 9,
@@ -159,7 +167,8 @@
     "right_slot2_image": "",
     "right_slot3_personid": 0,
     "right_slot3_image": "",
-    "background": ""
+    "background": "",
+    "gain_item_text": ""
   },
   {
     "id": 10,
@@ -177,7 +186,8 @@
     "right_slot2_image": "",
     "right_slot3_personid": 0,
     "right_slot3_image": "",
-    "background": ""
+    "background": "",
+    "gain_item_text": ""
   },
   {
     "id": 11,
@@ -195,7 +205,8 @@
     "right_slot2_image": "",
     "right_slot3_personid": 0,
     "right_slot3_image": "",
-    "background": ""
+    "background": "",
+    "gain_item_text": ""
   },
   {
     "id": 12,
@@ -213,7 +224,8 @@
     "right_slot2_image": "",
     "right_slot3_personid": 0,
     "right_slot3_image": "",
-    "background": ""
+    "background": "",
+    "gain_item_text": ""
   },
   {
     "id": 13,
@@ -231,7 +243,8 @@
     "right_slot2_image": "",
     "right_slot3_personid": 0,
     "right_slot3_image": "",
-    "background": ""
+    "background": "",
+    "gain_item_text": ""
   },
   {
     "id": 14,
@@ -249,7 +262,8 @@
     "right_slot2_image": "",
     "right_slot3_personid": 0,
     "right_slot3_image": "",
-    "background": ""
+    "background": "",
+    "gain_item_text": ""
   },
   {
     "id": 15,
@@ -267,7 +281,8 @@
     "right_slot2_image": "",
     "right_slot3_personid": 0,
     "right_slot3_image": "",
-    "background": ""
+    "background": "",
+    "gain_item_text": ""
   },
   {
     "id": 16,
@@ -285,7 +300,8 @@
     "right_slot2_image": "",
     "right_slot3_personid": 0,
     "right_slot3_image": "",
-    "background": ""
+    "background": "",
+    "gain_item_text": ""
   },
   {
     "id": 17,
@@ -303,7 +319,8 @@
     "right_slot2_image": "",
     "right_slot3_personid": 0,
     "right_slot3_image": "",
-    "background": ""
+    "background": "",
+    "gain_item_text": ""
   },
   {
     "id": 18,
@@ -321,7 +338,8 @@
     "right_slot2_image": "",
     "right_slot3_personid": 0,
     "right_slot3_image": "",
-    "background": ""
+    "background": "",
+    "gain_item_text": ""
   },
   {
     "id": 19,
@@ -339,7 +357,8 @@
     "right_slot2_image": "",
     "right_slot3_personid": 0,
     "right_slot3_image": "",
-    "background": ""
+    "background": "",
+    "gain_item_text": ""
   },
   {
     "id": 20,
@@ -357,7 +376,8 @@
     "right_slot2_image": "",
     "right_slot3_personid": 0,
     "right_slot3_image": "",
-    "background": ""
+    "background": "",
+    "gain_item_text": ""
   },
   {
     "id": 21,
@@ -375,7 +395,8 @@
     "right_slot2_image": "",
     "right_slot3_personid": 0,
     "right_slot3_image": "",
-    "background": ""
+    "background": "",
+    "gain_item_text": ""
   },
   {
     "id": 22,
@@ -393,7 +414,8 @@
     "right_slot2_image": "",
     "right_slot3_personid": 0,
     "right_slot3_image": "",
-    "background": ""
+    "background": "",
+    "gain_item_text": ""
   },
   {
     "id": 23,
@@ -411,7 +433,8 @@
     "right_slot2_image": "",
     "right_slot3_personid": 0,
     "right_slot3_image": "",
-    "background": ""
+    "background": "",
+    "gain_item_text": ""
   },
   {
     "id": 24,
@@ -429,7 +452,8 @@
     "right_slot2_image": "",
     "right_slot3_personid": 0,
     "right_slot3_image": "",
-    "background": ""
+    "background": "",
+    "gain_item_text": ""
   },
   {
     "id": 25,
@@ -447,7 +471,8 @@
     "right_slot2_image": "",
     "right_slot3_personid": 0,
     "right_slot3_image": "",
-    "background": ""
+    "background": "",
+    "gain_item_text": ""
   },
   {
     "id": 26,
@@ -465,7 +490,8 @@
     "right_slot2_image": "",
     "right_slot3_personid": 0,
     "right_slot3_image": "",
-    "background": ""
+    "background": "",
+    "gain_item_text": ""
   },
   {
     "id": 27,
@@ -483,7 +509,8 @@
     "right_slot2_image": "",
     "right_slot3_personid": 0,
     "right_slot3_image": "",
-    "background": ""
+    "background": "",
+    "gain_item_text": ""
   },
   {
     "id": 28,
@@ -501,7 +528,8 @@
     "right_slot2_image": "",
     "right_slot3_personid": 0,
     "right_slot3_image": "",
-    "background": ""
+    "background": "",
+    "gain_item_text": ""
   },
   {
     "id": 29,
@@ -519,7 +547,8 @@
     "right_slot2_image": "",
     "right_slot3_personid": 0,
     "right_slot3_image": "",
-    "background": ""
+    "background": "",
+    "gain_item_text": ""
   },
   {
     "id": 30,
@@ -537,7 +566,8 @@
     "right_slot2_image": "",
     "right_slot3_personid": 0,
     "right_slot3_image": "",
-    "background": ""
+    "background": "",
+    "gain_item_text": ""
   },
   {
     "id": 31,
@@ -555,7 +585,8 @@
     "right_slot2_image": "",
     "right_slot3_personid": 0,
     "right_slot3_image": "",
-    "background": ""
+    "background": "",
+    "gain_item_text": ""
   },
   {
     "id": 32,
@@ -573,7 +604,8 @@
     "right_slot2_image": "",
     "right_slot3_personid": 0,
     "right_slot3_image": "",
-    "background": ""
+    "background": "",
+    "gain_item_text": ""
   },
   {
     "id": 33,
@@ -591,7 +623,8 @@
     "right_slot2_image": "",
     "right_slot3_personid": 0,
     "right_slot3_image": "",
-    "background": ""
+    "background": "",
+    "gain_item_text": ""
   },
   {
     "id": 34,
@@ -609,7 +642,8 @@
     "right_slot2_image": "",
     "right_slot3_personid": 0,
     "right_slot3_image": "",
-    "background": ""
+    "background": "",
+    "gain_item_text": ""
   },
   {
     "id": 35,
@@ -627,7 +661,8 @@
     "right_slot2_image": "",
     "right_slot3_personid": 0,
     "right_slot3_image": "",
-    "background": ""
+    "background": "",
+    "gain_item_text": ""
   },
   {
     "id": 36,
@@ -645,7 +680,8 @@
     "right_slot2_image": "",
     "right_slot3_personid": 0,
     "right_slot3_image": "",
-    "background": ""
+    "background": "",
+    "gain_item_text": ""
   },
   {
     "id": 37,
@@ -663,7 +699,8 @@
     "right_slot2_image": "",
     "right_slot3_personid": 0,
     "right_slot3_image": "",
-    "background": ""
+    "background": "",
+    "gain_item_text": ""
   },
   {
     "id": 38,
@@ -681,7 +718,8 @@
     "right_slot2_image": "",
     "right_slot3_personid": 0,
     "right_slot3_image": "",
-    "background": ""
+    "background": "",
+    "gain_item_text": ""
   },
   {
     "id": 39,
@@ -699,7 +737,8 @@
     "right_slot2_image": "",
     "right_slot3_personid": 0,
     "right_slot3_image": "",
-    "background": ""
+    "background": "",
+    "gain_item_text": ""
   },
   {
     "id": 40,
@@ -717,7 +756,8 @@
     "right_slot2_image": "",
     "right_slot3_personid": 0,
     "right_slot3_image": "",
-    "background": ""
+    "background": "",
+    "gain_item_text": ""
   },
   {
     "id": 41,
@@ -735,7 +775,8 @@
     "right_slot2_image": "",
     "right_slot3_personid": 0,
     "right_slot3_image": "",
-    "background": ""
+    "background": "",
+    "gain_item_text": ""
   },
   {
     "id": 42,
@@ -753,7 +794,8 @@
     "right_slot2_image": "",
     "right_slot3_personid": 0,
     "right_slot3_image": "",
-    "background": ""
+    "background": "",
+    "gain_item_text": ""
   },
   {
     "id": 43,
@@ -771,7 +813,8 @@
     "right_slot2_image": "",
     "right_slot3_personid": 0,
     "right_slot3_image": "",
-    "background": ""
+    "background": "",
+    "gain_item_text": ""
   },
   {
     "id": 44,
@@ -789,7 +832,8 @@
     "right_slot2_image": "",
     "right_slot3_personid": 0,
     "right_slot3_image": "",
-    "background": ""
+    "background": "",
+    "gain_item_text": ""
   },
   {
     "id": 45,
@@ -807,7 +851,8 @@
     "right_slot2_image": "",
     "right_slot3_personid": 0,
     "right_slot3_image": "",
-    "background": ""
+    "background": "",
+    "gain_item_text": ""
   },
   {
     "id": 46,
@@ -825,7 +870,8 @@
     "right_slot2_image": "",
     "right_slot3_personid": 0,
     "right_slot3_image": "",
-    "background": ""
+    "background": "",
+    "gain_item_text": ""
   },
   {
     "id": 47,
@@ -843,7 +889,8 @@
     "right_slot2_image": "",
     "right_slot3_personid": 0,
     "right_slot3_image": "",
-    "background": ""
+    "background": "",
+    "gain_item_text": ""
   },
   {
     "id": 48,
@@ -861,7 +908,8 @@
     "right_slot2_image": "",
     "right_slot3_personid": 0,
     "right_slot3_image": "",
-    "background": ""
+    "background": "",
+    "gain_item_text": ""
   },
   {
     "id": 49,
@@ -879,7 +927,8 @@
     "right_slot2_image": "",
     "right_slot3_personid": 0,
     "right_slot3_image": "",
-    "background": ""
+    "background": "",
+    "gain_item_text": ""
   },
   {
     "id": 50,
@@ -897,7 +946,8 @@
     "right_slot2_image": "",
     "right_slot3_personid": 0,
     "right_slot3_image": "",
-    "background": ""
+    "background": "",
+    "gain_item_text": ""
   },
   {
     "id": 51,
@@ -915,6 +965,121 @@
     "right_slot2_image": "",
     "right_slot3_personid": 0,
     "right_slot3_image": "",
-    "background": ""
+    "background": "",
+    "gain_item_text": ""
+  },
+  {
+    "id": 52,
+    "dialogid": 500,
+    "type": 0,
+    "content": "河马走进了训练场",
+    "sortid": 1,
+    "statename1": "",
+    "statename2": "",
+    "slotstateid1": 0,
+    "slotstateid2": 0,
+    "right_slot1_personid": 0,
+    "right_slot1_image": "",
+    "right_slot2_personid": 0,
+    "right_slot2_image": "",
+    "right_slot3_personid": 0,
+    "right_slot3_image": "",
+    "background": "",
+    "gain_item_text": ""
+  },
+  {
+    "id": 53,
+    "dialogid": 500,
+    "type": 1,
+    "content": "教练，给我一把武器吧！",
+    "sortid": 2,
+    "statename1": "",
+    "statename2": "",
+    "slotstateid1": 0,
+    "slotstateid2": 0,
+    "right_slot1_personid": 0,
+    "right_slot1_image": "",
+    "right_slot2_personid": 0,
+    "right_slot2_image": "",
+    "right_slot3_personid": 0,
+    "right_slot3_image": "",
+    "background": "",
+    "gain_item_text": ""
+  },
+  {
+    "id": 54,
+    "dialogid": 500,
+    "type": 2,
+    "content": "好吧，这把铁剑给你。",
+    "sortid": 3,
+    "statename1": "",
+    "statename2": "",
+    "slotstateid1": 0,
+    "slotstateid2": 0,
+    "right_slot1_personid": 0,
+    "right_slot1_image": "",
+    "right_slot2_personid": 0,
+    "right_slot2_image": "",
+    "right_slot3_personid": 0,
+    "right_slot3_image": "",
+    "background": "",
+    "gain_item_text": "获得：铁剑"
+  },
+  {
+    "id": 55,
+    "dialogid": 500,
+    "type": 1,
+    "content": "太好了！我收下了。",
+    "sortid": 4,
+    "statename1": "",
+    "statename2": "",
+    "slotstateid1": 0,
+    "slotstateid2": 0,
+    "right_slot1_personid": 0,
+    "right_slot1_image": "",
+    "right_slot2_personid": 0,
+    "right_slot2_image": "",
+    "right_slot3_personid": 0,
+    "right_slot3_image": "",
+    "background": "",
+    "gain_item_text": "获得：护盾"
+  },
+  {
+    "id": 56,
+    "dialogid": 500,
+    "type": 0,
+    "content": "河马获得了装备，战斗力大增。",
+    "sortid": 5,
+    "statename1": "",
+    "statename2": "",
+    "slotstateid1": 0,
+    "slotstateid2": 0,
+    "right_slot1_personid": 0,
+    "right_slot1_image": "",
+    "right_slot2_personid": 0,
+    "right_slot2_image": "",
+    "right_slot3_personid": 0,
+    "right_slot3_image": "",
+    "background": "",
+    "gain_item_text": ""
+  },
+  {
+    "id": 57,
+    "dialogid": 500,
+    "type": 2,
+    "content": "不错，现在去实战吧！",
+    "sortid": 6,
+    "statename1": "",
+    "statename2": "",
+    "slotstateid1": 0,
+    "slotstateid2": 0,
+    "right_slot1_personid": 0,
+    "right_slot1_image": "",
+    "right_slot2_personid": 0,
+    "right_slot2_image": "",
+    "right_slot3_personid": 0,
+    "right_slot3_image": "",
+    "background": "",
+    "gain_item_text": "获得：经验药水×3"
   }
 ]
