@@ -4,7 +4,7 @@ using UnityEngine;
 public class DialogTestLauncher : MonoBehaviour
 {
     [Header("测试配置")]
-    [SerializeField] private int startDialogId = 1001001;
+    [SerializeField] private int startDialogId = 600;
     [SerializeField] private bool autoStart = true;
 
     private DataTableManager _dataTable;
@@ -13,14 +13,16 @@ public class DialogTestLauncher : MonoBehaviour
     private DialogCharacterManager _charMgr;
     private string _statusText = "等待初始化...";
 
-    private static readonly int[] TestDialogIds = { 1001001, 100, 200, 300, 400 };
+    private static readonly int[] TestDialogIds = { 1001001, 100, 200, 300, 400, 500, 600 };
     private static readonly string[] TestDialogNames =
     {
         "1001001: 原始对话（选项循环）",
         "100: 线性对话（自动推进）",
         "200: 循环选项（可回退）",
         "300: 嵌套选项（多层分支）",
-        "400: 纯旁白（无角色）"
+        "400: 纯旁白（无角色）",
+        "500: 物品获得测试",
+        "600: ItemBox长度测试"
     };
     private int _currentTestIndex;
     private bool _initialized;

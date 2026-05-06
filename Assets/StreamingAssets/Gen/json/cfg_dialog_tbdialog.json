@@ -203,5 +203,15 @@
     "speakerid1": 1,
     "speakerid2": 2,
     "gain_item_id": 1001
+  },
+  {
+    "id": 600,
+    "type": 0,
+    "param1": [],
+    "param2": "",
+    "selection_name": "",
+    "speakerid1": 1,
+    "speakerid2": 2,
+    "gain_item_id": 0
   }
 ]

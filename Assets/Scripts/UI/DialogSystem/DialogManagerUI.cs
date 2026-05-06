@@ -128,7 +128,7 @@ public class DialogManagerUI : MonoBehaviour
                 break;
             default:
                 var middleBubble = Instantiate(middleBubblePrefab, chatContent);
-                middleBubble.SetText(text, gainItemText);
+                middleBubble.SetText(text);
                 bubbleRoot = middleBubble.gameObject;
                 break;
         }

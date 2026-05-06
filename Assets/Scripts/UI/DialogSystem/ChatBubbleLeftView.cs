@@ -10,14 +10,13 @@ public sealed class ChatBubbleLeftView : MonoBehaviour
 
     [Header("Gain Item Box")]
     [SerializeField] private GameObject itemBoxRoot;
+    [SerializeField] private RectTransform itemBoxRect;
     [SerializeField] private TMP_Text itemText;
 
     private const float MinBgWidth = 300f;
     private const float ItemExtraHeight = 50f;
     private float _maxTextWidth;
     private float _maxBgWidth;
-    private float _maxRootWidth;
-    private float _rootPaddingLeft;
     private VerticalLayoutGroup _bgLayout;
     private int _bgOriginalBottomPadding;
 
@@ -45,16 +44,23 @@ public sealed class ChatBubbleLeftView : MonoBehaviour
 
             text.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, desiredText);
             bubbleBgRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, desiredBg);
-            ((RectTransform)transform).SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, desiredBg + _rootPaddingLeft);
         }
         else
         {
             text.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, _maxTextWidth);
             bubbleBgRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, _maxBgWidth);
-            ((RectTransform)transform).SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, _maxRootWidth);
         }
 
         LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform)transform);
+        PositionItemBox();
+    }
+
+    private void PositionItemBox()
+    {
+        if (!itemBoxRoot.activeSelf) return;
+        float bgRight = bubbleBgRect.anchoredPosition.x + bubbleBgRect.sizeDelta.x / 2f - 50;
+        float bgBottom = bubbleBgRect.sizeDelta.y - itemBoxRect.sizeDelta.y;
+        itemBoxRect.anchoredPosition = new Vector2(bgRight, bgBottom);
     }
 
     private void CacheOriginalWidths()
@@ -62,8 +68,6 @@ public sealed class ChatBubbleLeftView : MonoBehaviour
         if (_maxTextWidth > 0) return;
         _maxTextWidth = text.rectTransform.sizeDelta.x;
         _maxBgWidth = bubbleBgRect.sizeDelta.x;
-        _maxRootWidth = ((RectTransform)transform).sizeDelta.x;
-        _rootPaddingLeft = _maxRootWidth - _maxBgWidth;
         _bgLayout = bubbleBgRect.GetComponent<VerticalLayoutGroup>();
         _bgOriginalBottomPadding = _bgLayout.padding.bottom;
     }
