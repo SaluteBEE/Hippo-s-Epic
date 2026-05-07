@@ -174,7 +174,7 @@
     "id": 10,
     "dialogid": 1001004,
     "type": 0,
-    "content": "一拳打在他脸上！<br>现在教练惨了。",
+    "content": "一拳打在他脸上！<br>教练这下惨了，你的拳头在他的嘴里过了个来回，他昨天吃的花生米都被打的爆了一地，估计他2年内没法再吃花生米了。",
     "sortid": 1,
     "statename1": "idle",
     "statename2": "angry",
@@ -206,7 +206,7 @@
     "right_slot3_personid": 0,
     "right_slot3_image": "",
     "background": "",
-    "gain_item_text": ""
+    "gain_item_text": "获得了两颗打豁进去的牙"
   },
   {
     "id": 12,
