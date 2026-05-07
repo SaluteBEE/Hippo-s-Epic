@@ -12,6 +12,8 @@ public sealed class ChatBubbleMiddleView : MonoBehaviour
     [SerializeField] private GameObject itemBoxRoot;
     [SerializeField] private TMP_Text itemText;
 
+    public TMP_Text MainText => text;
+
     private const float MinBgWidth = 300f;
     private const float ItemExtraHeight = 50f;
     private float _maxTextWidth;

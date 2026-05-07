@@ -36,6 +36,7 @@ public class DialogManager : MonoBehaviour
 
     public int CurrentSpeakerId1 => _currentDialog?.Speakerid1 ?? 0;
     public int CurrentSpeakerId2 => _currentDialog?.Speakerid2 ?? 0;
+    public cfg.cfg.dialog.Dialog CurrentDialog => _currentDialog;
 
     private void Awake()
     {

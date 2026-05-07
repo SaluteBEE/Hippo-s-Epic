@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -13,6 +14,10 @@ public class DialogManagerUI : MonoBehaviour
     [SerializeField] private ChatBubbleRightView rightBubblePrefab;
     [SerializeField] private ChatBubbleOptionView optionBubblePrefab;
 
+    [Header("跳字")]
+    [SerializeField] private bool enableTypewriter = true;
+    [SerializeField] private float typewriterSpeed = 30f;
+
     private readonly List<BubbleTintController> _bubbleTints = new List<BubbleTintController>();
     private readonly List<RaycastResult> _raycastResults = new List<RaycastResult>();
     private PointerEventData _pointerEventData;
@@ -20,6 +25,9 @@ public class DialogManagerUI : MonoBehaviour
     private RectTransform _scrollViewRect;
     private bool _blockAdvance;
     private bool _optionChosen;
+    private RectTransform _lastRightBubbleBeforeOption;
+    private bool _pendingCollapse;
+    private TypewriterEffect _currentTypewriter;
 
     public void Initialize(
         RectTransform contentRect,
@@ -75,12 +83,35 @@ public class DialogManagerUI : MonoBehaviour
         if (IsPointerOverButtonOrSelectable()) return;
         if (!IsPointerOverScrollView()) return;
 
+        if (enableTypewriter && _currentTypewriter != null && _currentTypewriter.IsTyping)
+        {
+            _currentTypewriter.Skip();
+            return;
+        }
+
         _dialogManager.Advance();
     }
 
     private void OnOptions(List<OptionInfo> options)
     {
+        if (_currentTypewriter != null && _currentTypewriter.IsTyping)
+            _currentTypewriter.Skip();
+        _currentTypewriter = null;
+
+        if (_pendingCollapse)
+        {
+            _pendingCollapse = false;
+            _lastRightBubbleBeforeOption = null;
+        }
+
         _optionChosen = false;
+
+        if (_bubbleTints.Count > 0)
+        {
+            var latest = _bubbleTints[_bubbleTints.Count - 1];
+            if (latest != null && latest.GetComponent<ChatBubbleRightView>() != null)
+                _lastRightBubbleBeforeOption = latest.GetComponent<RectTransform>();
+        }
 
         var opBubble = Instantiate(optionBubblePrefab, chatContent);
 
@@ -98,6 +129,9 @@ public class DialogManagerUI : MonoBehaviour
             _optionChosen = true;
             _blockAdvance = true;
 
+            if (_lastRightBubbleBeforeOption != null && !IsOptionAction(index))
+                _pendingCollapse = true;
+
             RemoveFromTints(opBubble.gameObject);
             DestroyImmediate(opBubble.gameObject);
 
@@ -113,24 +147,42 @@ public class DialogManagerUI : MonoBehaviour
 
     private void OnContent(SpeakerSide side, string text, string speakerName, string gainItemText)
     {
+        if (_pendingCollapse && _lastRightBubbleBeforeOption != null)
+        {
+            _pendingCollapse = false;
+            CollapseBubble(_lastRightBubbleBeforeOption);
+            _lastRightBubbleBeforeOption = null;
+        }
+
+        TMP_Text mainText = null;
         GameObject bubbleRoot;
         switch (side)
         {
             case SpeakerSide.Left:
                 var leftBubble = Instantiate(leftBubblePrefab, chatContent);
                 leftBubble.SetText(text, gainItemText);
+                mainText = leftBubble.MainText;
                 bubbleRoot = leftBubble.gameObject;
                 break;
             case SpeakerSide.Right:
                 var rightBubble = Instantiate(rightBubblePrefab, chatContent);
                 rightBubble.SetText(text, gainItemText);
+                mainText = rightBubble.MainText;
                 bubbleRoot = rightBubble.gameObject;
                 break;
             default:
                 var middleBubble = Instantiate(middleBubblePrefab, chatContent);
                 middleBubble.SetText(text);
+                mainText = middleBubble.MainText;
                 bubbleRoot = middleBubble.gameObject;
                 break;
+        }
+
+        if (enableTypewriter && mainText != null)
+        {
+            var tw = bubbleRoot.AddComponent<TypewriterEffect>();
+            tw.Play(mainText, typewriterSpeed);
+            _currentTypewriter = tw;
         }
 
         MarkAsLatest(bubbleRoot);
@@ -170,9 +222,38 @@ public class DialogManagerUI : MonoBehaviour
 
     private void ClearAllBubbles()
     {
+        _currentTypewriter = null;
         for (int i = chatContent.childCount - 1; i >= 0; i--)
             Destroy(chatContent.GetChild(i).gameObject);
         _bubbleTints.Clear();
+        _lastRightBubbleBeforeOption = null;
+        _pendingCollapse = false;
+    }
+
+    private bool IsOptionAction(int optionIndex)
+    {
+        var current = _dialogManager?.CurrentDialog;
+        if (current == null || string.IsNullOrEmpty(current.Param2)) return false;
+        var parts = current.Param2.Split('|');
+        return optionIndex < parts.Length && parts[optionIndex].Trim() == "2";
+    }
+
+    private void CollapseBubble(RectTransform bubble)
+    {
+        if (bubble == null) return;
+
+        var csf = bubble.GetComponent<ContentSizeFitter>();
+        if (csf != null) csf.enabled = false;
+
+        float currentHeight = bubble.rect.height;
+        float newHeight = Mathf.Max(currentHeight - 70f, 0f);
+        bubble.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, newHeight);
+
+        var le = bubble.GetComponent<LayoutElement>();
+        if (le == null) le = bubble.gameObject.AddComponent<LayoutElement>();
+        le.preferredHeight = newHeight;
+
+        LayoutRebuilder.ForceRebuildLayoutImmediate(chatContent);
     }
 
     private void RemoveFromTints(GameObject go)
