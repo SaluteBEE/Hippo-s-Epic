@@ -60,19 +60,7 @@
     "gain_item_id": 0
   },
   {
-    "id": 100,
-    "type": 1,
-    "param1": [
-      101
-    ],
-    "param2": "",
-    "selection_name": "",
-    "speakerid1": 1,
-    "speakerid2": 2,
-    "gain_item_id": 0
-  },
-  {
-    "id": 101,
+    "id": 1002001,
     "type": 1,
     "param1": [],
     "param2": "",
@@ -82,131 +70,66 @@
     "gain_item_id": 0
   },
   {
-    "id": 200,
+    "id": 1003001,
+    "type": 1,
+    "param1": [
+      1003002
+    ],
+    "param2": "",
+    "selection_name": "",
+    "speakerid1": 1,
+    "speakerid2": 2,
+    "gain_item_id": 0
+  },
+  {
+    "id": 1003002,
     "type": 2,
     "param1": [
-      201,
-      202
+      1003003,
+      1003004,
+      1003005
     ],
-    "param2": "",
+    "param2": "1|1|1",
     "selection_name": "",
     "speakerid1": 1,
     "speakerid2": 2,
     "gain_item_id": 0
   },
   {
-    "id": 201,
+    "id": 1003003,
     "type": 1,
     "param1": [
-      200
+      1003006
     ],
     "param2": "",
-    "selection_name": "再来一遍",
+    "selection_name": "暂时还没有发现，顺便问下选手们的牙还有痊愈的可能吗",
     "speakerid1": 1,
     "speakerid2": 2,
     "gain_item_id": 0
   },
   {
-    "id": 202,
-    "type": 1,
-    "param1": [
-      203
-    ],
-    "param2": "",
-    "selection_name": "我受够了",
-    "speakerid1": 1,
-    "speakerid2": 2,
-    "gain_item_id": 0
-  },
-  {
-    "id": 203,
+    "id": 1003004,
     "type": 1,
     "param1": [],
     "param2": "",
-    "selection_name": "",
+    "selection_name": "我在拳王更衣室里找到了这个报道",
     "speakerid1": 1,
     "speakerid2": 2,
     "gain_item_id": 0
   },
   {
-    "id": 300,
-    "type": 2,
-    "param1": [
-      301,
-      302
-    ],
-    "param2": "",
-    "selection_name": "",
-    "speakerid1": 1,
-    "speakerid2": 2,
-    "gain_item_id": 0
-  },
-  {
-    "id": 301,
-    "type": 2,
-    "param1": [
-      303,
-      304
-    ],
-    "param2": "",
-    "selection_name": "打听消息",
-    "speakerid1": 1,
-    "speakerid2": 2,
-    "gain_item_id": 0
-  },
-  {
-    "id": 302,
+    "id": 1003005,
     "type": 1,
     "param1": [],
     "param2": "",
-    "selection_name": "转身离开",
+    "selection_name": "我可以报名上场吗，我想成为一个伟大的人",
     "speakerid1": 1,
     "speakerid2": 2,
     "gain_item_id": 0
   },
   {
-    "id": 303,
+    "id": 1003006,
     "type": 1,
-    "param1": [],
-    "param2": "",
-    "selection_name": "关于拳王",
-    "speakerid1": 1,
-    "speakerid2": 2,
-    "gain_item_id": 0
-  },
-  {
-    "id": 304,
-    "type": 1,
-    "param1": [],
-    "param2": "",
-    "selection_name": "关于这个小镇",
-    "speakerid1": 1,
-    "speakerid2": 2,
-    "gain_item_id": 0
-  },
-  {
-    "id": 400,
-    "type": 1,
-    "param1": [],
-    "param2": "",
-    "selection_name": "",
-    "speakerid1": 1,
-    "speakerid2": 2,
-    "gain_item_id": 0
-  },
-  {
-    "id": 500,
-    "type": 1,
-    "param1": [],
-    "param2": "",
-    "selection_name": "",
-    "speakerid1": 1,
-    "speakerid2": 2,
-    "gain_item_id": 1001
-  },
-  {
-    "id": 600,
-    "type": 0,
     "param1": [],
     "param2": "",
     "selection_name": "",
