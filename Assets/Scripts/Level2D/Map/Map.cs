@@ -3,21 +3,92 @@ using UnityEngine;
 
 public sealed class Map : MonoBehaviour
 {
-    public Vector2 MainEntrance;
-    public Vector2 CameraClampX;
-    public Vector2 CameraClampY;
+    [Header("Spawn Point")]
+    [Tooltip("游戏初始出生点")]
+    [SerializeField] private Transform spawnPoint;
 
-    public Vector2 CameraClampXWorld =>
-        new Vector2(
-            CameraClampX.x + transform.position.x,
-            CameraClampX.y + transform.position.x
-        );
+    [Header("Teleport")]
+    [Tooltip("传送到达点，从其他地图传送到此地图时的出生位置。为空时使用 SpawnPoint")]
+    [SerializeField] private Transform teleportArrival;
 
-    public Vector2 CameraClampYWorld =>
-        new Vector2(
-            CameraClampY.x + transform.position.y,
-            CameraClampY.y + transform.position.y
-        );
+    [Header("Camera Bounds")]
+    [Tooltip("用碰撞体定义摄像机可显示的地图范围，Scene 视图中可直接拖拽编辑")]
+    [SerializeField] private Collider2D cameraBounds;
+
+    [Header("Interactables")]
+    [Tooltip("此地图下的所有可交互节点，编辑器自动收集")]
+    [SerializeField] private List<Interactable> interactables = new List<Interactable>();
+
+    public IReadOnlyList<Interactable> InteractableList => interactables;
+
+    public Vector3 SpawnPointWorld
+    {
+        get
+        {
+            if (spawnPoint != null)
+            {
+                Vector3 pos = spawnPoint.position;
+                return new Vector3(pos.x, pos.y, pos.y);
+            }
+            return transform.position;
+        }
+    }
+
+    public Vector3 TeleportArrivalWorld
+    {
+        get
+        {
+            Transform point = teleportArrival != null ? teleportArrival : spawnPoint;
+            if (point != null)
+            {
+                Vector3 pos = point.position;
+                return new Vector3(pos.x, pos.y, pos.y);
+            }
+            return transform.position;
+        }
+    }
+
+    public Vector2 CameraClampXWorld
+    {
+        get
+        {
+            if (cameraBounds != null)
+            {
+                Camera cam = Camera.main;
+                if (cam != null && cam.orthographic)
+                {
+                    float halfW = cam.orthographicSize * cam.aspect;
+                    Bounds b = cameraBounds.bounds;
+                    float min = b.min.x + halfW;
+                    float max = b.max.x - halfW;
+                    if (min > max) return new Vector2((min + max) * 0.5f, (min + max) * 0.5f);
+                    return new Vector2(min, max);
+                }
+            }
+            return new Vector2(transform.position.x, transform.position.x);
+        }
+    }
+
+    public Vector2 CameraClampYWorld
+    {
+        get
+        {
+            if (cameraBounds != null)
+            {
+                Camera cam = Camera.main;
+                if (cam != null && cam.orthographic)
+                {
+                    float halfH = cam.orthographicSize;
+                    Bounds b = cameraBounds.bounds;
+                    float min = b.min.y + halfH;
+                    float max = b.max.y - halfH;
+                    if (min > max) return new Vector2((min + max) * 0.5f, (min + max) * 0.5f);
+                    return new Vector2(min, max);
+                }
+            }
+            return new Vector2(transform.position.y, transform.position.y);
+        }
+    }
 
     public Vector2 MapCenterWorld =>
         new Vector2(
@@ -128,6 +199,48 @@ public sealed class Map : MonoBehaviour
             item?.OnCameraOffsetChanged(cameraDelta);
         }
     }
+
+    public void SaveInteractableStates()
+    {
+        foreach (var interactable in interactables)
+        {
+            if (interactable == null) continue;
+            SaveManager.Instance.SetEntityState(interactable.EntityId, interactable.CurrentState);
+        }
+    }
+
+#if UNITY_EDITOR
+    public void CollectInteractables()
+    {
+        interactables.Clear();
+        var found = GetComponentsInChildren<Interactable>(true);
+        if (found == null || found.Length == 0)
+            return;
+
+        var sorted = new List<Interactable>(found);
+        sorted.Sort((a, b) =>
+        {
+            string pathA = GetHierarchyPath(a.transform, transform);
+            string pathB = GetHierarchyPath(b.transform, transform);
+            return string.Compare(pathA, pathB, System.StringComparison.Ordinal);
+        });
+        interactables.AddRange(sorted);
+        UnityEditor.EditorUtility.SetDirty(this);
+    }
+
+    private static string GetHierarchyPath(Transform t, Transform root)
+    {
+        var parts = new List<string>();
+        Transform current = t;
+        while (current != null && current != root)
+        {
+            parts.Add(current.name);
+            current = current.parent;
+        }
+        parts.Reverse();
+        return string.Join("/", parts);
+    }
+#endif
 
     public void Dispose()
     {

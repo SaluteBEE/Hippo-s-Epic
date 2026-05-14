@@ -3,15 +3,20 @@ using UnityEngine;
 public class PauseState : IGameState
 {
     private readonly GameApp app;
+    private InputManager _inputManager;
 
     public PauseState(GameApp app)
     {
         this.app = app;
+        _inputManager = ManagerRegistry.Get<InputManager>();
     }
 
     public void Enter()
     {
         Time.timeScale = 0f;
+
+        if (_inputManager != null)
+            _inputManager.EnableOnlyUI();
     }
 
     public void Exit()
@@ -21,7 +26,7 @@ public class PauseState : IGameState
 
     public void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Escape))
+        if (_inputManager != null && _inputManager.GameInput.UI.Cancel.WasPressedThisFrame())
         {
             app.ResumeGame();
         }

@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
+using UnityEngine.InputSystem;
 using UnityEngine.ResourceManagement.AsyncOperations;
 
 public class LevelController : MonoBehaviour
@@ -14,6 +15,9 @@ public class LevelController : MonoBehaviour
 
     public PlayerCharacter PlayerCharacter => playerCharacter;
     public MapManager MapManager => mapManager;
+
+    private GameInput _gameInput;
+    private bool _ownsInput;
 
     private void Awake()
     {
@@ -31,22 +35,58 @@ public class LevelController : MonoBehaviour
             mapManager = GetComponentInChildren<MapManager>(true);
         }
 
+        EnsureInputManager();
         InitializePlayer();
+    }
+
+    private void OnDestroy()
+    {
+        if (Instance != this) return;
+        Instance = null;
+        if (_ownsInput && _gameInput != null)
+        {
+            _gameInput.Player.Disable();
+            _gameInput.Dispose();
+        }
+    }
+
+    private void EnsureInputManager()
+    {
+        var inputManager = ManagerRegistry.Get<InputManager>();
+        if (inputManager != null)
+        {
+            _gameInput = inputManager.GameInput;
+            return;
+        }
+
+        _gameInput = new GameInput();
+        _ownsInput = true;
+        Debug.Log("[LevelController] 无 InputManager，创建独立 GameInput 实例");
     }
 
     private void Update()
     {
-        HandleInput(out LevelInput levelInput);
+        if (playerCharacter == null) return;
+        if (_gameInput == null) return;
 
-        if (playerCharacter != null)
-        {
-            playerCharacter.SetMoveInput(levelInput.PlayerControl);
+        if (!_gameInput.Player.enabled)
+            _gameInput.Player.Enable();
 
-            if (levelInput.IsPlayerInteractionTriggered)
-            {
-                playerCharacter.PlayerExecute();
-            }
-        }
+        var move = _gameInput.Player.Move.ReadValue<Vector2>();
+        playerCharacter.SetMoveInput(move);
+
+        if (_gameInput.Player.Interact.WasPressedThisFrame())
+            playerCharacter.PlayerExecute(0);
+        else if (_gameInput.Player.Button2.WasPressedThisFrame())
+            playerCharacter.PlayerExecute(1);
+        else if (_gameInput.Player.Button3.WasPressedThisFrame())
+            playerCharacter.PlayerExecute(2);
+        else if (_gameInput.Player.Button4.WasPressedThisFrame())
+            playerCharacter.PlayerExecute(3);
+        else if (_gameInput.Player.Button5.WasPressedThisFrame())
+            playerCharacter.PlayerExecute(4);
+        else if (_gameInput.Player.Button1.WasPressedThisFrame())
+            playerCharacter.PlayerExecute(0);
     }
 
     private void InitializePlayer()
@@ -86,37 +126,8 @@ public class LevelController : MonoBehaviour
             return;
         }
 
+        SaveManager.Instance.Load();
         mapManager.Initialize(playerCharacter);
-        EntityConfigLoader.InitializeScene(gameObject.scene.name);
-    }
-
-    private void HandleInput(out LevelInput levelInput)
-    {
-        levelInput = new LevelInput();
-
-        Vector2 playerMoveInput = Vector2.zero;
-
-        bool moveLeft = Input.GetKey(KeyCode.A);
-        bool moveRight = Input.GetKey(KeyCode.D);
-        bool moveUp = Input.GetKey(KeyCode.W);
-        bool moveDown = Input.GetKey(KeyCode.S);
-
-        if (moveLeft)
-            playerMoveInput.x = -1f;
-        else if (moveRight)
-            playerMoveInput.x = 1f;
-
-        if (moveUp)
-            playerMoveInput.y = 1f;
-        else if (moveDown)
-            playerMoveInput.y = -1f;
-
-        levelInput.SetPlayerControl(playerMoveInput);
-
-        if (Input.GetKeyDown(KeyCode.E))
-        {
-            levelInput.IsPlayerInteractionTriggered = true;
-        }
     }
 
     public void SetPlayerCharacter(PlayerCharacter player)
@@ -137,22 +148,5 @@ public class LevelController : MonoBehaviour
 
         GameObject levelGameObject = new GameObject("Level");
         return levelGameObject.AddComponent<LevelController>();
-    }
-}
-
-public struct LevelInput
-{
-    [Obsolete("请使用 PlayerControl 属性读取，使用 SetPlayerControl 方法设置输入。")]
-    public Vector2 playerControl;
-
-    private Vector2 _playerControl;
-
-    public Vector2 PlayerControl => _playerControl;
-
-    public bool IsPlayerInteractionTriggered;
-
-    public void SetPlayerControl(Vector2 input)
-    {
-        _playerControl = input.normalized;
     }
 }

@@ -5,12 +5,14 @@ public class GameplayState : IGameState
     private readonly GameApp app;
     private UIManager _ui;
     private AudioManager _audio;
+    private InputManager _inputManager;
 
     public GameplayState(GameApp app)
     {
         this.app = app;
         _ui = ManagerRegistry.Get<UIManager>();
         _audio = ManagerRegistry.Get<AudioManager>();
+        _inputManager = ManagerRegistry.Get<InputManager>();
     }
 
     public void Enter()
@@ -21,6 +23,9 @@ public class GameplayState : IGameState
         _ui.Close<MainMenuPanel>();
 
         _audio.PlayBGM("Gameplay");
+
+        if (_inputManager != null)
+            _inputManager.EnablePlayerAndUI();
     }
 
     public void Exit()
@@ -29,7 +34,7 @@ public class GameplayState : IGameState
 
     public void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Escape))
+        if (_inputManager != null && _inputManager.GameInput.Player.Pause.WasPressedThisFrame())
         {
             app.TogglePause();
         }

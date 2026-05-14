@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 public class DialogManagerUI : MonoBehaviour
@@ -273,9 +274,20 @@ public class DialogManagerUI : MonoBehaviour
 
     private bool IsClickOrTapBegan()
     {
-        if (Input.GetMouseButtonDown(0)) return true;
-        if (Input.touchCount > 0) return Input.GetTouch(0).phase == TouchPhase.Began;
+        var inputManager = ManagerRegistry.Get<InputManager>();
+        if (inputManager != null && inputManager.GameInput.Dialog.enabled)
+            return inputManager.GameInput.Dialog.Advance.WasPressedThisFrame();
+
         return false;
+    }
+
+    private Vector2 GetPointerPosition()
+    {
+#if ENABLE_INPUT_SYSTEM
+        if (Mouse.current != null)
+            return Mouse.current.position.ReadValue();
+#endif
+        return Input.mousePosition;
     }
 
     private bool IsPointerOverButtonOrSelectable()
@@ -285,7 +297,7 @@ public class DialogManagerUI : MonoBehaviour
         if (_pointerEventData == null)
             _pointerEventData = new PointerEventData(EventSystem.current);
 
-        _pointerEventData.position = Input.mousePosition;
+        _pointerEventData.position = GetPointerPosition();
 
         _raycastResults.Clear();
         EventSystem.current.RaycastAll(_pointerEventData, _raycastResults);
@@ -304,6 +316,6 @@ public class DialogManagerUI : MonoBehaviour
     {
         if (_scrollViewRect == null) return false;
         return RectTransformUtility.RectangleContainsScreenPoint(
-            _scrollViewRect, Input.mousePosition, null);
+            _scrollViewRect, GetPointerPosition(), null);
     }
 }

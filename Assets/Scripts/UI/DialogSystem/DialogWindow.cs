@@ -50,6 +50,12 @@ public class DialogWindow : UIWindow
         if (_cameraRootInstance == null)
             InstantiateCameraRoot();
 
+        var app = ManagerRegistry.Get<GameApp>();
+        if (app != null)
+            app.EnterDialogMode();
+        else
+            ManagerRegistry.Get<BootstrapQuickStart>()?.EnterDialogMode();
+
         if (args is int dialogId)
             StartDialog(dialogId);
     }
@@ -145,6 +151,12 @@ public class DialogWindow : UIWindow
 
     public override void OnClose()
     {
+        var app = ManagerRegistry.Get<GameApp>();
+        if (app != null)
+            app.ExitDialogMode();
+        else
+            ManagerRegistry.Get<BootstrapQuickStart>()?.ExitDialogMode();
+
         if (_dialogManager != null)
         {
             _dialogManager.OnBackgroundChange -= OnBackgroundChange;

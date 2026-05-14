@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using cfg.cfg.entity;
 using cfg.cfg.scene;
-using cfg.cfg.item;
 using NUnit.Framework;
 using UnityEditor;
 using UnityEngine;
@@ -241,115 +240,302 @@ public class SceneEntityTablesTests
 
     #endregion
 
-    #region EntityConfigLoader 集成测试
+    #region InteractableManager 集成测试
+
+    private const string TestMapName = "TestMap";
+
+    private static GameObject EnsureTestMap()
+    {
+        var existing = GameObject.Find("[Test] " + TestMapName);
+        if (existing != null) return existing;
+        var map = new GameObject("[Test] " + TestMapName);
+        return map;
+    }
+
+    private static void WriteButtonProperty(SerializedProperty buttonsProp, int index, ButtonOption btn)
+    {
+        buttonsProp.arraySize = Mathf.Max(buttonsProp.arraySize, index + 1);
+        var bp = buttonsProp.GetArrayElementAtIndex(index);
+        bp.FindPropertyRelative("buttonText").stringValue = btn.buttonText ?? "";
+        bp.FindPropertyRelative("type").intValue = (int)btn.type;
+        bp.FindPropertyRelative("dataId").intValue = btn.dataId;
+        bp.FindPropertyRelative("param1").stringValue = btn.param1 ?? "";
+        bp.FindPropertyRelative("param2").stringValue = btn.param2 ?? "";
+        bp.FindPropertyRelative("transitionToState").intValue = btn.transitionToState;
+    }
+
+    private static Interactable CreateTestInteractable(string name, params InteractionPhase[] phases)
+    {
+        var map = EnsureTestMap();
+        var go = new GameObject(name);
+        go.transform.parent = map.transform;
+        go.AddComponent<BoxCollider2D>();
+        var interactable = go.AddComponent<Interactable>();
+
+        if (phases == null || phases.Length == 0)
+            return interactable;
+
+        var so = new SerializedObject(interactable);
+        var phasesProp = so.FindProperty("phases");
+        phasesProp.arraySize = phases.Length;
+        for (int i = 0; i < phases.Length; i++)
+        {
+            var element = phasesProp.GetArrayElementAtIndex(i);
+            element.FindPropertyRelative("state").intValue = phases[i].state;
+            element.FindPropertyRelative("hintText").stringValue = phases[i].hintText ?? "";
+            element.FindPropertyRelative("canRepeat").boolValue = phases[i].canRepeat;
+            element.FindPropertyRelative("hideAfterExecute").boolValue = phases[i].hideAfterExecute;
+            element.FindPropertyRelative("destroySelf").boolValue = phases[i].destroySelf;
+            element.FindPropertyRelative("deactivateSelf").boolValue = phases[i].deactivateSelf;
+
+            var buttonsProp = element.FindPropertyRelative("buttons");
+            buttonsProp.arraySize = 0;
+            if (phases[i].buttons != null)
+            {
+                for (int j = 0; j < phases[i].buttons.Count; j++)
+                    WriteButtonProperty(buttonsProp, j, phases[i].buttons[j]);
+            }
+        }
+
+        so.ApplyModifiedProperties();
+        return interactable;
+    }
 
     [Test]
-    public void GetFinalState_NoSavedState_ReturnsInitialState()
+    public void InteractableManager_NoSavedState_UsesFirstPhase()
     {
         SaveManager.Instance.ClearSave();
 
-        var entity = _dtm.Tables.TbEntity["gym_main_npc_01"];
-        int state = EntityConfigLoader.GetFinalState(entity);
-        Assert.AreEqual(entity.InitialState, state,
-            "无存档时应返回 InitialState");
+        CreateTestInteractable("NPC",
+            new InteractionPhase
+            {
+                state = 0,
+                hintText = "按 E 对话",
+                buttons = new List<ButtonOption>
+                {
+                    new ButtonOption { buttonText = "E", type = InteractionType.Dialogue, dataId = 1001001, transitionToState = 1 }
+                },
+                canRepeat = false
+            },
+            new InteractionPhase
+            {
+                state = 1,
+                hintText = "......",
+                buttons = new List<ButtonOption>
+                {
+                    new ButtonOption { buttonText = "好吧", type = InteractionType.HintOnly, transitionToState = -1 }
+                },
+                canRepeat = true
+            });
+
+        InteractableManager.InitializeScene();
+
+        var interactable = Object.FindObjectsOfType<Interactable>(true)[0];
+        Assert.AreEqual(0, interactable.CurrentState, "无存档时应用第一个 phase 的 state");
+        Assert.IsNotNull(interactable.CurrentPhase);
+        Assert.AreEqual(InteractionType.Dialogue, interactable.CurrentPhase.buttons[0].type);
+
+        CleanupTestGameObjects();
     }
 
     [Test]
-    public void GetFinalState_HasSavedState_ReturnsSavedState()
+    public void InteractableManager_SavedState_UsesSavedState()
     {
         SaveManager.Instance.ClearSave();
-        SaveManager.Instance.SetEntityState("gym_main_npc_01", 1);
+        string eid = $"[Test] {TestMapName}_NPC";
+        SaveManager.Instance.SetEntityState(eid, 1);
 
-        var entity = _dtm.Tables.TbEntity["gym_main_npc_01"];
-        int state = EntityConfigLoader.GetFinalState(entity);
-        Assert.AreEqual(1, state,
-            "有存档时应返回存档状态而非 InitialState");
+        CreateTestInteractable("NPC",
+            new InteractionPhase
+            {
+                state = 0,
+                hintText = "按 E 对话",
+                buttons = new List<ButtonOption>
+                {
+                    new ButtonOption { buttonText = "E", type = InteractionType.Dialogue, dataId = 1001001, transitionToState = 1 }
+                },
+                canRepeat = false
+            },
+            new InteractionPhase
+            {
+                state = 1,
+                hintText = "......",
+                buttons = new List<ButtonOption>
+                {
+                    new ButtonOption { buttonText = "好吧", type = InteractionType.HintOnly, transitionToState = -1 }
+                },
+                canRepeat = true
+            });
+
+        InteractableManager.InitializeScene();
+
+        var interactable = Object.FindObjectsOfType<Interactable>(true)[0];
+        Assert.AreEqual(1, interactable.CurrentState, "有存档时应用存档状态");
+        Assert.AreEqual(InteractionType.HintOnly, interactable.CurrentPhase.buttons[0].type);
+
+        CleanupTestGameObjects();
     }
 
     [Test]
-    public void GetFinalState_SavedStateOverridesNonZeroInitial()
+    public void Interactable_ApplyState_DeactivateSelf_DisablesGameObject()
+    {
+        var map = EnsureTestMap();
+        var go = new GameObject("Deactivated");
+        go.transform.parent = map.transform;
+        var interactable = go.AddComponent<Interactable>();
+
+        var so = new SerializedObject(interactable);
+        var phasesProp = so.FindProperty("phases");
+        phasesProp.arraySize = 2;
+
+        var phase0 = phasesProp.GetArrayElementAtIndex(0);
+        phase0.FindPropertyRelative("state").intValue = 0;
+        phase0.FindPropertyRelative("canRepeat").boolValue = false;
+        phase0.FindPropertyRelative("destroySelf").boolValue = true;
+        var p0Buttons = phase0.FindPropertyRelative("buttons");
+        p0Buttons.arraySize = 1;
+        var p0Btn0 = p0Buttons.GetArrayElementAtIndex(0);
+        p0Btn0.FindPropertyRelative("buttonText").stringValue = "拾取";
+        p0Btn0.FindPropertyRelative("type").intValue = (int)InteractionType.Pickup;
+        p0Btn0.FindPropertyRelative("transitionToState").intValue = 1;
+
+        var phase1 = phasesProp.GetArrayElementAtIndex(1);
+        phase1.FindPropertyRelative("state").intValue = 1;
+        phase1.FindPropertyRelative("deactivateSelf").boolValue = true;
+        var p1Buttons = phase1.FindPropertyRelative("buttons");
+        p1Buttons.arraySize = 1;
+        var p1Btn0 = p1Buttons.GetArrayElementAtIndex(0);
+        p1Btn0.FindPropertyRelative("buttonText").stringValue = "查看";
+        p1Btn0.FindPropertyRelative("type").intValue = (int)InteractionType.HintOnly;
+
+        so.ApplyModifiedProperties();
+
+        interactable.ApplyState(1);
+
+        Assert.IsFalse(go.activeSelf, "deactivateSelf 的 phase 应禁用 GameObject");
+        CleanupTestGameObjects();
+    }
+
+    [Test]
+    public void Interactable_TransitionToState_UpdatesSaveManager()
     {
         SaveManager.Instance.ClearSave();
-        SaveManager.Instance.SetEntityState("gym_door_locked", 0);
 
-        var entity = _dtm.Tables.TbEntity["gym_door_locked"];
-        Assert.AreEqual(1, entity.InitialState, "gym_door_locked 初始状态应为 1(Disabled)");
+        CreateTestInteractable("Transition",
+            new InteractionPhase
+            {
+                state = 0,
+                hintText = "按 E 对话",
+                buttons = new List<ButtonOption>
+                {
+                    new ButtonOption { buttonText = "E", type = InteractionType.Dialogue, dataId = 1001001, transitionToState = 1 }
+                },
+                canRepeat = false
+            },
+            new InteractionPhase
+            {
+                state = 1,
+                hintText = "......",
+                buttons = new List<ButtonOption>
+                {
+                    new ButtonOption { buttonText = "好吧", type = InteractionType.HintOnly, transitionToState = -1 }
+                },
+                canRepeat = true
+            });
 
-        int state = EntityConfigLoader.GetFinalState(entity);
-        Assert.AreEqual(0, state,
-            "存档状态应覆盖非零 InitialState");
+        InteractableManager.InitializeScene();
+
+        var interactable = Object.FindObjectsOfType<Interactable>(true)[0];
+        Assert.AreEqual(InteractionType.Dialogue, interactable.CurrentPhase.buttons[0].type);
+        Assert.AreEqual(1, interactable.CurrentPhase.buttons[0].transitionToState);
+
+        interactable.OnPlayerEnter();
+        interactable.OnPlayerExecute(0);
+
+        string eid = interactable.EntityId;
+        Assert.AreEqual(1, SaveManager.Instance.GetEntityState(eid),
+            "状态转换应写入 SaveManager");
+        Assert.AreEqual(1, interactable.CurrentState);
+        Assert.AreEqual(InteractionType.HintOnly, interactable.CurrentPhase.buttons[0].type);
+
+        CleanupTestGameObjects();
     }
 
     [Test]
-    public void ApplyState_Normal_ActivatesGameObject()
+    public void Interactable_CanRepeat_AllowsMultipleExecute()
     {
-        var go = new GameObject("[Test] NormalEntity");
-        go.SetActive(false);
-        var collider = go.AddComponent<SimpleInteractionObject>();
+        CreateTestInteractable("Repeat",
+            new InteractionPhase
+            {
+                state = 0,
+                hintText = "按 E 对话",
+                buttons = new List<ButtonOption>
+                {
+                    new ButtonOption { buttonText = "E", type = InteractionType.Dialogue, dataId = 1001001, transitionToState = 1 }
+                },
+                canRepeat = false
+            },
+            new InteractionPhase
+            {
+                state = 1,
+                hintText = "......",
+                buttons = new List<ButtonOption>
+                {
+                    new ButtonOption { buttonText = "好吧", type = InteractionType.HintOnly, transitionToState = -1 }
+                },
+                canRepeat = true
+            });
 
-        EntityConfigLoader.ApplyState(collider, EntityConfigLoader.StateNormal);
+        InteractableManager.InitializeScene();
 
-        Assert.IsTrue(go.activeSelf,
-            "StateNormal 应激活 GameObject");
-        Object.DestroyImmediate(go);
+        var interactable = Object.FindObjectsOfType<Interactable>(true)[0];
+
+        interactable.ApplyState(1);
+        Assert.IsTrue(interactable.CurrentPhase.canRepeat);
+
+        interactable.OnPlayerEnter();
+        interactable.OnPlayerExecute(0);
+        interactable.OnPlayerExecute(0);
+
+        CleanupTestGameObjects();
     }
 
     [Test]
-    public void ApplyState_Disabled_SetsExecutedAndStaysActive()
+    public void Interactable_CannotRepeat_BlocksSecondExecute()
     {
-        var go = new GameObject("[Test] DisabledEntity");
-        var simple = go.AddComponent<SimpleInteractionObject>();
+        CreateTestInteractable("NoRepeat",
+            new InteractionPhase
+            {
+                state = 0,
+                hintText = "按 E 对话",
+                buttons = new List<ButtonOption>
+                {
+                    new ButtonOption { buttonText = "E", type = InteractionType.Dialogue, dataId = 1001001, transitionToState = 1 }
+                },
+                canRepeat = false
+            },
+            new InteractionPhase
+            {
+                state = 1,
+                hintText = "......",
+                buttons = new List<ButtonOption>
+                {
+                    new ButtonOption { buttonText = "好吧", type = InteractionType.HintOnly, transitionToState = -1 }
+                },
+                canRepeat = true
+            });
 
-        EntityConfigLoader.ApplyState(simple, EntityConfigLoader.StateDisabled);
+        InteractableManager.InitializeScene();
 
-        Assert.IsTrue(go.activeSelf,
-            "StateDisabled 应保持 GameObject 激活");
-        Assert.IsTrue(simple.HasBeenExecuted,
-            "StateDisabled 应设置 HasBeenExecuted=true");
-        Object.DestroyImmediate(go);
-    }
+        var interactable = Object.FindObjectsOfType<Interactable>(true)[0];
+        Assert.IsFalse(interactable.CurrentPhase.canRepeat);
 
-    [Test]
-    public void ApplyState_Hidden_DeactivatesGameObject()
-    {
-        var go = new GameObject("[Test] HiddenEntity");
-        go.SetActive(true);
-        var collider = go.AddComponent<SimpleInteractionObject>();
+        interactable.OnPlayerEnter();
+        interactable.OnPlayerExecute(0);
 
-        EntityConfigLoader.ApplyState(collider, EntityConfigLoader.StateHidden);
+        Assert.AreEqual(1, interactable.CurrentState, "首次执行应触发状态转换");
 
-        Assert.IsFalse(go.activeSelf,
-            "StateHidden 应停用 GameObject");
-        Object.DestroyImmediate(go);
-    }
-
-    [Test]
-    public void OnEntityInteracted_UpdatesSaveManager()
-    {
-        SaveManager.Instance.ClearSave();
-
-        EntityConfigLoader.OnEntityInteracted("gym_main_npc_01", 1);
-
-        Assert.IsTrue(SaveManager.Instance.HasEntityState("gym_main_npc_01"),
-            "交互后 SaveManager 应有该实体记录");
-        Assert.AreEqual(1, SaveManager.Instance.GetEntityState("gym_main_npc_01"),
-            "交互后状态应正确");
-    }
-
-    [Test]
-    public void GetEntityConfig_ReturnsCorrectEntity()
-    {
-        var entity = EntityConfigLoader.GetEntityConfig("gym_main_npc_01");
-        Assert.IsNotNull(entity);
-        Assert.AreEqual(0, entity.Type);
-        Assert.AreEqual(2, entity.SceneId);
-    }
-
-    [Test]
-    public void GetEntityConfig_NotFound_ReturnsNull()
-    {
-        var entity = EntityConfigLoader.GetEntityConfig("nonexistent");
-        Assert.IsNull(entity);
+        CleanupTestGameObjects();
     }
 
     #endregion

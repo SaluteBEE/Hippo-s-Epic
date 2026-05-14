@@ -8,13 +8,23 @@ using UnityEngine;
         public new Rigidbody2D rigidbody2D;
         public float MoveSpeed = 2.5f;
 
-        public LayerMask interactionLayerMask;
-
         [Header("Flip")]
         [SerializeField] private bool faceRightByDefault = true;
 
-        private InteractionCollider _currentInteractionCollider;
+        private Interactable _currentInteractable;
         private Vector3 _originalScale;
+
+        public Interactable CurrentInteractable => _currentInteractable;
+
+        public void SetCurrentInteractable(Interactable interactable)
+        {
+            _currentInteractable = interactable;
+        }
+
+        public void ClearCurrentInteractable()
+        {
+            _currentInteractable = null;
+        }
 
         private void Awake()
         {
@@ -58,46 +68,13 @@ using UnityEngine;
             Vector2 position2D = new Vector2(position.x, position.y);
             transform.position = new Vector3(position2D.x, position2D.y, position2D.y);
             Moved?.Invoke(position2D);
-
-            // Interaction Check
-            Vector2 vector2 = new Vector2(transform.position.x, transform.position.y);
-
-            Collider2D collider2D = Physics2D.OverlapPoint(vector2, interactionLayerMask);
-            if (collider2D != null)
-            {
-                if (collider2D.TryGetComponent(out InteractionCollider interactionCollider))
-                {
-                    if (interactionCollider != _currentInteractionCollider)
-                    {
-                        _currentInteractionCollider?.OnPlayerExit();
-                        _currentInteractionCollider = interactionCollider;
-                        _currentInteractionCollider.OnPlayerEnter();
-                    }
-                }
-            }
-            else
-            {
-                if (_currentInteractionCollider != null)
-                {
-                    _currentInteractionCollider.OnPlayerExit();
-                    _currentInteractionCollider = null;
-                }
-            }
         }
 
-        public void PlayerExecute()
+        public void PlayerExecute(int buttonIndex = 0)
         {
-            Collider2D collider2D = Physics2D.OverlapPoint(
-                new Vector2(transform.position.x, transform.position.y),
-                interactionLayerMask
-            );
-
-            if (collider2D != null)
+            if (_currentInteractable != null)
             {
-                if (collider2D.TryGetComponent(out InteractionCollider interactionCollider))
-                {
-                    interactionCollider.OnPlayerExecute();
-                }
+                _currentInteractable.OnPlayerExecute(buttonIndex);
             }
         }
 

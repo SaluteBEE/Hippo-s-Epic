@@ -8,6 +8,8 @@ public class GameStateMachine
 {
     public IGameState Current { get; private set; }
 
+    public event System.Action<IGameState> OnStateChanged;
+
     public void ChangeState(IGameState newState)
     {
         if (newState == null)
@@ -16,6 +18,7 @@ public class GameStateMachine
         Current?.Exit();
         Current = newState;
         Current.Enter();
+        OnStateChanged?.Invoke(newState);
     }
 
     public void Update()

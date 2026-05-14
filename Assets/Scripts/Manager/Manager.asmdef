@@ -1,7 +1,7 @@
 {
     "name": "Manager",
     "rootNamespace": "",
-    "references": ["Core", "LubanData.Gen", "Luban.Runtime"],
+    "references": ["Core", "LubanData.Gen", "Luban.Runtime", "HippoInput", "Unity.InputSystem"],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,

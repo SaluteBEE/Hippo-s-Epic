@@ -1,0 +1,105 @@
+using System;
+using System.Collections.Generic;
+using UnityEngine;
+
+[Serializable]
+public class InteractionPhase
+{
+    [Header("状态")]
+    [Tooltip("状态值，与 SaveManager 存档中的 EntityState 对应\nInteractableManager 初始化时根据存档选择对应阶段")]
+    public int state;
+
+    [Header("提示")]
+    [Tooltip("玩家进入范围时显示的提示文字，如 \"按 E 交谈\"")]
+    public string hintText = "选择操作";
+
+    [Header("按钮选项")]
+    [Tooltip("可选按钮列表，每个按钮可触发不同的交互操作\n玩家可通过键盘按键或点击UI按钮触发")]
+    public List<ButtonOption> buttons = new List<ButtonOption>();
+
+    [Header("行为")]
+    [Tooltip("是否可重复交互。false 时首次交互后不再响应")]
+    public bool canRepeat = true;
+    [Tooltip("交互后隐藏提示UI")]
+    public bool hideAfterExecute;
+    [Tooltip("交互后销毁此GameObject")]
+    public bool destroySelf;
+    [Tooltip("交互后禁用此GameObject（SetActive(false)）")]
+    public bool deactivateSelf;
+
+    [HideInInspector]
+    [SerializeField]
+    private InteractionType _legacyType;
+    [HideInInspector]
+    [SerializeField]
+    private string _legacyHintButton = "E";
+    [HideInInspector]
+    [SerializeField]
+    private int _legacyDataId;
+    [HideInInspector]
+    [SerializeField]
+    private string _legacyParam1;
+    [HideInInspector]
+    [SerializeField]
+    private string _legacyParam2;
+    [HideInInspector]
+    [SerializeField]
+    private int _legacyTransitionToState = -1;
+
+    public void MigrateIfNeeded()
+    {
+        if (buttons.Count > 0)
+            return;
+
+        if (_legacyType == InteractionType.HintOnly && string.IsNullOrEmpty(_legacyHintButton))
+            return;
+
+        buttons.Add(new ButtonOption
+        {
+            buttonText = !string.IsNullOrEmpty(_legacyHintButton) ? _legacyHintButton : "交互",
+            type = _legacyType,
+            dataId = _legacyDataId,
+            param1 = _legacyParam1,
+            param2 = _legacyParam2,
+            transitionToState = _legacyTransitionToState
+        });
+
+        _legacyType = InteractionType.HintOnly;
+        _legacyHintButton = "";
+        _legacyDataId = 0;
+        _legacyParam1 = "";
+        _legacyParam2 = "";
+        _legacyTransitionToState = -1;
+    }
+}
+
+[Serializable]
+public class ButtonOption
+{
+    [Tooltip("按钮显示文字，如 \"E\"、\"交谈\"、\"拾取\"")]
+    public string buttonText = "交互";
+
+    [Header("操作")]
+    [Tooltip("交互类型：HintOnly=仅提示 | Dialogue=对话 | Pickup=拾取 | Teleport=传送")]
+    public InteractionType type;
+    [Tooltip("Dialogue → 对话表ID\nPickup → 物品ID（当 param1 为空时用作物品名）")]
+    public int dataId;
+    [Tooltip("Teleport(场景内) → 目标地图名（Map名称）\nTeleport(跨场景) → 留空，使用 param2\nPickup → 物品名称（覆盖 dataId）")]
+    public string param1;
+    [Tooltip("Teleport(跨场景) → 目标场景名（如 Scene_Staff_Lounge）\n需要 GameApp 存在才能跨场景传送")]
+    public string param2;
+    [Tooltip("传送模式：0=传送到交互点，1=跨场景")]
+    public int teleportMode;
+
+    [Header("行为")]
+    [Tooltip("点击后转换到的状态值，-1 表示不转换状态\n转换后会重新匹配 phases 中对应 state 的阶段")]
+    public int transitionToState = -1;
+}
+
+public enum InteractionType
+{
+    HintOnly,
+    Dialogue,
+    Pickup,
+    Teleport
+}

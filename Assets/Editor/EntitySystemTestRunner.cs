@@ -1,34 +1,10 @@
 #if UNITY_EDITOR
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public static class EntitySystemTestRunner
 {
-    private const string TestSceneName = "EntitySystemTest";
-
-    [MenuItem("Tools/EntityTest/LoadLubanData")]
-    public static void TestLoadLubanData()
-    {
-        Debug.Log("[Test] LoadLubanData START");
-        var go = new GameObject("[Test] DataTableManager");
-        var dtm = go.AddComponent<DataTableManager>();
-        dtm.LoadTables();
-        ManagerRegistry.Register(dtm);
-
-        var tables = dtm.Tables;
-        Debug.Log($"[Test] TbScene 记录数: {tables.TbScene.DataList.Count}");
-        foreach (var s in tables.TbScene.DataList)
-            Debug.Log($"  Scene: id={s.Id} name={s.Name} display={s.DisplayName}");
-
-        Debug.Log($"[Test] TbEntity 记录数: {tables.TbEntity.DataList.Count}");
-        foreach (var e in tables.TbEntity.DataList)
-            Debug.Log($"  Entity: id={e.Id} sceneId={e.SceneId} type={e.Type} dataId={e.DataId} initialState={e.InitialState}");
-
-        Debug.Log("[Test] Luban 数据加载 ✓");
-    }
-
-    [MenuItem("Tools/EntityTest/TestSaveManager")]
+    [MenuItem("Tools/InteractableTest/TestSaveManager")]
     public static void TestSaveManager()
     {
         Debug.Log("[Test] TestSaveManager START");
@@ -53,104 +29,108 @@ public static class EntitySystemTestRunner
         SaveManager.Instance.ClearSave();
     }
 
-    [MenuItem("Tools/EntityTest/CreateAndInit")]
+    [MenuItem("Tools/InteractableTest/CreateAndInit")]
     public static void TestCreateSceneObjectsAndInit()
     {
-        var dtm = ManagerRegistry.Get<DataTableManager>();
-        if (dtm == null || !dtm.IsLoaded)
-        {
-            TestLoadLubanData();
-        }
-
         CleanupTestObjects();
 
-        var parent = new GameObject("[Test] Entities");
+        var parent = new GameObject("[Test] TestMap");
+        parent.transform.position = Vector3.zero;
 
-        CreateTestInteractable("TestNPC", "gym_main_npc_01", parent.transform);
-        CreateTestInteractable("TestItem", "lounge_item_01", parent.transform);
-        CreateTestInteractable("TestNPC2", "lounge_npc_01", parent.transform);
-        CreateTestInteractable("TestDoor", "gym_door_locked", parent.transform);
-        CreateTestInteractable("TestNoConfig", "", parent.transform);
+        CreateTestInteractable("TestNPC", parent.transform,
+            new InteractionPhase
+            {
+                state = 0,
+                hintText = "按 E 对话",
+                buttons = new System.Collections.Generic.List<ButtonOption>
+                {
+                    new ButtonOption
+                    {
+                        buttonText = "E",
+                        type = InteractionType.Dialogue,
+                        dataId = 1001001,
+                        transitionToState = 1
+                    }
+                },
+                canRepeat = false
+            },
+            new InteractionPhase
+            {
+                state = 1,
+                hintText = "......",
+                buttons = new System.Collections.Generic.List<ButtonOption>
+                {
+                    new ButtonOption
+                    {
+                        buttonText = "好吧",
+                        type = InteractionType.HintOnly
+                    }
+                },
+                canRepeat = true
+            });
 
-        Debug.Log("[Test] 已创建 5 个测试交互物体");
+        CreateTestInteractable("TestNoConfig", parent.transform);
+
+        Debug.Log("[Test] 已创建测试交互物体");
 
         SaveManager.Instance.ClearSave();
-        EntityConfigLoader.InitializeScene(SceneManager.GetActiveScene().name);
+        InteractableManager.InitializeScene();
 
-        Debug.Log("[Test] EntityConfigLoader 初始化完成，查看上方日志验证匹配结果");
+        Debug.Log("[Test] InteractableManager 初始化完成，查看上方日志验证匹配结果");
     }
 
-    [MenuItem("Tools/EntityTest/InteractionSave")]
-    public static void TestInteractionAndSave()
-    {
-        EntityConfigLoader.OnEntityInteracted("gym_main_npc_01", 1);
-        EntityConfigLoader.OnEntityInteracted("lounge_item_01", 2);
-        SaveManager.Instance.Save();
-
-        Debug.Log("[Test] 模拟交互完成并保存，查看 persistentDataPath/save.json");
-        Debug.Log($"[Test] 存档路径: {Application.persistentDataPath}/save.json");
-    }
-
-    [MenuItem("Tools/EntityTest/StateRestore")]
-    public static void TestStateRestore()
-    {
-        var dtm = ManagerRegistry.Get<DataTableManager>();
-        if (dtm == null || !dtm.IsLoaded)
-        {
-            TestLoadLubanData();
-        }
-
-        CleanupTestObjects();
-
-        var parent = new GameObject("[Test] Entities");
-        CreateTestInteractable("TestNPC", "gym_main_npc_01", parent.transform);
-        CreateTestInteractable("TestItem", "lounge_item_01", parent.transform);
-        CreateTestInteractable("TestNPC2", "lounge_npc_01", parent.transform);
-        CreateTestInteractable("TestDoor", "gym_door_locked", parent.transform);
-
-        EntityConfigLoader.InitializeScene(SceneManager.GetActiveScene().name);
-
-        Debug.Log("[Test] 如果之前执行了步骤 4，gym_main_npc_01 应为 StateDisabled(1)，lounge_item_01 应为 StateHidden(2)");
-        Debug.Log("[Test] 状态恢复测试完成 ✓");
-    }
-
-    [MenuItem("Tools/EntityTest/Cleanup")]
+    [MenuItem("Tools/InteractableTest/Cleanup")]
     public static void CleanupAll()
     {
         CleanupTestObjects();
         SaveManager.Instance.ClearSave();
-
-        var dtm = ManagerRegistry.Get<DataTableManager>();
-        if (dtm != null)
-        {
-            ManagerRegistry.Unregister<DataTableManager>();
-            Object.DestroyImmediate(dtm.gameObject);
-        }
-
         Debug.Log("[Test] 清理完成");
     }
 
-    private static void CreateTestInteractable(string name, string entityId, Transform parent)
+    private static void CreateTestInteractable(string name, Transform parent, params InteractionPhase[] phases)
     {
         var go = new GameObject(name);
         go.transform.parent = parent;
         go.AddComponent<BoxCollider2D>();
-        var pickup = go.AddComponent<ItemPickup>();
-        if (!string.IsNullOrEmpty(entityId))
+        var interactable = go.AddComponent<Interactable>();
+
+        if (phases == null || phases.Length == 0)
+            return;
+
+        var so = new SerializedObject(interactable);
+        var phasesProp = so.FindProperty("phases");
+        phasesProp.arraySize = phases.Length;
+        for (int i = 0; i < phases.Length; i++)
         {
-            var so = new SerializedObject(pickup);
-            var prop = so.FindProperty("entityId");
-            if (prop != null)
+            var element = phasesProp.GetArrayElementAtIndex(i);
+            element.FindPropertyRelative("state").intValue = phases[i].state;
+            element.FindPropertyRelative("hintText").stringValue = phases[i].hintText;
+            element.FindPropertyRelative("canRepeat").boolValue = phases[i].canRepeat;
+            element.FindPropertyRelative("hideAfterExecute").boolValue = phases[i].hideAfterExecute;
+            element.FindPropertyRelative("destroySelf").boolValue = phases[i].destroySelf;
+            element.FindPropertyRelative("deactivateSelf").boolValue = phases[i].deactivateSelf;
+
+            var buttonsProp = element.FindPropertyRelative("buttons");
+            buttonsProp.arraySize = phases[i].buttons.Count;
+            for (int j = 0; j < phases[i].buttons.Count; j++)
             {
-                prop.stringValue = entityId;
-                so.ApplyModifiedProperties();
+                var btn = buttonsProp.GetArrayElementAtIndex(j);
+                var src = phases[i].buttons[j];
+                btn.FindPropertyRelative("buttonText").stringValue = src.buttonText;
+                btn.FindPropertyRelative("type").intValue = (int)src.type;
+                btn.FindPropertyRelative("dataId").intValue = src.dataId;
+                btn.FindPropertyRelative("param1").stringValue = src.param1 ?? "";
+                btn.FindPropertyRelative("param2").stringValue = src.param2 ?? "";
+                btn.FindPropertyRelative("transitionToState").intValue = src.transitionToState;
             }
         }
+
+        so.ApplyModifiedProperties();
     }
 
     private static void CleanupTestObjects()
     {
-        var obj = GameObject.Find("[Test] Entities");
+        var obj = GameObject.Find("[Test] TestMap");
         if (obj != null) Object.DestroyImmediate(obj);
     }
 }

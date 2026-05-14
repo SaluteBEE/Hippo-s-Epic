@@ -53,7 +53,7 @@ public class MapManager : MonoBehaviour
             return;
         }
 
-        LoadMap(startMap, player, true, null);
+        LoadMap(startMap, player, true, null, false);
     }
 
     public void SwitchMap(string mapName, bool teleportPlayer = true)
@@ -70,7 +70,8 @@ public class MapManager : MonoBehaviour
             targetMap,
             LevelController.Instance != null ? LevelController.Instance.PlayerCharacter : null,
             teleportPlayer,
-            null
+            null,
+            true
         );
     }
 
@@ -88,7 +89,8 @@ public class MapManager : MonoBehaviour
             targetMap,
             LevelController.Instance != null ? LevelController.Instance.PlayerCharacter : null,
             teleportPlayer,
-            targetEntrance
+            targetEntrance,
+            true
         );
     }
 
@@ -104,7 +106,8 @@ public class MapManager : MonoBehaviour
             targetMap,
             LevelController.Instance != null ? LevelController.Instance.PlayerCharacter : null,
             teleportPlayer,
-            null
+            null,
+            true
         );
     }
 
@@ -120,11 +123,12 @@ public class MapManager : MonoBehaviour
             targetMap,
             LevelController.Instance != null ? LevelController.Instance.PlayerCharacter : null,
             teleportPlayer,
-            targetEntrance
+            targetEntrance,
+            true
         );
     }
 
-    private void LoadMap(Map targetMap, PlayerCharacter player, bool teleportPlayer, Vector2? customEntrance)
+    private void LoadMap(Map targetMap, PlayerCharacter player, bool teleportPlayer, Vector2? customEntrance, bool preferTeleportArrival = false)
     {
         if (targetMap == null)
             return;
@@ -136,6 +140,7 @@ public class MapManager : MonoBehaviour
 
         if (currentMap != null && currentMap != targetMap)
         {
+            currentMap.SaveInteractableStates();
             currentMap.gameObject.SetActive(false);
         }
 
@@ -146,18 +151,26 @@ public class MapManager : MonoBehaviour
         {
             if (customEntrance.HasValue)
                 MovePlayerToEntrance(player, currentMap, customEntrance.Value);
+            else if (preferTeleportArrival)
+                MovePlayerToTeleportArrival(player, currentMap);
             else
                 MovePlayerToMainEntrance(player, currentMap);
         }
 
         ApplyCamera(currentMap, player);
+        InteractableManager.InitializeMap(currentMap);
 
         Debug.Log($"[MapManager] Switched to map: {currentMap.name}");
     }
 
     private void MovePlayerToMainEntrance(PlayerCharacter player, Map map)
     {
-        MovePlayerToEntrance(player, map, map.MainEntrance);
+        player.transform.position = map.SpawnPointWorld;
+    }
+
+    private void MovePlayerToTeleportArrival(PlayerCharacter player, Map map)
+    {
+        player.transform.position = map.TeleportArrivalWorld;
     }
 
     private void MovePlayerToEntrance(PlayerCharacter player, Map map, Vector2 entranceLocal)

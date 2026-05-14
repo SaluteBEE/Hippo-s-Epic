@@ -11,6 +11,7 @@ public class GameApp : MonoBehaviour
     [SerializeField] private new AudioManager audio;
     [SerializeField] private SceneController scene;
     [SerializeField] private DataTableManager dataTable;
+    [SerializeField] private InputManager inputManager;
 
     [Header("Startup")]
     [SerializeField] private string mainMenuSceneName = "Scene_Init";
@@ -45,6 +46,17 @@ public class GameApp : MonoBehaviour
         ManagerRegistry.Register(audio);
         ManagerRegistry.Register(scene);
         ManagerRegistry.Register(dataTable);
+
+        if (inputManager == null) inputManager = GetComponentInChildren<InputManager>(true);
+        if (inputManager == null)
+        {
+            var go = new GameObject("[InputManager]");
+            go.transform.SetParent(transform);
+            inputManager = go.AddComponent<InputManager>();
+        }
+        ManagerRegistry.Register(inputManager);
+
+        StateMachine.OnStateChanged += OnGameStateChanged;
     }
 
     private void Start()
@@ -107,5 +119,45 @@ public class GameApp : MonoBehaviour
             ResumeGame();
         else if (StateMachine.Current is GameplayState)
             PauseGame();
+    }
+
+    public void EnterDialogMode()
+    {
+        if (inputManager != null)
+            inputManager.EnableOnlyDialog();
+    }
+
+    public void ExitDialogMode()
+    {
+        if (inputManager != null)
+            inputManager.EnablePlayerAndUI();
+    }
+
+    private void OnGameStateChanged(IGameState state)
+    {
+        if (inputManager == null) return;
+
+        if (state is MainMenuState)
+        {
+            inputManager.EnableOnlyUI();
+        }
+        else if (state is GameplayState)
+        {
+            inputManager.EnablePlayerAndUI();
+        }
+        else if (state is PauseState)
+        {
+            inputManager.EnableOnlyUI();
+        }
+        else if (state is LoadingState)
+        {
+            inputManager.DisableAll();
+        }
+    }
+
+    private void OnDestroy()
+    {
+        if (Instance != this) return;
+        StateMachine.OnStateChanged -= OnGameStateChanged;
     }
 }

@@ -18,7 +18,6 @@ public class DialogCharacterManager : MonoBehaviour
     private readonly Dictionary<int, GameObject> _dynamicInstances = new Dictionary<int, GameObject>();
     private readonly Dictionary<int, AsyncOperationHandle<GameObject>> _loadedHandles = new Dictionary<int, AsyncOperationHandle<GameObject>>();
     private readonly List<AsyncOperationHandle> _pendingHandles = new List<AsyncOperationHandle>();
-    private readonly HashSet<int> _scenePersonIds = new HashSet<int>();
     private readonly Dictionary<int, SpeakerSide> _personSides = new Dictionary<int, SpeakerSide>();
     private readonly int[] _rightSlotPersonIds = new int[RightSlotCount];
     private Coroutine _prepareCoroutine;
@@ -134,8 +133,6 @@ public class DialogCharacterManager : MonoBehaviour
 
     private IEnumerator PrepareCharactersCoroutine(int speakerid1, int speakerid2, int seq)
     {
-        _scenePersonIds.Clear();
-
         PrepareSide(speakerid1, SpeakerSide.Left, -1, seq);
         PrepareRightSlot(0, speakerid2, seq);
 
@@ -225,16 +222,6 @@ public class DialogCharacterManager : MonoBehaviour
             return;
         }
 
-        AnimationController existingCtrl = FindControllerInScene(personId);
-        if (existingCtrl != null)
-        {
-            _scenePersonIds.Add(personId);
-            RegisterToStateManager(personId, existingCtrl);
-            _rightSlotPersonIds[slotIndex] = personId;
-            Debug.Log($"[DialogCharacterManager] 使用场景角色: personId={personId} ({person.Name})");
-            return;
-        }
-
         LoadAndInstantiateToSlot(person, slotIndex, seq);
         _rightSlotPersonIds[slotIndex] = personId;
     }
@@ -262,41 +249,7 @@ public class DialogCharacterManager : MonoBehaviour
             return;
         }
 
-        AnimationController existingCtrl = FindControllerInScene(personId);
-        if (existingCtrl != null)
-        {
-            _scenePersonIds.Add(personId);
-            RegisterToStateManager(personId, existingCtrl);
-            Debug.Log($"[DialogCharacterManager] 使用场景角色: personId={personId} ({person.Name})");
-            return;
-        }
-
         LoadAndInstantiate(person, side, slotIndex, seq);
-    }
-
-    private AnimationController FindControllerInScene(int personId)
-    {
-        if (_stateMgr == null) return null;
-
-        if (_stateMgr.IsRegistered(personId, PrefabType))
-            return _stateMgr.GetController(personId, PrefabType);
-
-        var person = _tables.TbPerson.GetOrDefault(personId);
-        if (person == null) return null;
-
-        var allControllers = FindObjectsOfType<AnimationController>();
-        foreach (var ctrl in allControllers)
-        {
-            if (ctrl.Config == null) continue;
-
-            string configName = ctrl.Config.name.Replace("_AnimationConfig", "");
-            if (person.Animconfigs != null && person.Animconfigs.Contains(configName))
-            {
-                return ctrl;
-            }
-        }
-
-        return null;
     }
 
     private void LoadAndInstantiate(Person person, SpeakerSide side, int slotIndex, int seq)
@@ -482,8 +435,6 @@ public class DialogCharacterManager : MonoBehaviour
                 Addressables.Release(handle);
         }
         _pendingHandles.Clear();
-
-        _scenePersonIds.Clear();
 
         if (_renderer != null)
             _renderer.SetVisible(false);
