@@ -1,6 +1,6 @@
 ﻿// ============================================================
 // 自动生成文件 - 勿手动修改
-// 生成时间: 2026-05-15 01:03:08
+// 生成时间: 2026-05-17 18:22:33
 // 通过 Tools/Map/收集所有场景的传送目标 重新生成
 // ============================================================
 
@@ -29,13 +29,13 @@ public static class TeleportTargetDef
             {
                 new InteractableEntry { entityId = "NPC_NPC_Coach", mapName = "Staff Lounge" },
                 new InteractableEntry { entityId = "trans_Teleporter_To_Gym", mapName = "Staff Lounge" },
-                new InteractableEntry { entityId = "Underground Boxing Gym_Transporter", mapName = "Underground Boxing Gym" }
+                new InteractableEntry { entityId = "trans_Transporter", mapName = "Underground Boxing Gym" }
             }
         },
         new SceneEntry
         {
-            sceneName = "Scene_Underground_Boxing_Gym",
-            mapNames = new string[] { "Main Map", "Underground Boxing Gym" },
+            sceneName = "Temple",
+            mapNames = new string[] { "temple" },
             interactables = System.Array.Empty<InteractableEntry>()
         }
     };

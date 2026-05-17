@@ -19,6 +19,12 @@ public class MapManager : MonoBehaviour
 
     public void Initialize(PlayerCharacter player)
     {
+        string pendingMap = GameApp.ConsumePendingMap();
+        Initialize(player, pendingMap);
+    }
+
+    public void Initialize(PlayerCharacter player, string mapName)
+    {
         if (sceneMaps == null || sceneMaps.Length == 0)
         {
             Debug.LogWarning("[MapManager] sceneMaps is empty, skipping map initialization.");
@@ -33,13 +39,18 @@ public class MapManager : MonoBehaviour
 
         Map startMap = null;
 
-        if (!string.IsNullOrEmpty(initialMapName))
+        if (!string.IsNullOrEmpty(mapName))
+        {
+            startMap = sceneMaps.FirstOrDefault(m => m != null && m.name == mapName);
+            if (startMap == null)
+                Debug.LogWarning($"[MapManager] 指定地图未找到: {mapName}");
+        }
+
+        if (startMap == null && !string.IsNullOrEmpty(initialMapName))
         {
             startMap = sceneMaps.FirstOrDefault(m => m != null && m.name == initialMapName);
             if (startMap == null)
-            {
                 Debug.LogWarning($"[MapManager] Initial map not found: {initialMapName}");
-            }
         }
 
         if (startMap == null)

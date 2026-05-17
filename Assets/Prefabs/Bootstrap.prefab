@@ -143,6 +143,9 @@ MonoBehaviour:
   rootCanvas: {fileID: 0}
   windows:
   - {fileID: 8822420684512519431, guid: d09353bb4b7642349a2f58092b2fe394, type: 3}
+  - {fileID: 2748663225813179973, guid: 0da5c93151d8d7a4da9da7892a9a4c96, type: 3}
+  - {fileID: 7916875803305758733, guid: 5dc0706b5ace6344b83c4a9701ba9081, type: 3}
+  - {fileID: 6186421785516643252, guid: a95b9c147c9db894cb3d953ca8dbdfa4, type: 3}
 --- !u!114 &4479774886411730833
 MonoBehaviour:
   m_ObjectHideFlags: 0

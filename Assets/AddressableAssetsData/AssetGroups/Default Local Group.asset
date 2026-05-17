@@ -24,37 +24,37 @@ MonoBehaviour:
     - background
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: ab105f16188c31b4a8edfcd8de2fe12f
-    m_Address: ui/BubbleLeft
+    m_Address: ui/Dialog/BubbleLeft
     m_ReadOnly: 0
     m_SerializedLabels:
     - ui_prefab
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: c73df702408772b42b68a4b0d89e3205
-    m_Address: ui/BubbleMiddle
+    m_Address: ui/Dialog/BubbleMiddle
     m_ReadOnly: 0
     m_SerializedLabels:
     - ui_prefab
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 5e0861a17eabd3a4db06b3cfc207ce42
-    m_Address: ui/BubbleOption
+    m_Address: ui/Dialog/BubbleOption
     m_ReadOnly: 0
     m_SerializedLabels:
     - ui_prefab
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: cbba89dd17a70de4e83ec9117ea420e3
-    m_Address: ui/BubbleRight
+    m_Address: ui/Dialog/BubbleRight
     m_ReadOnly: 0
     m_SerializedLabels:
     - ui_prefab
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: d9f082591a7dd534d8201345555b871d
-    m_Address: ui/DialoguePanel
+    m_Address: ui/Dialog/DialoguePanel
     m_ReadOnly: 0
     m_SerializedLabels:
     - ui_prefab
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 0da5c93151d8d7a4da9da7892a9a4c96
-    m_Address: ui/MainMenuPanel
+    m_Address: ui/Global/MainMenuPanel
     m_ReadOnly: 0
     m_SerializedLabels:
     - ui_prefab
@@ -65,10 +65,70 @@ MonoBehaviour:
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 8f47d42ebe93395418e6d0ac6e620ff9
-    m_Address: prefabs/ui/InteractHint
+    m_Address: ui/Interact/InteractHint
     m_ReadOnly: 0
     m_SerializedLabels:
     - ui_prefab
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d09353bb4b7642349a2f58092b2fe394
+    m_Address: ui/Dialog/DialogWindow
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - ui_prefab
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a95b9c147c9db894cb3d953ca8dbdfa4
+    m_Address: ui/Bag/BagPanel
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - ui_prefab
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5dc0706b5ace6344b83c4a9701ba9081
+    m_Address: ui/Global/LoadingPanel
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - ui_prefab
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: cf158ebc8bb7fe749aea7ddeb745372c
+    m_Address: ui/Bag/UseItemTip
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - ui_prefab
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 882963ba44968274ebc1b49f0c7e5bf5
+    m_Address: icon/item/6
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - icon
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 220b8325cfa4baa47a5d5553e36482e9
+    m_Address: icon/item/7
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - icon
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 16dac8a21386a7e44a8449a4edb084a0
+    m_Address: icon/item/8
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - icon
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 75215d461ce71ff458e3eeeb9c520d0d
+    m_Address: icon/item/9
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - icon
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: fb1f7e60857747a4a9159be0b266c4cf
+    m_Address: icon/item/10
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - icon
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 578c714e7f1217a48a8a7867a112c378
+    m_Address: icon/item/11
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - icon
     FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: dd90b6ecff8020e40aa537a3ddf43594, type: 2}

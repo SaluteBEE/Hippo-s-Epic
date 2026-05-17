@@ -41,6 +41,15 @@ public class DialogManager : MonoBehaviour
     private void Awake()
     {
         ManagerRegistry.Register(this);
+        TryAutoInit();
+    }
+
+    private void TryAutoInit()
+    {
+        if (_tables != null) return;
+        var tables = ManagerRegistry.GetTables<cfg.Tables>();
+        if (tables != null)
+            SetTables(tables);
     }
 
     protected void OnDestroy()

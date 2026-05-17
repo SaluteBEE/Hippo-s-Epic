@@ -31,7 +31,13 @@ public class SaveManager
 
     public void Save()
     {
-        var wrapper = new SaveDataWrapper { entities = new List<EntityStateEntry>(_entityStates.Count) };
+        var wrapper = new SaveDataWrapper
+        {
+            entities = new List<EntityStateEntry>(_entityStates.Count),
+            bag = BagManager.Instance.BuildSaveData(),
+            equip = EquipManager.Instance.BuildSaveData()
+        };
+
         foreach (var kvp in _entityStates)
         {
             wrapper.entities.Add(new EntityStateEntry { id = kvp.Key, state = kvp.Value });
@@ -43,7 +49,7 @@ public class SaveManager
             Directory.CreateDirectory(dir);
 
         File.WriteAllText(SavePath, json);
-        Debug.Log($"[SaveManager] 存档已保存: {SavePath} ({_entityStates.Count} 条记录)");
+        Debug.Log($"[SaveManager] 存档已保存: {SavePath} ({_entityStates.Count} 条记录, {wrapper.bag.Count} 种物品, {wrapper.equip.Count} 件装备)");
     }
 
     public void Load()
@@ -58,13 +64,16 @@ public class SaveManager
 
         string json = File.ReadAllText(SavePath);
         var wrapper = JsonUtility.FromJson<SaveDataWrapper>(json);
-        if (wrapper?.entities == null)
-            return;
-
-        foreach (var entry in wrapper.entities)
+        if (wrapper?.entities != null)
         {
-            _entityStates[entry.id] = entry.state;
+            foreach (var entry in wrapper.entities)
+            {
+                _entityStates[entry.id] = entry.state;
+            }
         }
+
+        BagManager.Instance.RestoreFromSaveData(wrapper?.bag);
+        EquipManager.Instance.RestoreFromSaveData(wrapper?.equip);
 
         Debug.Log($"[SaveManager] 存档已加载: {_entityStates.Count} 条记录");
     }
@@ -72,6 +81,8 @@ public class SaveManager
     public void ClearSave()
     {
         _entityStates.Clear();
+        BagManager.Instance.Clear();
+        EquipManager.Instance.Clear();
         if (File.Exists(SavePath))
             File.Delete(SavePath);
         Debug.Log("[SaveManager] 存档已清除");
@@ -81,6 +92,8 @@ public class SaveManager
     private class SaveDataWrapper
     {
         public List<EntityStateEntry> entities;
+        public List<BagManager.BagSaveEntry> bag;
+        public List<EquipManager.EquipSaveEntry> equip;
     }
 
     [System.Serializable]

@@ -32,9 +32,9 @@ public class AnimationStateManager : MonoBehaviour
     private void TryAutoInit()
     {
         if (_tables != null) return;
-        var dtm = ManagerRegistry.Get<DataTableManager>();
-        if (dtm != null && dtm.IsLoaded)
-            SetTables(dtm.Tables);
+        var tables = ManagerRegistry.GetTables<cfg.Tables>();
+        if (tables != null)
+            SetTables(tables);
     }
 
     public void SetTables(cfg.Tables tables)

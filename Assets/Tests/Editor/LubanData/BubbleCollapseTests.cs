@@ -289,8 +289,6 @@ class BubbleCollapseTests
 
         int lastBubbleTypeBeforeOption = -1;
         bool pendingCollapse = false;
-        int collapseTargetBubbleType = -1;
-
         while (currentId > 0 && safety-- > 0)
         {
             var dialog = tables.TbDialog.GetOrDefault(currentId);

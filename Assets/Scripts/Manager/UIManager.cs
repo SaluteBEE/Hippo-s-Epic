@@ -1,14 +1,25 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.AsyncOperations;
 
 public class UIManager : MonoBehaviour
 {
     [SerializeField] private Canvas rootCanvas;
-    [SerializeField] private List<UIWindow> windows = new List<UIWindow>();
 
-    private readonly Dictionary<Type, UIWindow> windowMap = new Dictionary<Type, UIWindow>();
-    private readonly HashSet<Type> createdSet = new HashSet<Type>();
+    private static readonly Dictionary<string, string> addressMap = new Dictionary<string, string>();
+
+    private readonly Dictionary<string, UIWindow> windowMap = new Dictionary<string, UIWindow>();
+    private readonly HashSet<string> createdSet = new HashSet<string>();
+    private readonly Dictionary<string, AsyncOperationHandle<GameObject>> loadHandles = new Dictionary<string, AsyncOperationHandle<GameObject>>();
+    private readonly HashSet<string> pendingClose = new HashSet<string>();
+
+    public static void RegisterAddress(Type windowType, string address)
+    {
+        addressMap[windowType.FullName] = address;
+    }
 
     private void Awake()
     {
@@ -16,54 +27,103 @@ public class UIManager : MonoBehaviour
 
         if (rootCanvas == null)
             rootCanvas = GetComponentInChildren<Canvas>(true);
-
-        windowMap.Clear();
-        createdSet.Clear();
-
-        foreach (var window in windows)
-        {
-            if (window == null) continue;
-
-            var instance = !window.gameObject.scene.IsValid()
-                ? Instantiate(window, rootCanvas.transform, false)
-                : window;
-
-            var type = instance.GetType();
-            if (windowMap.ContainsKey(type)) continue;
-
-            windowMap.Add(type, instance);
-
-            PlaceWindow(instance);
-            instance.gameObject.SetActive(false);
-        }
     }
 
-    public T Open<T>(object args = null) where T : UIWindow
+    public T Open<T>(object args = null, Action<T> onReady = null) where T : UIWindow
     {
-        if (!windowMap.TryGetValue(typeof(T), out var window))
+        string key = typeof(T).FullName;
+        pendingClose.Remove(key);
+
+        if (windowMap.TryGetValue(key, out var window))
         {
-            Debug.LogError($"[UIManager] Window not found: {typeof(T).Name}");
-            return null;
+            PlaceWindow(window);
+            window.gameObject.SetActive(true);
+
+            if (!createdSet.Contains(key))
+            {
+                window.OnCreate(args);
+                createdSet.Add(key);
+            }
+
+            window.OnOpen(args);
+            onReady?.Invoke((T)window);
+            return (T)window;
         }
 
+        StartCoroutine(LoadAndOpenCoroutine<T>(args, onReady));
+        return null;
+    }
+
+    private IEnumerator LoadAndOpenCoroutine<T>(object args, Action<T> onReady) where T : UIWindow
+    {
+        string key = typeof(T).FullName;
+
+        if (!addressMap.TryGetValue(key, out var address))
+        {
+            Debug.LogError($"[UIManager] 未注册 Addressable 地址: {typeof(T).Name}");
+            yield break;
+        }
+
+        if (loadHandles.ContainsKey(key))
+        {
+            yield return loadHandles[key];
+        }
+        else
+        {
+            var handle = Addressables.LoadAssetAsync<GameObject>(address);
+            loadHandles[key] = handle;
+            yield return handle;
+        }
+
+        if (loadHandles[key].Status != AsyncOperationStatus.Succeeded)
+        {
+            Debug.LogError($"[UIManager] 加载失败: {address}");
+            loadHandles.Remove(key);
+            yield break;
+        }
+
+        var prefab = loadHandles[key].Result;
+        var instance = Instantiate(prefab, rootCanvas.transform, false);
+        var window = instance.GetComponent<T>();
+
+        if (window == null)
+        {
+            Debug.LogError($"[UIManager] 预制体上找不到 {typeof(T).Name} 组件: {address}");
+            Destroy(instance);
+            yield break;
+        }
+
+        windowMap[key] = window;
         PlaceWindow(window);
+
+        if (pendingClose.Contains(key))
+        {
+            pendingClose.Remove(key);
+            window.gameObject.SetActive(false);
+            yield break;
+        }
 
         window.gameObject.SetActive(true);
 
-        if (!createdSet.Contains(typeof(T)))
+        if (!createdSet.Contains(key))
         {
             window.OnCreate(args);
-            createdSet.Add(typeof(T));
+            createdSet.Add(key);
         }
 
         window.OnOpen(args);
-        return (T)window;
+        onReady?.Invoke(window);
     }
 
     public void Close<T>() where T : UIWindow
     {
-        if (!windowMap.TryGetValue(typeof(T), out var window))
+        string key = typeof(T).FullName;
+
+        if (!windowMap.TryGetValue(key, out var window))
+        {
+            pendingClose.Add(key);
             return;
+        }
 
         window.OnClose();
         window.gameObject.SetActive(false);
@@ -71,18 +131,61 @@ public class UIManager : MonoBehaviour
 
     public bool IsOpen<T>() where T : UIWindow
     {
-        return windowMap.TryGetValue(typeof(T), out var window) && window.gameObject.activeSelf;
+        string key = typeof(T).FullName;
+        return windowMap.TryGetValue(key, out var window) && window.gameObject.activeSelf;
+    }
+
+    public bool HasPopupOpen()
+    {
+        foreach (var kvp in windowMap)
+        {
+            var w = kvp.Value;
+            if (w != null && w.gameObject.activeSelf && (int)w.Layer >= (int)UILayer.Popup)
+                return true;
+        }
+        return false;
+    }
+
+    public void CloseTopmost()
+    {
+        UIWindow topmost = null;
+        int topLayer = -1;
+
+        foreach (var kvp in windowMap)
+        {
+            var w = kvp.Value;
+            if (w != null && w.gameObject.activeSelf && (int)w.Layer > topLayer)
+            {
+                topmost = w;
+                topLayer = (int)w.Layer;
+            }
+        }
+
+        if (topmost != null)
+        {
+            topmost.OnClose();
+            topmost.gameObject.SetActive(false);
+        }
     }
 
     public T Get<T>() where T : UIWindow
     {
-        if (windowMap.TryGetValue(typeof(T), out var window))
+        string key = typeof(T).FullName;
+
+        if (windowMap.TryGetValue(key, out var window))
             return (T)window;
         return null;
     }
 
     private void OnDestroy()
     {
+        foreach (var kvp in loadHandles)
+        {
+            if (kvp.Value.IsValid())
+                Addressables.Release(kvp.Value);
+        }
+
+        loadHandles.Clear();
         ManagerRegistry.Unregister<UIManager>();
     }
 

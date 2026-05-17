@@ -32,9 +32,9 @@ public class DialogCharacterManager : MonoBehaviour
     private void TryAutoInit()
     {
         if (_tables != null) return;
-        var dtm = ManagerRegistry.Get<DataTableManager>();
-        if (dtm != null && dtm.IsLoaded)
-            Initialize(dtm.Tables);
+        var tables = ManagerRegistry.GetTables<cfg.Tables>();
+        if (tables != null)
+            Initialize(tables);
     }
 
     private DialogManager _dialogManager;

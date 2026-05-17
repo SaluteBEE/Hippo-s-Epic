@@ -171,30 +171,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72aefb6116696b145bf7035053090574, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  enableAnimationTest: 0
+  testPersonId: 1
+  testPrefabType: 1
+  enableBagTest: 1
   ui: {fileID: 2048630439}
   audio: {fileID: 2104528045}
   scene: {fileID: 1182991098}
   dataTable: {fileID: 1067370069}
   inputManager: {fileID: 0}
   mainMenuSceneName: Scene_Init
-  gameSceneName: Scene_Underground_Boxing_Gym
+  startMap: 0
   launchConfig: {fileID: 11400000, guid: 5a9f518bd038b594ca0c8b5617edea5b, type: 2}
+  enableDialogTest: 0
+  testDialogId: 1001001
+  autoStartTest: 0
 --- !u!224 &229120885 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 7916875803305758733, guid: 5dc0706b5ace6344b83c4a9701ba9081, type: 3}
   m_PrefabInstance: {fileID: 4901231731312147659}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &229120886 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 3278367834063527539, guid: 5dc0706b5ace6344b83c4a9701ba9081, type: 3}
-  m_PrefabInstance: {fileID: 4901231731312147659}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 484a0fb734504b4789b6917d2dc0e462, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &506944131
 GameObject:
   m_ObjectHideFlags: 0
@@ -393,7 +389,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3073074964425209693, guid: 0da5c93151d8d7a4da9da7892a9a4c96, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -753,10 +749,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UIManager
   rootCanvas: {fileID: 506944135}
-  windows:
-  - {fileID: 0}
-  - {fileID: 229120886}
-  - {fileID: 0}
 --- !u!1 &2104528043
 GameObject:
   m_ObjectHideFlags: 0

@@ -38,9 +38,22 @@ public static class ManagerRegistry
         return false;
     }
 
+    private static object _tables;
+
+    public static void SetTables(object tables)
+    {
+        _tables = tables;
+    }
+
+    public static T GetTables<T>() where T : class
+    {
+        return _tables as T;
+    }
+
     public static void Clear()
     {
         _managers.Clear();
+        _tables = null;
     }
 
     public static T GetOrCreate<T>() where T : MonoBehaviour
@@ -49,6 +62,7 @@ public static class ManagerRegistry
         if (mgr != null) return mgr;
 
         var go = new GameObject($"[{typeof(T).Name}]");
+        UnityEngine.Object.DontDestroyOnLoad(go);
         mgr = go.AddComponent<T>();
         _managers[typeof(T)] = mgr;
         Debug.Log($"[ManagerRegistry] 自动创建: {typeof(T).Name}");

@@ -52,7 +52,7 @@ public class DialogWindow : UIWindow
 
         var app = ManagerRegistry.Get<GameApp>();
         if (app != null)
-            app.EnterDialogMode();
+            app.EnterDialog();
         else
             ManagerRegistry.Get<BootstrapQuickStart>()?.EnterDialogMode();
 
@@ -153,7 +153,7 @@ public class DialogWindow : UIWindow
     {
         var app = ManagerRegistry.Get<GameApp>();
         if (app != null)
-            app.ExitDialogMode();
+            app.ExitDialog();
         else
             ManagerRegistry.Get<BootstrapQuickStart>()?.ExitDialogMode();
 

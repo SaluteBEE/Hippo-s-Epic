@@ -70,7 +70,7 @@ public class LevelController : MonoBehaviour
         if (_gameInput == null) return;
 
         if (!_gameInput.Player.enabled)
-            _gameInput.Player.Enable();
+            return;
 
         var move = _gameInput.Player.Move.ReadValue<Vector2>();
         playerCharacter.SetMoveInput(move);

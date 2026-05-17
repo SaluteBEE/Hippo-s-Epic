@@ -17,5 +17,7 @@ public class DataTableManager : MonoBehaviour
             byte[] bytes = File.ReadAllBytes(path);
             return new Luban.ByteBuf(bytes);
         });
+
+        ManagerRegistry.SetTables(Tables);
     }
 }

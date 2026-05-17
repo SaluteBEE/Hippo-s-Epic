@@ -1,0 +1,233 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+
+public class BagManager
+{
+    private static BagManager _instance;
+    public static BagManager Instance => _instance ??= new BagManager();
+
+    private const int PlayerPersonId = 1;
+
+    private int _nextInstanceId = 1;
+
+    private readonly List<BagItemEntry> _items = new List<BagItemEntry>();
+
+    public IReadOnlyList<BagItemEntry> AllItems => _items;
+
+    public event Action<BagChangeType, int> OnItemChanged;
+
+    public int GetItemCount(int itemId)
+    {
+        return _items.Count(x => x.itemId == itemId);
+    }
+
+    public bool HasItem(int itemId, int count = 1)
+    {
+        return GetItemCount(itemId) >= count;
+    }
+
+    public int AddItem(int itemId, int count = 1)
+    {
+        if (count <= 0) return 0;
+
+        var itemCfg = GetItemConfig(itemId);
+        if (itemCfg == null)
+        {
+            Debug.LogWarning($"[BagManager] 物品配置不存在: {itemId}");
+            return 0;
+        }
+
+        int added = 0;
+
+        if (itemCfg.Stackable)
+        {
+            var existing = _items.FirstOrDefault(x => x.itemId == itemId);
+            if (existing != null)
+            {
+                existing.count += count;
+                added = count;
+            }
+            else
+            {
+                _items.Add(new BagItemEntry
+                {
+                    instanceId = _nextInstanceId++,
+                    itemId = itemId,
+                    count = count
+                });
+                added = count;
+            }
+        }
+        else
+        {
+            for (int i = 0; i < count; i++)
+            {
+                _items.Add(new BagItemEntry
+                {
+                    instanceId = _nextInstanceId++,
+                    itemId = itemId,
+                    count = 1
+                });
+            }
+            added = count;
+        }
+
+        if (added > 0)
+            OnItemChanged?.Invoke(BagChangeType.Added, itemId);
+
+        return added;
+    }
+
+    public bool RemoveItem(int itemId, int count = 1)
+    {
+        if (count <= 0) return true;
+
+        int available = GetItemCount(itemId);
+        if (available < count) return false;
+
+        if (IsStackable(itemId))
+        {
+            var entry = _items.FirstOrDefault(x => x.itemId == itemId);
+            if (entry == null) return false;
+
+            entry.count -= count;
+            if (entry.count <= 0)
+                _items.Remove(entry);
+        }
+        else
+        {
+            for (int i = 0; i < count; i++)
+            {
+                int idx = _items.FindLastIndex(x => x.itemId == itemId);
+                if (idx >= 0)
+                    _items.RemoveAt(idx);
+            }
+        }
+
+        OnItemChanged?.Invoke(BagChangeType.Removed, itemId);
+        return true;
+    }
+
+    public bool RemoveByInstanceId(int instanceId)
+    {
+        int idx = _items.FindIndex(x => x.instanceId == instanceId);
+        if (idx < 0) return false;
+
+        int itemId = _items[idx].itemId;
+        _items.RemoveAt(idx);
+        OnItemChanged?.Invoke(BagChangeType.Removed, itemId);
+        return true;
+    }
+
+    public BagItemEntry GetByInstanceId(int instanceId)
+    {
+        return _items.FirstOrDefault(x => x.instanceId == instanceId);
+    }
+
+    public List<BagItemEntry> GetItemsOfType(int itemId)
+    {
+        return _items.Where(x => x.itemId == itemId).ToList();
+    }
+
+    public void Clear()
+    {
+        _items.Clear();
+    }
+
+    public List<BagSaveEntry> BuildSaveData()
+    {
+        var result = new List<BagSaveEntry>(_items.Count);
+        foreach (var entry in _items)
+        {
+            result.Add(new BagSaveEntry
+            {
+                instanceId = entry.instanceId,
+                itemId = entry.itemId,
+                count = entry.count
+            });
+        }
+        return result;
+    }
+
+    public void RestoreFromSaveData(List<BagSaveEntry> data)
+    {
+        _items.Clear();
+        if (data == null) return;
+
+        foreach (var entry in data)
+        {
+            if (entry.count > 0)
+            {
+                int iid = entry.instanceId > 0 ? entry.instanceId : _nextInstanceId++;
+                _items.Add(new BagItemEntry
+                {
+                    instanceId = iid,
+                    itemId = entry.itemId,
+                    count = entry.count
+                });
+                if (iid >= _nextInstanceId)
+                    _nextInstanceId = iid + 1;
+            }
+        }
+    }
+
+    public void InitFromConfig()
+    {
+        _items.Clear();
+
+        if (!ManagerRegistry.TryGet<DataTableManager>(out var dtm) || dtm.Tables == null)
+        {
+            Debug.LogWarning("[BagManager] DataTableManager 未加载，无法初始化背包");
+            return;
+        }
+
+        var tbBag = dtm.Tables.TbBag;
+        foreach (var bagEntry in tbBag.DataList)
+        {
+            if (bagEntry.Ownerid == PlayerPersonId && bagEntry.Num > 0)
+            {
+                AddItem(bagEntry.Itemid, bagEntry.Num);
+            }
+        }
+
+        Debug.Log($"[BagManager] 从配置初始化背包: {_items.Count} 个物品实例");
+    }
+
+    private bool IsStackable(int itemId)
+    {
+        var cfg = GetItemConfig(itemId);
+        return cfg != null && cfg.Stackable;
+    }
+
+    private cfg.cfg.item.Item GetItemConfig(int itemId)
+    {
+        if (ManagerRegistry.TryGet<DataTableManager>(out var dtm) && dtm.Tables != null)
+        {
+            return dtm.Tables.TbItem.GetOrDefault(itemId);
+        }
+        return null;
+    }
+
+    public enum BagChangeType
+    {
+        Added,
+        Removed
+    }
+
+    public class BagItemEntry
+    {
+        public int instanceId;
+        public int itemId;
+        public int count;
+    }
+
+    [Serializable]
+    public class BagSaveEntry
+    {
+        public int instanceId;
+        public int itemId;
+        public int count;
+    }
+}
