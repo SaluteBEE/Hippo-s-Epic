@@ -18,8 +18,10 @@ public sealed partial class Item : Luban.BeanBase
     {
         Id = _buf.ReadInt();
         Type = _buf.ReadInt();
+        Childtype = _buf.ReadInt();
         Name = _buf.ReadString();
         Icon = _buf.ReadInt();
+        Price = _buf.ReadInt();
         Stackable = _buf.ReadBool();
         Tip = _buf.ReadString();
         {int n0 = _buf.ReadSize(); Func = new System.Collections.Generic.List<int>(n0);for(var i0 = 0 ; i0 < n0 ; i0++) { int _e0;  _e0 = _buf.ReadInt(); Func.Add(_e0);}}
@@ -40,6 +42,10 @@ public sealed partial class Item : Luban.BeanBase
     /// </summary>
     public readonly int Type;
     /// <summary>
+    /// 子类型
+    /// </summary>
+    public readonly int Childtype;
+    /// <summary>
     /// 物品名称
     /// </summary>
     public readonly string Name;
@@ -47,6 +53,10 @@ public sealed partial class Item : Luban.BeanBase
     /// 物品图标
     /// </summary>
     public readonly int Icon;
+    /// <summary>
+    /// 价值
+    /// </summary>
+    public readonly int Price;
     /// <summary>
     /// 是否可叠加
     /// </summary>
@@ -76,8 +86,10 @@ public sealed partial class Item : Luban.BeanBase
         return "{ "
         + "id:" + Id + ","
         + "type:" + Type + ","
+        + "childtype:" + Childtype + ","
         + "name:" + Name + ","
         + "icon:" + Icon + ","
+        + "price:" + Price + ","
         + "stackable:" + Stackable + ","
         + "tip:" + Tip + ","
         + "func:" + Luban.StringUtil.CollectionToString(Func) + ","
