@@ -98,9 +98,7 @@
   {
     "id": 1003003,
     "type": 1,
-    "param1": [
-      1003006
-    ],
+    "param1": [],
     "param2": "",
     "selection_name": "呃，呃，其实我暂时还没有什么发现。",
     "speakerid1": 1,
@@ -123,16 +121,6 @@
     "param1": [],
     "param2": "",
     "selection_name": "我可以报名上场吗，我想成为一个伟大的人",
-    "speakerid1": 1,
-    "speakerid2": 2,
-    "gain_item_id": 0
-  },
-  {
-    "id": 1003006,
-    "type": 1,
-    "param1": [],
-    "param2": "",
-    "selection_name": "",
     "speakerid1": 1,
     "speakerid2": 2,
     "gain_item_id": 0
