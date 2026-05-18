@@ -11,7 +11,7 @@ public class InteractionPhase
 
     [Header("提示")]
     [Tooltip("玩家进入范围时显示的提示文字，如 \"按 E 交谈\"")]
-    public string hintText = "选择操作";
+    public string hintText = UIStrings.Interaction.DefaultHint;
 
     [Header("按钮选项")]
     [Tooltip("可选按钮列表，每个按钮可触发不同的交互操作\n玩家可通过键盘按键或点击UI按钮触发")]
@@ -56,7 +56,7 @@ public class InteractionPhase
 
         buttons.Add(new ButtonOption
         {
-            buttonText = !string.IsNullOrEmpty(_legacyHintButton) ? _legacyHintButton : "交互",
+            buttonText = !string.IsNullOrEmpty(_legacyHintButton) ? _legacyHintButton : UIStrings.Interaction.DefaultButton,
             type = _legacyType,
             dataId = _legacyDataId,
             param1 = _legacyParam1,
@@ -77,7 +77,7 @@ public class InteractionPhase
 public class ButtonOption
 {
     [Tooltip("按钮显示文字，如 \"E\"、\"交谈\"、\"拾取\"")]
-    public string buttonText = "交互";
+    public string buttonText = UIStrings.Interaction.DefaultButton;
 
     [Header("操作")]
     [Tooltip("交互类型：HintOnly=仅提示 | Dialogue=对话 | Pickup=拾取 | Teleport=传送")]

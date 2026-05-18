@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class BagPanel : UIWindow
@@ -26,6 +27,7 @@ public class BagPanel : UIWindow
     [SerializeField] private TextMeshProUGUI itemTip;
     [SerializeField] private TextMeshProUGUI typeName;
     [SerializeField] private Button btnUseItem;
+    [SerializeField] private GameObject itemTipRoot;
 
     [Header("列表")]
     [SerializeField] private ScrollRect scrollRect;
@@ -40,6 +42,8 @@ public class BagPanel : UIWindow
 
     [Header("预制体")]
     [SerializeField] private BagItem bagItemPrefab;
+    
+    [SerializeField] private Button btnClose;
 
     private readonly List<BagItem> _bagItems = new List<BagItem>();
     private readonly Dictionary<EquipSlot, BagEquip> _equipSlots = new Dictionary<EquipSlot, BagEquip>();
@@ -48,6 +52,11 @@ public class BagPanel : UIWindow
     private int _selectedInstanceId;
     private EquipSlot? _selectedEquipSlot;
     private int _currentFilterType = -1;
+    private int _currentFilterChildtype = -1;
+
+    private GameObject _dragIcon;
+    private BagItem _dragBagItem;
+    private bool _isDragging;
 
     public override void OnCreate(object args)
     {
@@ -62,6 +71,9 @@ public class BagPanel : UIWindow
             {
                 EquipSlot slot = kvp.Key;
                 kvp.Value.onClick = OnEquipSlotClicked;
+                kvp.Value.onDropItem = OnEquipSlotDropItem;
+                kvp.Value.onBtnEquipClicked = OnEquipSlotBtnEquipClicked;
+                kvp.Value.onBtnUnequipClicked = OnEquipSlotBtnUnequipClicked;
             }
         }
 
@@ -79,6 +91,9 @@ public class BagPanel : UIWindow
         if (btnUseItem != null)
             btnUseItem.onClick.AddListener(OnBtnUseItemClicked);
 
+        if (btnClose != null)
+            btnClose.onClick.AddListener(OnBtnCloseClicked);
+
         _currentFilterType = -1;
         btnEquip.isOn = false;
         btnTrash.isOn = false;
@@ -88,6 +103,9 @@ public class BagPanel : UIWindow
 
     public override void OnOpen(object args)
     {
+        if (EventSystem.current != null)
+            EventSystem.current.SetSelectedGameObject(null);
+
         RefreshList();
         RefreshEquips();
         ClearSelection();
@@ -97,9 +115,10 @@ public class BagPanel : UIWindow
     {
     }
 
-    private void SetFilter(int type)
+    private void SetFilter(int type, int childtype = -1)
     {
         _currentFilterType = type;
+        _currentFilterChildtype = childtype;
         RefreshList();
         ClearSelection();
     }
@@ -120,6 +139,7 @@ public class BagPanel : UIWindow
             if (itemCfg == null) continue;
             if (itemCfg.Type == 1) continue;
             if (_currentFilterType > 0 && itemCfg.Type != _currentFilterType) continue;
+            if (_currentFilterChildtype > 0 && itemCfg.Childtype != _currentFilterChildtype) continue;
 
             EquipSlot equipSlot = EquipManager.Instance.GetEquipSlotByInstance(entry.instanceId);
             if (equipSlot != (EquipSlot)(-1)) continue;
@@ -128,6 +148,9 @@ public class BagPanel : UIWindow
             bagItem.Setup(entry.instanceId, itemId, entry.count, itemCfg);
             bagItem.onClick = OnBagItemLeftClick;
             bagItem.onRightClick = OnBagItemRightClick;
+            bagItem.onBeginDrag = OnBagItemBeginDrag;
+            bagItem.onDrag = OnBagItemDrag;
+            bagItem.onEndDrag = OnBagItemEndDrag;
             _bagItems.Add(bagItem);
         }
     }
@@ -178,6 +201,13 @@ public class BagPanel : UIWindow
         UseSelectedItem();
     }
 
+    private void OnBtnCloseClicked()
+    {
+        var uiMgr = ManagerRegistry.Get<UIManager>();
+        if (uiMgr != null)
+            uiMgr.Close<BagPanel>();
+    }
+
     private void UseSelectedItem()
     {
         if (_selectedItemId <= 0) return;
@@ -195,7 +225,7 @@ public class BagPanel : UIWindow
         else if (itemCfg.Type == 3)
         {
             BagManager.Instance.RemoveItem(_selectedItemId, 1);
-            Debug.Log($"[BagPanel] 使用消耗品: {_selectedItemId}");
+            Debug.Log($"[BagPanel] {UIStrings.Bag.Use}{UIStrings.Common.Confirm}: {_selectedItemId}");
         }
     }
 
@@ -212,6 +242,133 @@ public class BagPanel : UIWindow
             ClearDetail();
     }
 
+    private void OnEquipSlotBtnEquipClicked(BagEquip equip)
+    {
+        int childtype = (int)equip.Slot;
+        _currentFilterChildtype = childtype;
+        _currentFilterType = 4;
+        btnEquip.isOn = true;
+        btnTrash.isOn = false;
+        btnUse.isOn = false;
+        btnKey.isOn = false;
+        RefreshList();
+
+        _selectedItemId = 0;
+        _selectedEquipSlot = equip.Slot;
+        HighlightEquipSlot(equip);
+
+        int equippedId = EquipManager.Instance.GetEquippedItemId(equip.Slot);
+        if (equippedId > 0)
+            ShowItemDetail(equippedId);
+        else
+            ClearDetail();
+    }
+
+    private void OnEquipSlotBtnUnequipClicked(BagEquip equip)
+    {
+        if (!EquipManager.Instance.IsEquipped(equip.Slot)) return;
+        EquipManager.Instance.Unequip(equip.Slot);
+    }
+
+    private void OnEquipSlotDropItem(BagEquip equip, BagItem bagItem)
+    {
+        var tables = GetTables();
+        if (tables == null) return;
+
+        var itemCfg = tables.TbItem.GetOrDefault(bagItem.ItemId);
+        if (itemCfg == null) return;
+
+        if (itemCfg.Type != 4)
+        {
+            Debug.Log($"[BagPanel] 物品 {itemCfg.Name}{UIStrings.Bag.NotEquipable}");
+            return;
+        }
+
+        EquipSlot targetSlot = (EquipSlot)itemCfg.Childtype;
+        if (targetSlot != equip.Slot)
+        {
+            Debug.Log($"[BagPanel] 物品 {itemCfg.Name}{UIStrings.Bag.SlotMismatch}");
+            return;
+        }
+
+        EquipManager.Instance.EquipByInstance(bagItem.InstanceId);
+        CleanupDragIcon();
+    }
+
+    private void OnBagItemBeginDrag(BagItem item, PointerEventData eventData)
+    {
+        if (_dragIcon != null)
+            Destroy(_dragIcon);
+
+        _dragBagItem = item;
+        _isDragging = true;
+
+        var canvas = GetComponentInParent<Canvas>();
+        _dragIcon = new GameObject("DragIcon");
+        _dragIcon.transform.SetParent(canvas != null ? canvas.transform : transform.root, false);
+        _dragIcon.layer = LayerMask.NameToLayer("UI");
+
+        var img = _dragIcon.AddComponent<Image>();
+        img.sprite = item.IconSprite;
+        img.raycastTarget = false;
+        img.color = new Color(1, 1, 1, 0.9f);
+
+        var rt = _dragIcon.GetComponent<RectTransform>();
+        rt.sizeDelta = item.IconSize;
+        rt.position = item.transform.position;
+
+        var cg = _dragIcon.AddComponent<CanvasGroup>();
+        cg.blocksRaycasts = false;
+        cg.alpha = 0.8f;
+
+        var tables = GetTables();
+        var itemCfg = tables != null ? tables.TbItem.GetOrDefault(item.ItemId) : null;
+        bool isEquip = itemCfg != null && itemCfg.Type == 4;
+        EquipSlot dragSlot = isEquip ? (EquipSlot)itemCfg.Childtype : (EquipSlot)(-1);
+
+        foreach (var kvp in _equipSlots)
+        {
+            if (kvp.Value != null)
+                kvp.Value.SetHighlight(isEquip && kvp.Key == dragSlot);
+        }
+    }
+
+    private void OnBagItemDrag(PointerEventData eventData)
+    {
+        if (_dragIcon == null) return;
+
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            _dragIcon.transform.parent as RectTransform,
+            eventData.position,
+            eventData.pressEventCamera,
+            out Vector2 localPos);
+
+        _dragIcon.GetComponent<RectTransform>().localPosition = localPos;
+    }
+
+    private void OnBagItemEndDrag(PointerEventData eventData)
+    {
+        CleanupDragIcon();
+    }
+
+    private void CleanupDragIcon()
+    {
+        if (_dragIcon != null)
+        {
+            Destroy(_dragIcon);
+            _dragIcon = null;
+        }
+
+        _isDragging = false;
+        _dragBagItem = null;
+
+        foreach (var kvp in _equipSlots)
+        {
+            if (kvp.Value != null)
+                kvp.Value.SetHighlight(false);
+        }
+    }
+
     private void ShowItemDetail(int itemId)
     {
         var tables = GetTables();
@@ -219,6 +376,9 @@ public class BagPanel : UIWindow
 
         var itemCfg = tables.TbItem.GetOrDefault(itemId);
         if (itemCfg == null) return;
+
+        if (itemTipRoot != null)
+            itemTipRoot.SetActive(true);
 
         if (itemIcon != null)
         {
@@ -240,12 +400,12 @@ public class BagPanel : UIWindow
             bool isThisEquipped = EquipManager.Instance.IsInstanceEquipped(_selectedInstanceId);
             if (isThisEquipped)
             {
-                actionLabel = "已装备";
+                actionLabel = UIStrings.Bag.Equipped;
                 showBtn = false;
             }
             else
             {
-                actionLabel = "装备";
+                actionLabel = UIStrings.Bag.Equip;
                 showBtn = true;
             }
         }
@@ -254,7 +414,7 @@ public class BagPanel : UIWindow
             bool hasFunc = itemCfg.Func != null && itemCfg.Func.Count > 0;
             if (hasFunc)
             {
-                actionLabel = "使用";
+                actionLabel = UIStrings.Bag.Use;
                 showBtn = true;
             }
             else
@@ -276,6 +436,9 @@ public class BagPanel : UIWindow
 
     private void ClearDetail()
     {
+        if (itemTipRoot != null)
+            itemTipRoot.SetActive(false);
+
         if (itemIcon != null)
         {
             itemIcon.sprite = null;

@@ -3,28 +3,40 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class BagItem : MonoBehaviour, IPointerClickHandler
+public class BagItem : MonoBehaviour, IPointerClickHandler, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
     [SerializeField] private GameObject selectedBg;
     [SerializeField] private TextMeshProUGUI num;
     [SerializeField] private Image icon;
+    [SerializeField] private GameObject bg;
 
     public int InstanceId { get; private set; }
     public int ItemId { get; private set; }
+    public int ItemCount { get; private set; }
+    public Sprite IconSprite => icon != null ? icon.sprite : null;
+    public Vector2 IconSize => icon != null ? icon.rectTransform.rect.size : Vector2.zero;
+
     public System.Action<BagItem> onClick;
     public System.Action<BagItem> onRightClick;
+    public System.Action<BagItem, PointerEventData> onBeginDrag;
+    public System.Action<PointerEventData> onDrag;
+    public System.Action<PointerEventData> onEndDrag;
 
     private RectTransform _rt;
+    private Canvas _canvas;
+    private CanvasGroup _canvasGroup;
 
     private void Awake()
     {
         _rt = GetComponent<RectTransform>();
+        _canvas = GetComponentInParent<Canvas>();
     }
 
     public void Setup(int instanceId, int itemId, int count, cfg.cfg.item.Item itemCfg)
     {
         InstanceId = instanceId;
         ItemId = itemId;
+        ItemCount = count;
 
         if (icon != null)
         {
@@ -75,6 +87,37 @@ public class BagItem : MonoBehaviour, IPointerClickHandler
             onRightClick?.Invoke(this);
         else
             onClick?.Invoke(this);
+    }
+
+    public void OnBeginDrag(PointerEventData eventData)
+    {
+        if (eventData.button != PointerEventData.InputButton.Left)
+            return;
+
+        _canvasGroup = GetComponent<CanvasGroup>();
+        if (_canvasGroup == null)
+            _canvasGroup = gameObject.AddComponent<CanvasGroup>();
+
+        _canvasGroup.alpha = 0.5f;
+        _canvasGroup.blocksRaycasts = false;
+
+        onBeginDrag?.Invoke(this, eventData);
+    }
+
+    public void OnDrag(PointerEventData eventData)
+    {
+        onDrag?.Invoke(eventData);
+    }
+
+    public void OnEndDrag(PointerEventData eventData)
+    {
+        if (_canvasGroup != null)
+        {
+            _canvasGroup.alpha = 1f;
+            _canvasGroup.blocksRaycasts = true;
+        }
+
+        onEndDrag?.Invoke(eventData);
     }
 
     private Sprite LoadIcon(int iconId)

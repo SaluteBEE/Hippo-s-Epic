@@ -174,7 +174,7 @@ MonoBehaviour:
   enableAnimationTest: 0
   testPersonId: 1
   testPrefabType: 1
-  enableBagTest: 1
+  enableBagTest: 0
   ui: {fileID: 2048630439}
   audio: {fileID: 2104528045}
   scene: {fileID: 1182991098}

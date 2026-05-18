@@ -855,7 +855,7 @@ GameObject:
   - component: {fileID: 2670206125128972561}
   - component: {fileID: 740119067898080652}
   m_Layer: 0
-  m_Name: UseItemPanel
+  m_Name: UseItemTip
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -893,6 +893,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d52f97a48041925479bc7f69ae2a773c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  itemIcon: {fileID: 0}
+  itemName: {fileID: 0}
+  itemTip: {fileID: 0}
+  itemCount: {fileID: 0}
+  useBtn: {fileID: 0}
+  dropBtn: {fileID: 0}
+  equipBtn: {fileID: 0}
+  unequipBtn: {fileID: 0}
+  cancelBtn: {fileID: 0}
+  bgMask: {fileID: 0}
 --- !u!1 &6262578516621056255
 GameObject:
   m_ObjectHideFlags: 0

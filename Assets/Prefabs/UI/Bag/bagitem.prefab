@@ -55,6 +55,7 @@ MonoBehaviour:
   selectedBg: {fileID: 8501805521246626186}
   num: {fileID: 6042042219019974959}
   icon: {fileID: 5767123132218476753}
+  bg: {fileID: 5494045758309934302}
 --- !u!1 &5494045758309934302
 GameObject:
   m_ObjectHideFlags: 0
