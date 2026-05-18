@@ -11,7 +11,8 @@ public class BagEquip : MonoBehaviour, IDropHandler
     [SerializeField] private Image icon;
     [SerializeField] private Button btnEquipSlot;
     [SerializeField] private Button btnEquipIcon;
-    [SerializeField] private Button _button;
+    [SerializeField] private Button btnSelect;
+    [SerializeField] private GameObject highlightBg;
 
     public EquipSlot Slot { get; private set; }
     public System.Action<BagEquip> onClick;
@@ -19,12 +20,10 @@ public class BagEquip : MonoBehaviour, IDropHandler
     public System.Action<BagEquip> onBtnEquipClicked;
     public System.Action<BagEquip> onBtnUnequipClicked;
 
-    
-
     private void Awake()
     {
-        if (_button != null)
-            _button.onClick.AddListener(OnClick);
+        if (btnSelect != null)
+            btnSelect.onClick.AddListener(OnClick);
         if (btnEquipSlot != null)
             btnEquipSlot.onClick.AddListener(OnBtnEquipClicked);
         if (btnEquipIcon != null)
@@ -131,8 +130,8 @@ public class BagEquip : MonoBehaviour, IDropHandler
 
     public void SetHighlight(bool active)
     {
-        if (selectedBg != null)
-            selectedBg.SetActive(active);
+        if (highlightBg != null)
+            highlightBg.SetActive(active);
     }
 
     public void OnDrop(PointerEventData eventData)

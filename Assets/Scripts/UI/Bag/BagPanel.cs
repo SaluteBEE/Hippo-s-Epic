@@ -233,7 +233,17 @@ public class BagPanel : UIWindow
     {
         _selectedItemId = 0;
         _selectedEquipSlot = equip.Slot;
+
+        btnEquip.isOn = true;
+        btnTrash.isOn = false;
+        btnUse.isOn = false;
+        btnKey.isOn = false;
+
+        _currentFilterType = 4;
+        _currentFilterChildtype = (int)equip.Slot;
+
         HighlightEquipSlot(equip);
+        RefreshList();
 
         int equippedId = EquipManager.Instance.GetEquippedItemId(equip.Slot);
         if (equippedId > 0)
@@ -245,12 +255,14 @@ public class BagPanel : UIWindow
     private void OnEquipSlotBtnEquipClicked(BagEquip equip)
     {
         int childtype = (int)equip.Slot;
-        _currentFilterChildtype = childtype;
-        _currentFilterType = 4;
         btnEquip.isOn = true;
         btnTrash.isOn = false;
         btnUse.isOn = false;
         btnKey.isOn = false;
+
+        _currentFilterType = 4;
+        _currentFilterChildtype = childtype;
+
         RefreshList();
 
         _selectedItemId = 0;
