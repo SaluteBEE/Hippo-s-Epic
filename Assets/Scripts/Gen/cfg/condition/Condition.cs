@@ -17,11 +17,12 @@ public sealed partial class Condition : Luban.BeanBase
     public Condition(ByteBuf _buf) 
     {
         Id = _buf.ReadInt();
-        {int n0 = _buf.ReadSize(); ConditionType = new System.Collections.Generic.List<int>(n0);for(var i0 = 0 ; i0 < n0 ; i0++) { int _e0;  _e0 = _buf.ReadInt(); ConditionType.Add(_e0);}}
         {int n0 = _buf.ReadSize(); ComposeType = new System.Collections.Generic.List<System.Collections.Generic.List<int>>(n0);for(var i0 = 0 ; i0 < n0 ; i0++) { System.Collections.Generic.List<int> _e0;  {int n1 = _buf.ReadSize(); _e0 = new System.Collections.Generic.List<int>(n1);for(var i1 = 0 ; i1 < n1 ; i1++) { int _e1;  _e1 = _buf.ReadInt(); _e0.Add(_e1);}} ComposeType.Add(_e0);}}
         {int n0 = _buf.ReadSize(); HasItem = new System.Collections.Generic.List<int>(n0);for(var i0 = 0 ; i0 < n0 ; i0++) { int _e0;  _e0 = _buf.ReadInt(); HasItem.Add(_e0);}}
         {int n0 = _buf.ReadSize(); TaskState = new System.Collections.Generic.List<int>(n0);for(var i0 = 0 ; i0 < n0 ; i0++) { int _e0;  _e0 = _buf.ReadInt(); TaskState.Add(_e0);}}
         {int n0 = _buf.ReadSize(); HasPerkId = new System.Collections.Generic.List<int>(n0);for(var i0 = 0 ; i0 < n0 ; i0++) { int _e0;  _e0 = _buf.ReadInt(); HasPerkId.Add(_e0);}}
+        {int n0 = _buf.ReadSize(); BattleId = new System.Collections.Generic.List<int>(n0);for(var i0 = 0 ; i0 < n0 ; i0++) { int _e0;  _e0 = _buf.ReadInt(); BattleId.Add(_e0);}}
+        {int n0 = _buf.ReadSize(); DialogFinishId = new System.Collections.Generic.List<int>(n0);for(var i0 = 0 ; i0 < n0 ; i0++) { int _e0;  _e0 = _buf.ReadInt(); DialogFinishId.Add(_e0);}}
     }
 
     public static Condition DeserializeCondition(ByteBuf _buf)
@@ -33,10 +34,6 @@ public sealed partial class Condition : Luban.BeanBase
     /// 条件唯一标识
     /// </summary>
     public readonly int Id;
-    /// <summary>
-    /// 对话条件类型
-    /// </summary>
-    public readonly System.Collections.Generic.List<int> ConditionType;
     /// <summary>
     /// 判断
     /// </summary>
@@ -53,6 +50,14 @@ public sealed partial class Condition : Luban.BeanBase
     /// 是否有某个特质
     /// </summary>
     public readonly System.Collections.Generic.List<int> HasPerkId;
+    /// <summary>
+    /// 战斗id与结果条件
+    /// </summary>
+    public readonly System.Collections.Generic.List<int> BattleId;
+    /// <summary>
+    /// 需要完成对话的id
+    /// </summary>
+    public readonly System.Collections.Generic.List<int> DialogFinishId;
    
     public const int __ID__ = 101176158;
     public override int GetTypeId() => __ID__;
@@ -65,11 +70,12 @@ public sealed partial class Condition : Luban.BeanBase
     {
         return "{ "
         + "id:" + Id + ","
-        + "conditionType:" + Luban.StringUtil.CollectionToString(ConditionType) + ","
         + "composeType:" + Luban.StringUtil.CollectionToString(ComposeType) + ","
         + "hasItem:" + Luban.StringUtil.CollectionToString(HasItem) + ","
         + "taskState:" + Luban.StringUtil.CollectionToString(TaskState) + ","
         + "hasPerkId:" + Luban.StringUtil.CollectionToString(HasPerkId) + ","
+        + "battleId:" + Luban.StringUtil.CollectionToString(BattleId) + ","
+        + "dialogFinishId:" + Luban.StringUtil.CollectionToString(DialogFinishId) + ","
         + "}";
     }
 }

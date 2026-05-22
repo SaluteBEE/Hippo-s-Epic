@@ -19,6 +19,7 @@ public sealed partial class Quest : Luban.BeanBase
         Id = _buf.ReadInt();
         Type = _buf.ReadInt();
         State = _buf.ReadInt();
+        {int n0 = _buf.ReadSize(); Nodeseq = new System.Collections.Generic.List<int>(n0);for(var i0 = 0 ; i0 < n0 ; i0++) { int _e0;  _e0 = _buf.ReadInt(); Nodeseq.Add(_e0);}}
         Conditionid = _buf.ReadInt();
         Conditionid_Ref = null;
         Name = _buf.ReadString();
@@ -43,6 +44,10 @@ public sealed partial class Quest : Luban.BeanBase
     /// 任务状态
     /// </summary>
     public readonly int State;
+    /// <summary>
+    /// 首个任务id
+    /// </summary>
+    public readonly System.Collections.Generic.List<int> Nodeseq;
     /// <summary>
     /// 条件id
     /// </summary>
@@ -75,6 +80,7 @@ public sealed partial class Quest : Luban.BeanBase
         + "id:" + Id + ","
         + "type:" + Type + ","
         + "state:" + State + ","
+        + "nodeseq:" + Luban.StringUtil.CollectionToString(Nodeseq) + ","
         + "conditionid:" + Conditionid + ","
         + "name:" + Name + ","
         + "shorttext:" + Shorttext + ","

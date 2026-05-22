@@ -2,25 +2,39 @@
   {
     "id": 1,
     "questid": 1,
-    "des": "去找拳王对话",
+    "des": "了解现在该干什么",
     "conditionid": [
-      1,
-      2
+      5
     ],
     "nextState": [
       2,
-      3
+      3,
+      4
     ],
     "reward": []
   },
   {
     "id": 2,
     "questid": 1,
-    "des": "击败拳王",
+    "des": "直接上去把拳王干死！（可选）",
+    "conditionid": [
+      2
+    ],
+    "nextState": [
+      -1
+    ],
+    "reward": []
+  },
+  {
+    "id": 3,
+    "questid": 1,
+    "des": "教唆教练上去和拳王干！（可选）",
     "conditionid": [
       3
     ],
-    "nextState": [],
+    "nextState": [
+      -1
+    ],
     "reward": [
       [
         1,
@@ -33,23 +47,15 @@
     ]
   },
   {
-    "id": 3,
+    "id": 4,
     "questid": 1,
-    "des": "",
+    "des": "被拳王打的屁滚尿流（可选）",
     "conditionid": [
       4
     ],
-    "nextState": [],
-    "reward": []
-  },
-  {
-    "id": 4,
-    "questid": 1,
-    "des": "",
-    "conditionid": [
-      5
+    "nextState": [
+      -1
     ],
-    "nextState": [],
     "reward": []
   }
 ]

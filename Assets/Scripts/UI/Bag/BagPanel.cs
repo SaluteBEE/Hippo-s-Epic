@@ -203,9 +203,7 @@ public class BagPanel : UIWindow
 
     private void OnBtnCloseClicked()
     {
-        var uiMgr = ManagerRegistry.Get<UIManager>();
-        if (uiMgr != null)
-            uiMgr.Close<BagPanel>();
+        GameplayState.CloseBagIfOpen();
     }
 
     private void UseSelectedItem()

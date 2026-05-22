@@ -92,4 +92,11 @@ public class GameplayState : IGameState
         _ui.Close<UseItemTip>();
         _ui.Close<BagPanel>();
     }
+
+    public static void CloseBagIfOpen()
+    {
+        var app = GameApp.Instance;
+        if (app != null && app.StateMachine.Current is GameplayState gs && gs._bagOpen)
+            gs.CloseBag();
+    }
 }
