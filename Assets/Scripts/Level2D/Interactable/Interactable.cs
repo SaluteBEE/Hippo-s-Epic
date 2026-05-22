@@ -263,10 +263,16 @@ public class Interactable : MonoBehaviour
 
     private void ExecutePickup(ButtonOption button)
     {
-        string itemName = !string.IsNullOrEmpty(button.param1)
-            ? button.param1
-            : button.dataId.ToString();
-        Debug.Log($"获得了道具: {itemName}");
+        int itemId = button.dataId;
+        int count = 1;
+        if (!string.IsNullOrEmpty(button.param1) && int.TryParse(button.param1, out int parsed))
+            count = parsed;
+        int added = BagManager.Instance.AddItem(itemId, count);
+        if (added > 0)
+        {
+            var itemCfg = BagManager.Instance.GetItemConfig(itemId);
+            Debug.Log($"获得了道具: {itemCfg?.Name ?? itemId.ToString()} x{added}");
+        }
     }
 
     private void ExecuteTeleport(ButtonOption button)

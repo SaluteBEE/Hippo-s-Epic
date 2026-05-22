@@ -201,7 +201,7 @@ public class BagManager
         return cfg != null && cfg.Stackable;
     }
 
-    private cfg.cfg.item.Item GetItemConfig(int itemId)
+    public cfg.cfg.item.Item GetItemConfig(int itemId)
     {
         if (ManagerRegistry.TryGet<DataTableManager>(out var dtm) && dtm.Tables != null)
         {
