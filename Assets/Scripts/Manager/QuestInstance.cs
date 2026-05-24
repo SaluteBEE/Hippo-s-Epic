@@ -6,7 +6,8 @@ public class QuestInstance
     public cfg.cfg.quest.Quest Def { get; }
     public QuestState State { get; private set; }
     public int CurrentNodeId { get; private set; }
-    public HashSet<int> CompletedNodeIds { get; } = new HashSet<int>();
+    public List<int> CompletedNodeIds { get; } = new List<int>();
+    private readonly Dictionary<int, int> _completedBranchIndices = new Dictionary<int, int>();
 
     public cfg.cfg.questcontext.Questcontext CurrentNodeDef
     {
@@ -68,23 +69,23 @@ public class QuestInstance
         if (node.Conditionid == null || node.Conditionid.Count == 0)
             return;
 
-        foreach (var condId in node.Conditionid)
+        for (int i = 0; i < node.Conditionid.Count; i++)
         {
-            if (!ConditionSystem.Instance.IsConditionMet(condId))
+            if (!ConditionSystem.Instance.IsConditionMet(node.Conditionid[i]))
+                continue;
+
+            int completedNodeId = CurrentNodeId;
+            CompleteCurrentNode();
+            _completedBranchIndices[completedNodeId] = i;
+
+            if (node.NextState == null || i >= node.NextState.Count)
+            {
+                Complete();
                 return;
-        }
+            }
 
-        CompleteCurrentNode();
-
-        if (node.NextState == null || node.NextState.Count == 0)
-        {
-            Complete();
+            EnterNode(node.NextState[i]);
             return;
-        }
-
-        if (node.NextState.Count == 1)
-        {
-            EnterNode(node.NextState[0]);
         }
     }
 
@@ -101,13 +102,22 @@ public class QuestInstance
             return;
         }
 
+        int completedNodeId = CurrentNodeId;
+        int branchIdx = node.NextState.IndexOf(nextNodeId);
         CompleteCurrentNode();
+        if (branchIdx >= 0)
+            _completedBranchIndices[completedNodeId] = branchIdx;
         EnterNode(nextNodeId);
+    }
+
+    public int GetCompletedBranchIndex(int nodeId)
+    {
+        return _completedBranchIndices.TryGetValue(nodeId, out var idx) ? idx : -1;
     }
 
     private void CompleteCurrentNode()
     {
-        if (CurrentNodeId > 0)
+        if (CurrentNodeId > 0 && !CompletedNodeIds.Contains(CurrentNodeId))
         {
             CompletedNodeIds.Add(CurrentNodeId);
             Debug.Log($"[QuestInstance] 节点完成: {CurrentNodeId}");
@@ -116,7 +126,7 @@ public class QuestInstance
 
     public void ForceComplete()
     {
-        if (CurrentNodeId > 0)
+        if (CurrentNodeId > 0 && !CompletedNodeIds.Contains(CurrentNodeId))
             CompletedNodeIds.Add(CurrentNodeId);
 
         State = QuestState.Completed;
@@ -125,6 +135,14 @@ public class QuestInstance
     public void ForceFail()
     {
         State = QuestState.Failed;
+    }
+
+    public void SetNotAccepted()
+    {
+        State = QuestState.NotAccepted;
+        var startNode = Def.Nodeseq != null && Def.Nodeseq.Count > 0 ? Def.Nodeseq[0] : 0;
+        if (startNode > 0)
+            CurrentNodeId = startNode;
     }
 
     private void Complete()
@@ -137,15 +155,21 @@ public class QuestInstance
         State = QuestState.Failed;
     }
 
-    public void RestoreState(QuestState state, int currentNodeId, List<int> completedNodeIds)
+    public void RestoreState(QuestState state, int currentNodeId, List<int> completedNodeIds, Dictionary<int, int> branchIndices)
     {
         State = state;
         CurrentNodeId = currentNodeId;
         CompletedNodeIds.Clear();
+        _completedBranchIndices.Clear();
         if (completedNodeIds != null)
         {
             foreach (var id in completedNodeIds)
                 CompletedNodeIds.Add(id);
+        }
+        if (branchIndices != null)
+        {
+            foreach (var kv in branchIndices)
+                _completedBranchIndices[kv.Key] = kv.Value;
         }
     }
 }

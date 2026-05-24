@@ -312,6 +312,7 @@ public partial class GameApp : MonoBehaviour
         InitQuest();
 
         ConditionSystem.Instance.Initialize();
+        QuestManager.Instance.StartConditionListening();
 
         StartCoroutine(IconLoader.Init());
 
@@ -350,13 +351,27 @@ public partial class GameApp : MonoBehaviour
 
     private void InitQuest()
     {
-        QuestManager.Instance.Initialize();
+        if (QuestManager.Instance.AllQuests.Count > 0)
+        {
+            Debug.Log($"[GameApp] 任务从存档恢复: {QuestManager.Instance.AllQuests.Count} 个任务");
+        }
+        else
+        {
+            QuestManager.Instance.Initialize();
+        }
     }
 
     private void Update()
     {
         StateMachine.Update();
         UpdateDialogTest();
+    }
+
+    [ContextMenu("清除存档")]
+    public void ClearSave()
+    {
+        SaveManager.Instance.ClearSave();
+        Debug.Log("[GameApp] 存档已清除");
     }
 
     private void OnGUI()

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
@@ -236,7 +237,16 @@ public class DialogWindow : UIWindow
         var address = $"avatars/{avatarName}";
         var handle = Addressables.LoadAssetAsync<Texture2D>(address);
         _avatarHandles[avatarName] = handle;
-        await handle.Task;
+
+        try
+        {
+            await handle.Task;
+        }
+        catch (Exception)
+        {
+            Debug.LogWarning($"[DialogWindow] 头像不存在: {address}");
+            return;
+        }
 
         if (seq != _avatarSeq) return;
 

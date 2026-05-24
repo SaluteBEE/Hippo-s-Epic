@@ -356,6 +356,15 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Task"",
+                    ""type"": ""Button"",
+                    ""id"": ""a1b2c3d4-0001-4a00-0000-000000000008"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -532,6 +541,17 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": ""Keyboard&Mouse"",
                     ""action"": ""Bag"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""b1b2c3d4-0001-4a00-0000-000000000011"",
+                    ""path"": ""<Keyboard>/t"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""Task"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -748,6 +768,7 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
         m_UI_Click = m_UI.FindAction("Click", throwIfNotFound: true);
         m_UI_ScrollWheel = m_UI.FindAction("ScrollWheel", throwIfNotFound: true);
         m_UI_Bag = m_UI.FindAction("Bag", throwIfNotFound: true);
+        m_UI_Task = m_UI.FindAction("Task", throwIfNotFound: true);
         // Dialog
         m_Dialog = asset.FindActionMap("Dialog", throwIfNotFound: true);
         m_Dialog_Advance = m_Dialog.FindAction("Advance", throwIfNotFound: true);
@@ -926,6 +947,7 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
     private readonly InputAction m_UI_Click;
     private readonly InputAction m_UI_ScrollWheel;
     private readonly InputAction m_UI_Bag;
+    private readonly InputAction m_UI_Task;
     public struct UIActions
     {
         private @GameInput m_Wrapper;
@@ -937,6 +959,7 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
         public InputAction @Click => m_Wrapper.m_UI_Click;
         public InputAction @ScrollWheel => m_Wrapper.m_UI_ScrollWheel;
         public InputAction @Bag => m_Wrapper.m_UI_Bag;
+        public InputAction @Task => m_Wrapper.m_UI_Task;
         public InputActionMap Get() { return m_Wrapper.m_UI; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -967,6 +990,9 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
             @Bag.started += instance.OnBag;
             @Bag.performed += instance.OnBag;
             @Bag.canceled += instance.OnBag;
+            @Task.started += instance.OnTask;
+            @Task.performed += instance.OnTask;
+            @Task.canceled += instance.OnTask;
         }
 
         private void UnregisterCallbacks(IUIActions instance)
@@ -992,6 +1018,9 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
             @Bag.started -= instance.OnBag;
             @Bag.performed -= instance.OnBag;
             @Bag.canceled -= instance.OnBag;
+            @Task.started -= instance.OnTask;
+            @Task.performed -= instance.OnTask;
+            @Task.canceled -= instance.OnTask;
         }
 
         public void RemoveCallbacks(IUIActions instance)
@@ -1133,6 +1162,7 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
         void OnClick(InputAction.CallbackContext context);
         void OnScrollWheel(InputAction.CallbackContext context);
         void OnBag(InputAction.CallbackContext context);
+        void OnTask(InputAction.CallbackContext context);
     }
     public interface IDialogActions
     {

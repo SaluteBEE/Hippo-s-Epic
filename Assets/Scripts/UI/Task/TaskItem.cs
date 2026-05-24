@@ -9,14 +9,14 @@ public class TaskItem : MonoBehaviour
 
     private readonly List<GameObject> _contentInstances = new List<GameObject>();
 
-    public void Setup(QuestInstance quest, GameObject contentTemplate)
+    public void Setup(QuestInstance quest, int index, GameObject contentTemplate)
     {
-        nameTxt.text = $"{GetStateTag(quest.State)}{quest.Def.Name}";
+        nameTxt.text = $"{index}. {quest.Def.Name}";
         ClearContent();
 
         if (quest.State == QuestState.Completed || quest.State == QuestState.Failed)
         {
-            AddContentLine(contentTemplate, quest.State == QuestState.Completed ? "已完成" : "已失败");
+            AddContentLine(contentTemplate, $"{(quest.State == QuestState.Completed ? "v" : "x")} {(quest.State == QuestState.Completed ? "已完成" : "已失败")}");
             return;
         }
 
@@ -24,44 +24,31 @@ public class TaskItem : MonoBehaviour
         if (tables == null)
         {
             if (!string.IsNullOrEmpty(quest.Def.Shorttext))
-                AddContentLine(contentTemplate, quest.Def.Shorttext);
+                AddContentLine(contentTemplate, $"* {quest.Def.Shorttext}");
             return;
+        }
+
+        foreach (var nodeId in quest.CompletedNodeIds)
+        {
+            var completedNode = tables.TbQuestcontext.GetOrDefault(nodeId);
+            if (completedNode == null) continue;
+
+            int branchIdx = quest.GetCompletedBranchIndex(nodeId);
+            string text = branchIdx >= 0 && completedNode.Fintext != null && branchIdx < completedNode.Fintext.Count
+                ? completedNode.Fintext[branchIdx]
+                : completedNode.Des;
+            AddContentLine(contentTemplate, $"v {text}");
         }
 
         var node = quest.CurrentNodeDef;
         if (node == null)
         {
             if (!string.IsNullOrEmpty(quest.Def.Shorttext))
-                AddContentLine(contentTemplate, quest.Def.Shorttext);
+                AddContentLine(contentTemplate, $"* {quest.Def.Shorttext}");
             return;
         }
 
-        AddContentLine(contentTemplate, node.Des);
-
-        if (node.NextState == null || node.NextState.Count == 0)
-            return;
-
-        if (node.NextState.Count == 1)
-        {
-            int nextId = node.NextState[0];
-            if (nextId > 0)
-            {
-                var nextNode = tables.TbQuestcontext.GetOrDefault(nextId);
-                if (nextNode != null)
-                    AddContentLine(contentTemplate, $"  -> {nextNode.Des}");
-            }
-        }
-        else
-        {
-            for (int b = 0; b < node.NextState.Count; b++)
-            {
-                int nextId = node.NextState[b];
-                if (nextId <= 0) continue;
-                var branchNode = tables.TbQuestcontext.GetOrDefault(nextId);
-                if (branchNode != null)
-                    AddContentLine(contentTemplate, $"  * {branchNode.Des}");
-            }
-        }
+        AddContentLine(contentTemplate, $"* {node.Des}");
     }
 
     private void AddContentLine(GameObject template, string text)
@@ -80,17 +67,6 @@ public class TaskItem : MonoBehaviour
             if (go != null) Destroy(go);
         }
         _contentInstances.Clear();
-    }
-
-    private static string GetStateTag(QuestState state)
-    {
-        switch (state)
-        {
-            case QuestState.InProgress: return "<color=#FFDD44>> </color>";
-            case QuestState.Completed: return "<color=#44FF44>v </color>";
-            case QuestState.Failed: return "<color=#FF4444>x </color>";
-            default: return "";
-        }
     }
 
     private cfg.Tables GetTables()

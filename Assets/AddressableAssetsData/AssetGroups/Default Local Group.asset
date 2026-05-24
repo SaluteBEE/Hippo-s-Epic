@@ -131,6 +131,12 @@ MonoBehaviour:
     m_SerializedLabels:
     - icon
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a541335c14d0d1d4aa118d81b069ce9b
+    m_Address: ui/Task/TaskPanel
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - ui_prefab
+    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: dd90b6ecff8020e40aa537a3ddf43594, type: 2}
   m_SchemaSet:

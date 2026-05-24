@@ -1,24 +1,85 @@
-using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
-
 public class TaskPanel : UIWindow
 {
-    [Header("任务节点")]
-    [SerializeField] private GameObject taskOne;
-    [SerializeField] private GameObject taskTwo;
-    [SerializeField] private GameObject taskThere;
-    [SerializeField] private GameObject taskFour;
-    
+    [SerializeField] private GameObject itemCell;
+    [SerializeField] private GameObject cellContent;
+    [SerializeField] private ScrollRect sv;
+
     [Header("地图节点")]
     [SerializeField] private Button btnMidMap1;
     [SerializeField] private Button btnMidMap2;
     [SerializeField] private Button btnMidMap3;
-   
+
     [SerializeField] private Button btnClose;
-    [SerializeField] private Button btnLast;
-    [SerializeField] private Button btnNext;
-    
+
+    private readonly List<GameObject> _itemInstances = new List<GameObject>();
+
+    public override void OnCreate(object args)
+    {
+        btnClose.onClick.AddListener(Close);
+    }
+
+    public override void OnOpen(object args)
+    {
+        RebuildItems();
+        QuestManager.Instance.OnQuestNodeChanged += OnQuestChanged;
+        QuestManager.Instance.OnQuestCompleted += OnQuestChanged;
+        QuestManager.Instance.OnQuestFailed += OnQuestChanged;
+    }
+
+    public override void OnClose()
+    {
+        QuestManager.Instance.OnQuestNodeChanged -= OnQuestChanged;
+        QuestManager.Instance.OnQuestCompleted -= OnQuestChanged;
+        QuestManager.Instance.OnQuestFailed -= OnQuestChanged;
+        ClearItems();
+    }
+
+    private void OnQuestChanged(QuestInstance _)
+    {
+        RebuildItems();
+    }
+
+    private void RebuildItems()
+    {
+        ClearItems();
+
+        var quests = QuestManager.Instance.AllQuests.Values
+            .OrderByDescending(q => q.State == QuestState.InProgress)
+            .ThenByDescending(q => q.State == QuestState.NotAccepted)
+            .ThenByDescending(q => q.State == QuestState.Completed)
+            .ToList();
+
+        int index = 1;
+        foreach (var quest in quests)
+        {
+            var go = Instantiate(itemCell, sv.content, false);
+            go.SetActive(true);
+            var item = go.GetComponent<TaskItem>();
+            if (item != null)
+                item.Setup(quest, index++, cellContent);
+            _itemInstances.Add(go);
+        }
+
+        LayoutRebuilder.ForceRebuildLayoutImmediate(sv.content);
+        sv.verticalNormalizedPosition = 1f;
+    }
+
+    private void ClearItems()
+    {
+        foreach (var go in _itemInstances)
+        {
+            if (go != null) Destroy(go);
+        }
+        _itemInstances.Clear();
+    }
+
+    private void Close()
+    {
+        GameplayState.CloseTaskIfOpen();
+    }
 }

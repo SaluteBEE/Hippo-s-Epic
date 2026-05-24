@@ -97,9 +97,13 @@ public class Interactable : MonoBehaviour
     private void CreateHintInstance(Transform parent)
     {
         if (_hintPrefab == null) return;
+        if (_hint != null) return;
         GameObject instance = Instantiate(_hintPrefab, parent);
         instance.name = "InteractHint";
         _hint = instance.GetComponent<InteractHint>();
+
+        if (_playerInside)
+            RefreshHint();
     }
 
     public static void ReleaseHintPrefab()
@@ -132,6 +136,10 @@ public class Interactable : MonoBehaviour
             player.CurrentInteractable.OnPlayerExit();
 
         player.SetCurrentInteractable(this);
+
+        if (_hint == null)
+            InitializeHint();
+
         RefreshHint();
     }
 

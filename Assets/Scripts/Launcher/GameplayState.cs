@@ -36,9 +36,16 @@ public class GameplayState : IGameState
             Time.timeScale = 1f;
             _ui.Close<BagPanel>();
         }
+        if (_taskOpen)
+        {
+            _taskOpen = false;
+            Time.timeScale = 1f;
+            _ui.Close<TaskPanel>();
+        }
     }
 
     private bool _bagOpen;
+    private bool _taskOpen;
 
     public void Update()
     {
@@ -60,6 +67,19 @@ public class GameplayState : IGameState
             return;
         }
 
+        if (_taskOpen)
+        {
+            if (_inputManager.GameInput.UI.Cancel.WasPressedThisFrame())
+            {
+                CloseTask();
+            }
+            else if (_inputManager.GameInput.UI.Task.WasPressedThisFrame())
+            {
+                CloseTask();
+            }
+            return;
+        }
+
         if (_inputManager.GameInput.Player.Pause.WasPressedThisFrame())
         {
             app.TogglePause();
@@ -68,6 +88,10 @@ public class GameplayState : IGameState
         if (_inputManager.GameInput.UI.Bag.WasPressedThisFrame())
         {
             OpenBag();
+        }
+        else if (_inputManager.GameInput.UI.Task.WasPressedThisFrame())
+        {
+            OpenTask();
         }
         else if (_inputManager.GameInput.UI.Cancel.WasPressedThisFrame())
         {
@@ -98,5 +122,29 @@ public class GameplayState : IGameState
         var app = GameApp.Instance;
         if (app != null && app.StateMachine.Current is GameplayState gs && gs._bagOpen)
             gs.CloseBag();
+    }
+
+    private void OpenTask()
+    {
+        _taskOpen = true;
+        Time.timeScale = 0f;
+        _inputManager.DisablePlayer();
+        _inputManager.EnableUI();
+        _ui.Open<TaskPanel>();
+    }
+
+    private void CloseTask()
+    {
+        _taskOpen = false;
+        Time.timeScale = 1f;
+        _inputManager.EnablePlayerAndUI();
+        _ui.Close<TaskPanel>();
+    }
+
+    public static void CloseTaskIfOpen()
+    {
+        var app = GameApp.Instance;
+        if (app != null && app.StateMachine.Current is GameplayState gs && gs._taskOpen)
+            gs.CloseTask();
     }
 }

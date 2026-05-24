@@ -21,6 +21,7 @@ public sealed partial class Questcontext : Luban.BeanBase
         Questid_Ref = null;
         Des = _buf.ReadString();
         {int n0 = _buf.ReadSize(); Conditionid = new System.Collections.Generic.List<int>(n0);for(var i0 = 0 ; i0 < n0 ; i0++) { int _e0;  _e0 = _buf.ReadInt(); Conditionid.Add(_e0);}}
+        {int n0 = _buf.ReadSize(); Fintext = new System.Collections.Generic.List<string>(n0);for(var i0 = 0 ; i0 < n0 ; i0++) { string _e0;  _e0 = _buf.ReadString(); Fintext.Add(_e0);}}
         {int n0 = _buf.ReadSize(); NextState = new System.Collections.Generic.List<int>(n0);for(var i0 = 0 ; i0 < n0 ; i0++) { int _e0;  _e0 = _buf.ReadInt(); NextState.Add(_e0);}}
         {int n0 = _buf.ReadSize(); Reward = new System.Collections.Generic.List<System.Collections.Generic.List<int>>(n0);for(var i0 = 0 ; i0 < n0 ; i0++) { System.Collections.Generic.List<int> _e0;  {int n1 = _buf.ReadSize(); _e0 = new System.Collections.Generic.List<int>(n1);for(var i1 = 0 ; i1 < n1 ; i1++) { int _e1;  _e1 = _buf.ReadInt(); _e0.Add(_e1);}} Reward.Add(_e0);}}
     }
@@ -49,6 +50,10 @@ public sealed partial class Questcontext : Luban.BeanBase
     public readonly System.Collections.Generic.List<int> Conditionid;
     public System.Collections.Generic.List<cfg.condition.Condition> Conditionid_Ref;
     /// <summary>
+    /// 完成文本
+    /// </summary>
+    public readonly System.Collections.Generic.List<string> Fintext;
+    /// <summary>
     /// 下一阶段
     /// </summary>
     public readonly System.Collections.Generic.List<int> NextState;
@@ -75,6 +80,7 @@ public sealed partial class Questcontext : Luban.BeanBase
         + "questid:" + Questid + ","
         + "des:" + Des + ","
         + "conditionid:" + Luban.StringUtil.CollectionToString(Conditionid) + ","
+        + "fintext:" + Luban.StringUtil.CollectionToString(Fintext) + ","
         + "nextState:" + Luban.StringUtil.CollectionToString(NextState) + ","
         + "reward:" + Luban.StringUtil.CollectionToString(Reward) + ","
         + "}";

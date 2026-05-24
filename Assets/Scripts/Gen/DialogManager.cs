@@ -32,6 +32,7 @@ public class DialogManager : MonoBehaviour
     private bool _waitingCharacters;
     private int _transitionDepth;
     private bool _endingDialog;
+    private int _rootDialogId;
     private const int MaxTransitionDepth = 50;
 
     private static readonly HashSet<int> _finishedDialogs = new HashSet<int>();
@@ -95,6 +96,7 @@ public class DialogManager : MonoBehaviour
 
         Debug.Log($"[DialogManager] 开始对话 {dialogId}, Type={dialog.Type}");
         _currentDialog = dialog;
+        _rootDialogId = dialogId;
         State = DialogState.Playing;
         _waitingCharacters = false;
         _transitionDepth = 0;
@@ -298,13 +300,18 @@ public class DialogManager : MonoBehaviour
         _waitingCharacters = false;
         _currentDialog = null;
         _contentQueue = null;
-        OnDialogEnded?.Invoke();
-        _endingDialog = false;
-
         if (finishedId > 0)
         {
             _finishedDialogs.Add(finishedId);
         }
+
+        if (_rootDialogId > 0 && _rootDialogId != finishedId)
+        {
+            _finishedDialogs.Add(_rootDialogId);
+        }
+
+        OnDialogEnded?.Invoke();
+        _endingDialog = false;
     }
 
     private SpeakerSide ResolveSide(Dialogcontent content)

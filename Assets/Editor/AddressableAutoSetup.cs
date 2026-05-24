@@ -23,6 +23,7 @@ public static class AddressableAutoSetup
         new DirConfig { dir = "Assets/Art/DialogImages", addressPrefix = "dialog_images", label = null, filter = "t:Texture2D", forceSprite = false },
         new DirConfig { dir = "Assets/Art/Sprites/UI/Item", addressPrefix = "icon/item", label = "icon", filter = "t:Texture2D", forceSprite = true },
         new DirConfig { dir = "Assets/Art/Avatars", addressPrefix = "avatars", label = "avatar", filter = "t:Texture2D", forceSprite = true },
+        new DirConfig { dir = "Assets/Prefabs/UI", addressPrefix = "ui", label = null, filter = "t:Prefab", forceSprite = false },
     };
 
     [MenuItem("Tools/自动设置 Addressable")]
@@ -115,8 +116,9 @@ public static class AddressableAutoSetup
         foreach (var guid in guids)
         {
             var path = AssetDatabase.GUIDToAssetPath(guid);
-            var assetName = Path.GetFileNameWithoutExtension(path);
-            var address = $"{addressPrefix}/{assetName}";
+            var relativePath = path.Substring(dir.Length + 1);
+            var relativeNoExt = Path.ChangeExtension(relativePath, null);
+            var address = $"{addressPrefix}/{relativeNoExt}";
 
             if (forceSprite)
                 EnsureSpriteImport(path);

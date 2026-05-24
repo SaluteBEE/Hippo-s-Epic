@@ -28,6 +28,59 @@ public class QuestManager
     public void Initialize()
     {
         _quests.Clear();
+
+        var tables = ManagerRegistry.GetTables<cfg.Tables>();
+        if (tables == null) return;
+
+        foreach (var quest in tables.TbQuest.DataList)
+        {
+            if (quest.State == (int)QuestState.InProgress)
+            {
+                var inst = new QuestInstance(quest);
+                var startNode = quest.Nodeseq != null && quest.Nodeseq.Count > 0
+                    ? quest.Nodeseq[0]
+                    : 0;
+                inst.EnterNode(startNode);
+                _quests[quest.Id] = inst;
+                Debug.Log($"[QuestManager] 初始化 InProgress 任务: {quest.Name} (id={quest.Id})");
+            }
+            else if (quest.State == (int)QuestState.NotAccepted)
+            {
+                var inst = new QuestInstance(quest);
+                inst.SetNotAccepted();
+                _quests[quest.Id] = inst;
+            }
+        }
+    }
+
+    public void StartConditionListening()
+    {
+        ConditionSystem.Instance.OnConditionChanged += OnConditionChanged;
+
+        var tables = ManagerRegistry.GetTables<cfg.Tables>();
+        if (tables == null) return;
+
+        foreach (var quest in tables.TbQuest.DataList)
+        {
+            if (quest.State != (int)QuestState.NotAccepted) continue;
+            if (quest.Conditionid == 0) continue;
+
+            int questId = quest.Id;
+            ConditionSystem.Instance.OnConditionChanged += (condId, met) =>
+            {
+                if (!met) return;
+                if (_quests.ContainsKey(questId)) return;
+                if (!CanAccept(questId)) return;
+
+                AcceptQuest(questId);
+            };
+        }
+    }
+
+    private void OnConditionChanged(int condId, bool met)
+    {
+        if (!met) return;
+        CheckAllActiveQuests();
     }
 
     public bool CanAccept(int questId)
@@ -203,12 +256,17 @@ public class QuestManager
         foreach (var kv in _quests)
         {
             var inst = kv.Value;
+            var branchIndices = new List<int>();
+            foreach (var nodeId in inst.CompletedNodeIds)
+                branchIndices.Add(inst.GetCompletedBranchIndex(nodeId));
+
             data.entries.Add(new QuestSaveEntry
             {
                 questId = inst.Def.Id,
                 state = (int)inst.State,
                 currentNodeId = inst.CurrentNodeId,
-                completedNodeIds = new List<int>(inst.CompletedNodeIds)
+                completedNodeIds = new List<int>(inst.CompletedNodeIds),
+                branchIndices = branchIndices
             });
         }
         return data;
@@ -216,9 +274,13 @@ public class QuestManager
 
     public void RestoreFromSaveData(QuestSaveData data)
     {
-        _quests.Clear();
+        if (data?.entries == null || data.entries.Count == 0)
+        {
+            Debug.Log("[QuestManager] 无存档任务数据，跳过恢复");
+            return;
+        }
 
-        if (data?.entries == null) return;
+        _quests.Clear();
 
         var tables = ManagerRegistry.GetTables<cfg.Tables>();
         if (tables == null) return;
@@ -228,11 +290,22 @@ public class QuestManager
             var quest = tables.TbQuest.GetOrDefault(entry.questId);
             if (quest == null) continue;
 
+            var branchDict = new Dictionary<int, int>();
+            if (entry.completedNodeIds != null && entry.branchIndices != null)
+            {
+                for (int i = 0; i < entry.completedNodeIds.Count && i < entry.branchIndices.Count; i++)
+                {
+                    if (entry.branchIndices[i] >= 0)
+                        branchDict[entry.completedNodeIds[i]] = entry.branchIndices[i];
+                }
+            }
+
             var inst = new QuestInstance(quest);
             inst.RestoreState(
                 (QuestState)entry.state,
                 entry.currentNodeId,
-                entry.completedNodeIds ?? new List<int>()
+                entry.completedNodeIds ?? new List<int>(),
+                branchDict
             );
             _quests[entry.questId] = inst;
         }
@@ -261,4 +334,5 @@ public class QuestSaveEntry
     public int state;
     public int currentNodeId;
     public List<int> completedNodeIds;
+    public List<int> branchIndices;
 }

@@ -1600,11 +1600,31 @@ MonoBehaviour:
     buttons:
     - buttonText: E
       type: 1
-      dataId: 1001001
+      dataId: 1002001
       param1: 
       param2: 
       teleportMode: 0
-      transitionToState: 0
+      transitionToState: 1
+    canRepeat: 0
+    hideAfterExecute: 1
+    destroySelf: 0
+    deactivateSelf: 0
+    _legacyType: 0
+    _legacyHintButton: E
+    _legacyDataId: 0
+    _legacyParam1: 
+    _legacyParam2: 
+    _legacyTransitionToState: -1
+  - state: 1
+    hintText: "\u6309 E \u5BF9\u8BDD"
+    buttons:
+    - buttonText: E
+      type: 1
+      dataId: 1003001
+      param1: 
+      param2: 
+      teleportMode: 0
+      transitionToState: 1
     canRepeat: 0
     hideAfterExecute: 1
     destroySelf: 0
@@ -2151,7 +2171,6 @@ MonoBehaviour:
   cameraBounds: {fileID: 2141507369}
   interactables:
   - {fileID: 4157385160178939016}
-  - {fileID: 1660090652}
   - {fileID: 2002129720}
   VisualRoot: {fileID: 8832733064989031346}
 --- !u!4 &81510701032051241
@@ -3510,6 +3529,7 @@ MonoBehaviour:
   teleportArrival: {fileID: 1587279260}
   cameraBounds: {fileID: 945918870}
   interactables:
+  - {fileID: 1660090652}
   - {fileID: 1886808622}
   VisualRoot: {fileID: 9220051578885573660}
 --- !u!1 &3657018193388032858
