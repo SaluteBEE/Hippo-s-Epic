@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class TaskItem : MonoBehaviour
 {
@@ -9,19 +8,20 @@ public class TaskItem : MonoBehaviour
     [SerializeField] private TextMeshProUGUI nameTxt;
 
     private readonly List<GameObject> _contentInstances = new List<GameObject>();
-    private GameObject _titleStrikethrough;
 
     public void Setup(QuestInstance quest, int index, GameObject contentTemplate)
     {
-        nameTxt.text = $"{index}. {quest.Def.Name}";
         ClearContent();
-        SetTitleStrikethrough(false);
+
+        bool done = quest.State == QuestState.Completed || quest.State == QuestState.Failed;
+        nameTxt.text = done
+            ? $"<s><#888888>{index}. {quest.Def.Name}</color></s>"
+            : $"{index}. {quest.Def.Name}";
 
         var tables = GetTables();
 
-        if (quest.State == QuestState.Completed || quest.State == QuestState.Failed)
+        if (done)
         {
-            SetTitleStrikethrough(true, quest.State == QuestState.Failed);
             if (tables != null)
             {
                 foreach (var nodeId in quest.CompletedNodeIds)
@@ -33,7 +33,7 @@ public class TaskItem : MonoBehaviour
                     string text = branchIdx >= 0 && completedNode.Fintext != null && branchIdx < completedNode.Fintext.Count
                         ? completedNode.Fintext[branchIdx]
                         : completedNode.Des;
-                    AddContentLine(contentTemplate, $"v {text}", true);
+                    AddContentLine(contentTemplate, $"<s><#888888>v {text}</color></s>");
                 }
             }
             return;
@@ -55,7 +55,7 @@ public class TaskItem : MonoBehaviour
             string text = branchIdx >= 0 && completedNode.Fintext != null && branchIdx < completedNode.Fintext.Count
                 ? completedNode.Fintext[branchIdx]
                 : completedNode.Des;
-            AddContentLine(contentTemplate, $"v {text}", true);
+            AddContentLine(contentTemplate, $"<s><#888888>v {text}</color></s>");
         }
 
         var node = quest.CurrentNodeDef;
@@ -69,28 +69,12 @@ public class TaskItem : MonoBehaviour
         AddContentLine(contentTemplate, $"* {node.Des}");
     }
 
-    private void AddContentLine(GameObject template, string text, bool strikethrough = false)
+    private void AddContentLine(GameObject template, string text)
     {
         var go = Instantiate(template, content.transform, false);
         go.SetActive(true);
         var tmp = go.GetComponent<TextMeshProUGUI>();
-        if (tmp != null) tmp.text = strikethrough ? $"<#888888>{text}</color>" : text;
-
-        if (strikethrough && tmp != null)
-        {
-            var line = new GameObject("Strikethrough");
-            line.transform.SetParent(go.transform, false);
-            var img = line.AddComponent<Image>();
-            img.color = new Color(0.53f, 0.53f, 0.53f, 1f);
-            var rt = line.GetComponent<RectTransform>();
-            rt.anchorMin = new Vector2(0, 0.5f);
-            rt.anchorMax = new Vector2(0, 0.5f);
-            rt.pivot = new Vector2(0, 0.5f);
-            float textWidth = tmp.preferredWidth;
-            rt.sizeDelta = new Vector2(textWidth, 2);
-            rt.anchoredPosition = Vector2.zero;
-        }
-
+        if (tmp != null) tmp.text = text;
         _contentInstances.Add(go);
     }
 
@@ -101,31 +85,6 @@ public class TaskItem : MonoBehaviour
             if (go != null) Destroy(go);
         }
         _contentInstances.Clear();
-        SetTitleStrikethrough(false);
-    }
-
-    private void SetTitleStrikethrough(bool show, bool isFailed = false)
-    {
-        if (_titleStrikethrough != null)
-        {
-            Destroy(_titleStrikethrough);
-            _titleStrikethrough = null;
-        }
-
-        if (!show) return;
-
-        nameTxt.text = $"<#888888>{nameTxt.text}</color>";
-
-        _titleStrikethrough = new GameObject("TitleStrikethrough");
-        _titleStrikethrough.transform.SetParent(nameTxt.transform, false);
-        var img = _titleStrikethrough.AddComponent<Image>();
-        img.color = isFailed ? new Color(0.8f, 0.3f, 0.3f) : new Color(0.53f, 0.53f, 0.53f);
-        var rt = _titleStrikethrough.GetComponent<RectTransform>();
-        rt.anchorMin = new Vector2(0, 0.5f);
-        rt.anchorMax = new Vector2(0, 0.5f);
-        rt.pivot = new Vector2(0, 0.5f);
-        rt.sizeDelta = new Vector2(nameTxt.preferredWidth, 2);
-        rt.anchoredPosition = Vector2.zero;
     }
 
     private cfg.Tables GetTables()
