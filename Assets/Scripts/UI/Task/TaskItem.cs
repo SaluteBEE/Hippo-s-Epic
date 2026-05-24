@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class TaskItem : MonoBehaviour
 {
@@ -37,7 +38,7 @@ public class TaskItem : MonoBehaviour
             string text = branchIdx >= 0 && completedNode.Fintext != null && branchIdx < completedNode.Fintext.Count
                 ? completedNode.Fintext[branchIdx]
                 : completedNode.Des;
-            AddContentLine(contentTemplate, $"v {text}");
+            AddContentLine(contentTemplate, $"v {text}", true);
         }
 
         var node = quest.CurrentNodeDef;
@@ -51,12 +52,28 @@ public class TaskItem : MonoBehaviour
         AddContentLine(contentTemplate, $"* {node.Des}");
     }
 
-    private void AddContentLine(GameObject template, string text)
+    private void AddContentLine(GameObject template, string text, bool strikethrough = false)
     {
         var go = Instantiate(template, content.transform, false);
         go.SetActive(true);
         var tmp = go.GetComponent<TextMeshProUGUI>();
-        if (tmp != null) tmp.text = text;
+        if (tmp != null) tmp.text = strikethrough ? $"<#888888>{text}</color>" : text;
+
+        if (strikethrough && tmp != null)
+        {
+            var line = new GameObject("Strikethrough");
+            line.transform.SetParent(go.transform, false);
+            var img = line.AddComponent<Image>();
+            img.color = new Color(0.53f, 0.53f, 0.53f, 1f);
+            var rt = line.GetComponent<RectTransform>();
+            rt.anchorMin = new Vector2(0, 0.5f);
+            rt.anchorMax = new Vector2(0, 0.5f);
+            rt.pivot = new Vector2(0, 0.5f);
+            float textWidth = tmp.preferredWidth;
+            rt.sizeDelta = new Vector2(textWidth, 2);
+            rt.anchoredPosition = Vector2.zero;
+        }
+
         _contentInstances.Add(go);
     }
 
