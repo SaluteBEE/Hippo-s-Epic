@@ -19,7 +19,7 @@
     "icon": 2,
     "price": 0,
     "stackable": false,
-    "tip": "疑似大粪的钥匙",
+    "tip": "从厕所里掏出来的东西，一般认为这是一把钥匙，至于它<color=red>真的是什么</color>，谁在乎呢？",
     "func": [],
     "param1": ""
   },
@@ -31,7 +31,7 @@
     "icon": 3,
     "price": 0,
     "stackable": false,
-    "tip": "普通牙",
+    "tip": "一套普通的牙，咬啤酒瓶弄掉过几个角，整体黄不拉几的，不过没人能否认这确实是一套牙。",
     "func": [],
     "param1": ""
   },
@@ -43,7 +43,7 @@
     "icon": 4,
     "price": 0,
     "stackable": false,
-    "tip": "卵用没有的拳套",
+    "tip": "普通的拳套，只存在象征性的意义，不要想拳套能为你做些什么，要问你能为拳套<color=red>做些什么</color>。",
     "func": [],
     "param1": ""
   },
@@ -55,7 +55,7 @@
     "icon": 5,
     "price": 0,
     "stackable": false,
-    "tip": "一口好牙",
+    "tip": "一口好牙，一位伟大的拳王曾经用它咬掉过很多人的耳朵。",
     "func": [],
     "param1": ""
   },
@@ -63,11 +63,11 @@
     "id": 6,
     "type": 4,
     "childtype": 3,
-    "name": "石头拳套",
+    "name": "石膏拳套",
     "icon": 6,
     "price": 0,
     "stackable": false,
-    "tip": "下手很重的拳套",
+    "tip": "砸在脸上的感觉像是大卡车的冲撞，在他的抚摸下下没有人能够不被<color=red>哄睡</color>。",
     "func": [],
     "param1": ""
   },
@@ -79,7 +79,7 @@
     "icon": 7,
     "price": 0,
     "stackable": false,
-    "tip": "一口烂牙",
+    "tip": "疑似牙齿的东西，它已经太老以至于跟不上时代了，就连蛀虫都嫌弃这是套老破小。",
     "func": [],
     "param1": ""
   }
