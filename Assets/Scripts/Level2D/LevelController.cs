@@ -18,6 +18,7 @@ public class LevelController : MonoBehaviour
 
     private GameInput _gameInput;
     private bool _ownsInput;
+    private AsyncOperationHandle<GameObject> _playerHandle;
 
     private void Awake()
     {
@@ -48,6 +49,9 @@ public class LevelController : MonoBehaviour
             _gameInput.Player.Disable();
             _gameInput.Dispose();
         }
+        if (_playerHandle.IsValid())
+            Addressables.Release(_playerHandle);
+        Interactable.ReleaseHintPrefab();
     }
 
     private void EnsureInputManager()
@@ -102,16 +106,16 @@ public class LevelController : MonoBehaviour
 
     private IEnumerator LoadPlayerAsync()
     {
-        var handle = Addressables.LoadAssetAsync<GameObject>("prefabs/player/PlayerCharacter2D");
-        yield return handle;
+        _playerHandle = Addressables.LoadAssetAsync<GameObject>("prefabs/player/PlayerCharacter2D");
+        yield return _playerHandle;
 
-        if (handle.Status != AsyncOperationStatus.Succeeded)
+        if (_playerHandle.Status != AsyncOperationStatus.Succeeded)
         {
-            Debug.LogError($"[LevelController] 加载玩家 Prefab 失败：{handle.OperationException}");
+            Debug.LogError($"[LevelController] 加载玩家 Prefab 失败：{_playerHandle.OperationException}");
             yield break;
         }
 
-        var player = Instantiate(handle.Result, Vector3.zero, Quaternion.identity)
+        var player = Instantiate(_playerHandle.Result, Vector3.zero, Quaternion.identity)
             .GetComponent<PlayerCharacter>();
 
         SetPlayerCharacter(player);

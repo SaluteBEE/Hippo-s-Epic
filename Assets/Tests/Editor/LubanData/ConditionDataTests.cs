@@ -25,10 +25,10 @@ class ConditionDataTests
         Assert.AreEqual(5, cond.ComposeType.Count);
         CollectionAssert.AreEqual(new List<int> { 2, 3 }, cond.ComposeType[0]);
         CollectionAssert.AreEqual(new List<int> { 4 }, cond.ComposeType[1]);
-        Assert.AreEqual(new List<int> { 1, 1 }, cond.HasItem);
-        Assert.AreEqual(new List<int> { 1, 1 }, cond.TaskState);
+        CollectionAssert.AreEqual(new List<int> { 1, 1 }, cond.HasItem[0]);
+        CollectionAssert.AreEqual(new List<int> { 1, 1 }, cond.TaskState[0]);
         Assert.AreEqual(new List<int> { 1, 2 }, cond.HasPerkId);
-        Assert.AreEqual(new List<int> { 2002, 1 }, cond.BattleId);
+        CollectionAssert.AreEqual(new List<int> { 2002, 1 }, cond.BattleId[0]);
         Assert.AreEqual(0, cond.DialogFinishId.Count);
     }
 
@@ -39,10 +39,10 @@ class ConditionDataTests
         Assert.AreEqual(2, cond.Id);
         Assert.AreEqual(5, cond.ComposeType.Count);
         CollectionAssert.AreEqual(new List<int> { 0 }, cond.ComposeType[0]);
-        Assert.AreEqual(new List<int> { 1, 1 }, cond.HasItem);
+        CollectionAssert.AreEqual(new List<int> { 1, 1 }, cond.HasItem[0]);
         Assert.AreEqual(0, cond.TaskState.Count);
         Assert.AreEqual(0, cond.HasPerkId.Count);
-        Assert.AreEqual(new List<int> { 2002, 1 }, cond.BattleId);
+        CollectionAssert.AreEqual(new List<int> { 2002, 1 }, cond.BattleId[0]);
         Assert.AreEqual(0, cond.DialogFinishId.Count);
     }
 
@@ -55,7 +55,7 @@ class ConditionDataTests
         Assert.AreEqual(0, cond.HasItem.Count);
         Assert.AreEqual(0, cond.TaskState.Count);
         Assert.AreEqual(0, cond.HasPerkId.Count);
-        Assert.AreEqual(new List<int> { 2003, 2 }, cond.BattleId);
+        CollectionAssert.AreEqual(new List<int> { 2003, 2 }, cond.BattleId[0]);
         Assert.AreEqual(0, cond.DialogFinishId.Count);
     }
 
@@ -65,7 +65,7 @@ class ConditionDataTests
         var cond = tables.TbCondition.Get(4);
         Assert.AreEqual(4, cond.Id);
         Assert.AreEqual(5, cond.ComposeType.Count);
-        Assert.AreEqual(new List<int> { 2004, 2 }, cond.BattleId);
+        CollectionAssert.AreEqual(new List<int> { 2004, 2 }, cond.BattleId[0]);
         Assert.AreEqual(0, cond.DialogFinishId.Count);
     }
 

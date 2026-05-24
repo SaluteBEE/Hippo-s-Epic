@@ -62,7 +62,8 @@ MonoBehaviour:
   - m_GUID: 6c87d922910b4e548b72984c8551337b
     m_Address: backgrounds/catchdog
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - background
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 8f47d42ebe93395418e6d0ac6e620ff9
     m_Address: ui/Interact/InteractHint
@@ -106,26 +107,26 @@ MonoBehaviour:
     m_SerializedLabels:
     - icon
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 16dac8a21386a7e44a8449a4edb084a0
-    m_Address: icon/item/8
+  - m_GUID: ca5895c26071632469d4b7d61b91bdc2
+    m_Address: icon/item/2
     m_ReadOnly: 0
     m_SerializedLabels:
     - icon
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 75215d461ce71ff458e3eeeb9c520d0d
-    m_Address: icon/item/9
+  - m_GUID: 331feba6b6cac3c4ab30e0ff55583bfd
+    m_Address: icon/item/3
     m_ReadOnly: 0
     m_SerializedLabels:
     - icon
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: fb1f7e60857747a4a9159be0b266c4cf
-    m_Address: icon/item/10
+  - m_GUID: 5248289c5cbc880409b37b99835fab31
+    m_Address: icon/item/4
     m_ReadOnly: 0
     m_SerializedLabels:
     - icon
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 578c714e7f1217a48a8a7867a112c378
-    m_Address: icon/item/11
+  - m_GUID: ce7a6b22f5f601d4fa2dfadf55a0209f
+    m_Address: icon/item/5
     m_ReadOnly: 0
     m_SerializedLabels:
     - icon

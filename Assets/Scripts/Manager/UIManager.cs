@@ -179,13 +179,24 @@ public class UIManager : MonoBehaviour
 
     private void OnDestroy()
     {
+        foreach (var kvp in windowMap)
+        {
+            if (kvp.Value != null)
+            {
+                kvp.Value.OnClose();
+                Destroy(kvp.Value.gameObject);
+            }
+        }
+        windowMap.Clear();
+        createdSet.Clear();
+
         foreach (var kvp in loadHandles)
         {
             if (kvp.Value.IsValid())
                 Addressables.Release(kvp.Value);
         }
-
         loadHandles.Clear();
+        pendingClose.Clear();
         ManagerRegistry.Unregister<UIManager>();
     }
 

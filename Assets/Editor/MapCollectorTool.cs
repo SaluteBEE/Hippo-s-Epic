@@ -174,14 +174,19 @@ public static class MapCollectorTool
 
     private static string ToEnumName(string raw)
     {
-        var parts = raw.Split(new[] { '_', ' ', '-' });
         var sb = new StringBuilder();
-        foreach (var part in parts)
+        bool nextUpper = true;
+        foreach (char c in raw)
         {
-            if (string.IsNullOrEmpty(part)) continue;
-            sb.Append(char.ToUpper(part[0]));
-            if (part.Length > 1)
-                sb.Append(part.Substring(1));
+            if (char.IsLetterOrDigit(c))
+            {
+                sb.Append(nextUpper ? char.ToUpper(c) : c);
+                nextUpper = false;
+            }
+            else
+            {
+                nextUpper = true;
+            }
         }
         return sb.ToString();
     }

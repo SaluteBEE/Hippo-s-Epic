@@ -27,6 +27,7 @@ public class DialogWindow : UIWindow
     private Image _speakerAvatar;
     private readonly Dictionary<string, Sprite> _avatarCache = new Dictionary<string, Sprite>();
     private readonly Dictionary<string, AsyncOperationHandle<Texture2D>> _avatarHandles = new Dictionary<string, AsyncOperationHandle<Texture2D>>();
+    private int _avatarSeq;
     private GameObject _cameraRootInstance;
     private bool _initialized;
 
@@ -206,6 +207,8 @@ public class DialogWindow : UIWindow
     {
         if (_speakerAvatar == null || string.IsNullOrEmpty(avatarName)) return;
 
+        int seq = ++_avatarSeq;
+
         if (_avatarCache.TryGetValue(avatarName, out var sp) && sp != null)
         {
             _speakerAvatar.sprite = sp;
@@ -221,8 +224,11 @@ public class DialogWindow : UIWindow
                     new Rect(0, 0, existing.Result.width, existing.Result.height),
                     new Vector2(0.5f, 0.5f), 100f);
                 _avatarCache[avatarName] = sp;
-                _speakerAvatar.sprite = sp;
-                _speakerAvatar.enabled = true;
+                if (seq == _avatarSeq)
+                {
+                    _speakerAvatar.sprite = sp;
+                    _speakerAvatar.enabled = true;
+                }
             }
             return;
         }
@@ -231,6 +237,8 @@ public class DialogWindow : UIWindow
         var handle = Addressables.LoadAssetAsync<Texture2D>(address);
         _avatarHandles[avatarName] = handle;
         await handle.Task;
+
+        if (seq != _avatarSeq) return;
 
         if (handle.Status == AsyncOperationStatus.Succeeded && handle.Result != null)
         {
@@ -245,13 +253,19 @@ public class DialogWindow : UIWindow
 
     private void ReleaseAvatarHandles()
     {
+        foreach (var kvp in _avatarCache)
+        {
+            if (kvp.Value != null)
+                Destroy(kvp.Value);
+        }
+        _avatarCache.Clear();
+
         foreach (var kvp in _avatarHandles)
         {
             if (kvp.Value.IsValid())
                 Addressables.Release(kvp.Value);
         }
         _avatarHandles.Clear();
-        _avatarCache.Clear();
     }
 
     private void OnBackgroundChange(string backgroundName)

@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
@@ -12,6 +13,9 @@ public class Interactable : MonoBehaviour
     [SerializeField] private List<InteractionPhase> phases = new List<InteractionPhase>();
 
     private static GameObject _hintPrefab;
+    private static AsyncOperationHandle<GameObject> _hintPrefabHandle;
+    private static bool _hintLoading;
+    private readonly List<InteractHint> _pendingHints = new List<InteractHint>();
     private InteractHint _hint;
     private int _currentState;
     private InteractionPhase _currentPhase;
@@ -60,28 +64,50 @@ public class Interactable : MonoBehaviour
         Transform uiChild = transform.Find("UI");
         if (uiChild == null) return;
 
-        EnsureHintPrefabLoaded();
-        if (_hintPrefab == null) return;
+        if (_hintPrefab != null)
+        {
+            CreateHintInstance(uiChild);
+            return;
+        }
 
-        GameObject instance = Instantiate(_hintPrefab, uiChild);
-        instance.name = "InteractHint";
-        _hint = instance.GetComponent<InteractHint>();
+        if (!_hintLoading)
+            StartCoroutine(LoadHintPrefabAsync(uiChild));
+        else
+            _pendingHints.Add(null);
     }
 
-    private static void EnsureHintPrefabLoaded()
+    private IEnumerator LoadHintPrefabAsync(Transform uiChild)
     {
-        if (_hintPrefab != null) return;
+        _hintLoading = true;
+        _hintPrefabHandle = Addressables.LoadAssetAsync<GameObject>(HintPrefabAddress);
+        yield return _hintPrefabHandle;
 
-        var handle = Addressables.LoadAssetAsync<GameObject>(HintPrefabAddress);
-        handle.WaitForCompletion();
-        if (handle.Status == AsyncOperationStatus.Succeeded)
+        if (_hintPrefabHandle.Status == AsyncOperationStatus.Succeeded)
         {
-            _hintPrefab = handle.Result;
+            _hintPrefab = _hintPrefabHandle.Result;
+            CreateHintInstance(uiChild);
         }
         else
         {
             Debug.LogWarning($"[Interactable] 加载 Hint 预制体失败: {HintPrefabAddress}");
         }
+        _hintLoading = false;
+    }
+
+    private void CreateHintInstance(Transform parent)
+    {
+        if (_hintPrefab == null) return;
+        GameObject instance = Instantiate(_hintPrefab, parent);
+        instance.name = "InteractHint";
+        _hint = instance.GetComponent<InteractHint>();
+    }
+
+    public static void ReleaseHintPrefab()
+    {
+        if (_hintPrefabHandle.IsValid())
+            Addressables.Release(_hintPrefabHandle);
+        _hintPrefab = null;
+        _hintPrefabHandle = default;
     }
 
     #region Player Detection

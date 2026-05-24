@@ -309,6 +309,9 @@ public partial class GameApp : MonoBehaviour
 
         InitBag();
         InitEquip();
+        InitQuest();
+
+        ConditionSystem.Instance.Initialize();
 
         StartCoroutine(IconLoader.Init());
 
@@ -343,6 +346,11 @@ public partial class GameApp : MonoBehaviour
         {
             Debug.Log($"[GameApp] 装备从存档恢复: {equip.Equips.Count} 件装备");
         }
+    }
+
+    private void InitQuest()
+    {
+        QuestManager.Instance.Initialize();
     }
 
     private void Update()
@@ -452,6 +460,7 @@ public partial class GameApp : MonoBehaviour
         }
 
         SaveManager.Instance.Save();
+        IconLoader.ReleaseAll();
         StateMachine.OnStateChanged -= OnGameStateChanged;
     }
 }

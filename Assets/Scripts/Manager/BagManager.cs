@@ -75,7 +75,10 @@ public class BagManager
         }
 
         if (added > 0)
+        {
             OnItemChanged?.Invoke(BagChangeType.Added, itemId);
+            ConditionSystem.Instance.Notify(ConditionChangeType.Item);
+        }
 
         return added;
     }
@@ -107,6 +110,7 @@ public class BagManager
         }
 
         OnItemChanged?.Invoke(BagChangeType.Removed, itemId);
+        ConditionSystem.Instance.Notify(ConditionChangeType.Item);
         return true;
     }
 

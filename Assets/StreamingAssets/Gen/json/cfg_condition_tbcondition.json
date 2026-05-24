@@ -20,20 +20,26 @@
       ]
     ],
     "hasItem": [
-      1,
-      1
+      [
+        1,
+        1
+      ]
     ],
     "taskState": [
-      1,
-      1
+      [
+        1,
+        1
+      ]
     ],
     "hasPerkId": [
       1,
       2
     ],
     "battleId": [
-      2002,
-      1
+      [
+        2002,
+        1
+      ]
     ],
     "dialogFinishId": []
   },
@@ -57,14 +63,18 @@
       ]
     ],
     "hasItem": [
-      1,
-      1
+      [
+        1,
+        1
+      ]
     ],
     "taskState": [],
     "hasPerkId": [],
     "battleId": [
-      2002,
-      1
+      [
+        2002,
+        1
+      ]
     ],
     "dialogFinishId": []
   },
@@ -91,8 +101,10 @@
     "taskState": [],
     "hasPerkId": [],
     "battleId": [
-      2003,
-      2
+      [
+        2003,
+        2
+      ]
     ],
     "dialogFinishId": []
   },
@@ -119,8 +131,10 @@
     "taskState": [],
     "hasPerkId": [],
     "battleId": [
-      2004,
-      2
+      [
+        2004,
+        2
+      ]
     ],
     "dialogFinishId": []
   },

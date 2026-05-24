@@ -35,7 +35,8 @@ public class SaveManager
         {
             entities = new List<EntityStateEntry>(_entityStates.Count),
             bag = BagManager.Instance.BuildSaveData(),
-            equip = EquipManager.Instance.BuildSaveData()
+            equip = EquipManager.Instance.BuildSaveData(),
+            quest = QuestManager.Instance.BuildSaveData()
         };
 
         foreach (var kvp in _entityStates)
@@ -49,7 +50,7 @@ public class SaveManager
             Directory.CreateDirectory(dir);
 
         File.WriteAllText(SavePath, json);
-        Debug.Log($"[SaveManager] 存档已保存: {SavePath} ({_entityStates.Count} 条记录, {wrapper.bag.Count} 种物品, {wrapper.equip.Count} 件装备)");
+        Debug.Log($"[SaveManager] 存档已保存: {SavePath} ({_entityStates.Count} 条记录, {wrapper.bag?.Count ?? 0} 种物品, {wrapper.equip?.Count ?? 0} 件装备, {wrapper.quest?.entries?.Count ?? 0} 个任务)");
     }
 
     public void Load()
@@ -74,6 +75,7 @@ public class SaveManager
 
         BagManager.Instance.RestoreFromSaveData(wrapper?.bag);
         EquipManager.Instance.RestoreFromSaveData(wrapper?.equip);
+        QuestManager.Instance.RestoreFromSaveData(wrapper?.quest);
 
         Debug.Log($"[SaveManager] 存档已加载: {_entityStates.Count} 条记录");
     }
@@ -83,6 +85,7 @@ public class SaveManager
         _entityStates.Clear();
         BagManager.Instance.Clear();
         EquipManager.Instance.Clear();
+        QuestManager.Instance.Clear();
         if (File.Exists(SavePath))
             File.Delete(SavePath);
         Debug.Log("[SaveManager] 存档已清除");
@@ -94,6 +97,7 @@ public class SaveManager
         public List<EntityStateEntry> entities;
         public List<BagManager.BagSaveEntry> bag;
         public List<EquipManager.EquipSaveEntry> equip;
+        public QuestSaveData quest;
     }
 
     [System.Serializable]

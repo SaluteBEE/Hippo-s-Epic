@@ -26,6 +26,7 @@ public class RightSideSlotManager : MonoBehaviour
     private readonly GameObject[] _slotSpriteGOs = new GameObject[3];
     private readonly Dictionary<string, Sprite> _cache = new Dictionary<string, Sprite>();
     private readonly Dictionary<string, AsyncOperationHandle> _handles = new Dictionary<string, AsyncOperationHandle>();
+    private int _loadSeq;
     private DialogCharacterManager _charManager;
     private DialogCharacterRenderer _renderer;
 
@@ -75,6 +76,8 @@ public class RightSideSlotManager : MonoBehaviour
     {
         if (slotIndex < 0 || slotIndex >= SlotCount) return;
 
+        int seq = ++_loadSeq;
+
         if (_cache.TryGetValue(imageName, out var cached) && cached != null)
         {
             CreateSpriteGO(slotIndex, cached);
@@ -92,6 +95,8 @@ public class RightSideSlotManager : MonoBehaviour
         var texHandle = Addressables.LoadAssetAsync<Texture2D>(address);
         _handles[imageName] = texHandle;
         await texHandle.Task;
+
+        if (seq != _loadSeq) return;
 
         if (texHandle.Status == AsyncOperationStatus.Succeeded)
         {
@@ -157,12 +162,18 @@ public class RightSideSlotManager : MonoBehaviour
     {
         Cleanup();
 
+        foreach (var kvp in _cache)
+        {
+            if (kvp.Value != null)
+                Destroy(kvp.Value);
+        }
+        _cache.Clear();
+
         foreach (var kvp in _handles)
         {
             if (kvp.Value.IsValid())
                 Addressables.Release(kvp.Value);
         }
         _handles.Clear();
-        _cache.Clear();
     }
 }

@@ -34,6 +34,10 @@ public class DialogManager : MonoBehaviour
     private bool _endingDialog;
     private const int MaxTransitionDepth = 50;
 
+    private static readonly HashSet<int> _finishedDialogs = new HashSet<int>();
+    public static bool IsDialogFinished(int dialogId) => _finishedDialogs.Contains(dialogId);
+    public static IReadOnlyCollection<int> FinishedDialogs => _finishedDialogs;
+
     public int CurrentSpeakerId1 => _currentDialog?.Speakerid1 ?? 0;
     public int CurrentSpeakerId2 => _currentDialog?.Speakerid2 ?? 0;
     public cfg.cfg.dialog.Dialog CurrentDialog => _currentDialog;
@@ -288,6 +292,7 @@ public class DialogManager : MonoBehaviour
 
     private void EndDialog()
     {
+        int finishedId = _currentDialog?.Id ?? 0;
         _endingDialog = true;
         State = DialogState.Ended;
         _waitingCharacters = false;
@@ -295,6 +300,11 @@ public class DialogManager : MonoBehaviour
         _contentQueue = null;
         OnDialogEnded?.Invoke();
         _endingDialog = false;
+
+        if (finishedId > 0)
+        {
+            _finishedDialogs.Add(finishedId);
+        }
     }
 
     private SpeakerSide ResolveSide(Dialogcontent content)
