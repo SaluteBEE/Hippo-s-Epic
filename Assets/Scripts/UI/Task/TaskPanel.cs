@@ -49,9 +49,9 @@ public class TaskPanel : UIWindow
         ClearItems();
 
         var quests = QuestManager.Instance.AllQuests.Values
-            .OrderByDescending(q => q.State == QuestState.InProgress)
+            .OrderBy(q => q.State == QuestState.Completed || q.State == QuestState.Failed)
+            .ThenByDescending(q => q.State == QuestState.InProgress)
             .ThenByDescending(q => q.State == QuestState.NotAccepted)
-            .ThenByDescending(q => q.State == QuestState.Completed)
             .ToList();
 
         int index = 1;

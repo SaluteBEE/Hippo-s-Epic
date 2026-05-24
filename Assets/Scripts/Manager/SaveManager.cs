@@ -36,7 +36,9 @@ public class SaveManager
             entities = new List<EntityStateEntry>(_entityStates.Count),
             bag = BagManager.Instance.BuildSaveData(),
             equip = EquipManager.Instance.BuildSaveData(),
-            quest = QuestManager.Instance.BuildSaveData()
+            quest = QuestManager.Instance.BuildSaveData(),
+            finishedDialogs = new List<int>(DialogManager.FinishedDialogs),
+            metConditions = ConditionSystem.Instance.BuildMetConditionIds()
         };
 
         foreach (var kvp in _entityStates)
@@ -76,6 +78,8 @@ public class SaveManager
         BagManager.Instance.RestoreFromSaveData(wrapper?.bag);
         EquipManager.Instance.RestoreFromSaveData(wrapper?.equip);
         QuestManager.Instance.RestoreFromSaveData(wrapper?.quest);
+        DialogManager.RestoreFinishedDialogs(wrapper?.finishedDialogs);
+        ConditionSystem.Instance.RestoreMetConditions(wrapper?.metConditions);
 
         Debug.Log($"[SaveManager] 存档已加载: {_entityStates.Count} 条记录");
     }
@@ -98,6 +102,8 @@ public class SaveManager
         public List<BagManager.BagSaveEntry> bag;
         public List<EquipManager.EquipSaveEntry> equip;
         public QuestSaveData quest;
+        public List<int> finishedDialogs;
+        public List<int> metConditions;
     }
 
     [System.Serializable]

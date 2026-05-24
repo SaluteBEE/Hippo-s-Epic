@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public enum ConditionChangeType
@@ -20,6 +21,24 @@ public class ConditionSystem
 
     private readonly Dictionary<ConditionChangeType, HashSet<int>> _fieldIndex
         = new Dictionary<ConditionChangeType, HashSet<int>>();
+
+    public List<int> BuildMetConditionIds()
+    {
+        var result = new List<int>();
+        foreach (var kv in _cache)
+        {
+            if (kv.Value) result.Add(kv.Key);
+        }
+        return result;
+    }
+
+    public void RestoreMetConditions(List<int> metIds)
+    {
+        if (metIds == null || metIds.Count == 0) return;
+        foreach (var id in metIds)
+            _cache[id] = true;
+        Debug.Log($"[ConditionSystem] 恢复条件状态: {metIds.Count} 条");
+    }
 
     public event Action<int, bool> OnConditionChanged;
 
@@ -81,6 +100,29 @@ public class ConditionSystem
         bool result = EvaluateCondition(cond);
         _cache[conditionId] = result;
         return result;
+    }
+
+    public void ForceSetCondition(int conditionId, bool met)
+    {
+        _cache[conditionId] = met;
+        OnConditionChanged?.Invoke(conditionId, met);
+        Debug.Log($"[ConditionSystem] 强制设置条件 {conditionId} = {met}");
+    }
+
+    public List<int> GetAllConditionIds()
+    {
+        var tables = ManagerRegistry.GetTables<cfg.Tables>();
+        return tables?.TbCondition.DataList.Select(c => c.Id).ToList() ?? new List<int>();
+    }
+
+    public string GetConditionInfo(int conditionId)
+    {
+        var tables = ManagerRegistry.GetTables<cfg.Tables>();
+        var cond = tables?.TbCondition.GetOrDefault(conditionId);
+        if (cond == null) return $"条件 {conditionId} 不存在";
+
+        bool met = _cache.TryGetValue(conditionId, out bool v) && v;
+        return $"ID:{conditionId} | {(met ? "<color=green>已满足</color>" : "<color=red>未满足</color>")}";
     }
 
     public void Notify(ConditionChangeType changeType)

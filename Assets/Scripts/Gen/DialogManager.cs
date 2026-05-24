@@ -4,6 +4,7 @@ using System.Linq;
 using cfg.cfg.dialog;
 using cfg.cfg.dialogcontent;
 using UnityEngine;
+using System;
 
 public enum DialogState
 {
@@ -38,6 +39,14 @@ public class DialogManager : MonoBehaviour
     private static readonly HashSet<int> _finishedDialogs = new HashSet<int>();
     public static bool IsDialogFinished(int dialogId) => _finishedDialogs.Contains(dialogId);
     public static IReadOnlyCollection<int> FinishedDialogs => _finishedDialogs;
+
+    public static void RestoreFinishedDialogs(List<int> ids)
+    {
+        if (ids == null || ids.Count == 0) return;
+        foreach (var id in ids)
+            _finishedDialogs.Add(id);
+        Debug.Log($"[DialogManager] 恢复已完成对话: {ids.Count} 条");
+    }
 
     public int CurrentSpeakerId1 => _currentDialog?.Speakerid1 ?? 0;
     public int CurrentSpeakerId2 => _currentDialog?.Speakerid2 ?? 0;
