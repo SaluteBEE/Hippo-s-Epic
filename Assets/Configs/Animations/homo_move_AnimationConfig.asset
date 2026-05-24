@@ -108,5 +108,23 @@ MonoBehaviour:
       weight: 1
       transitionTime: 0.1
       delay: 0
+  - name: walk
+    description: "\u63CF\u8FF0"
+    layers:
+    - layerName: Base
+      clipName: head-idle
+      weight: 1
+      transitionTime: 0.1
+      delay: 0
+    - layerName: UpperBody
+      clipName: body-walk
+      weight: 1
+      transitionTime: 0.1
+      delay: 0
+    - layerName: LowerBody
+      clipName: leg-walk
+      weight: 1
+      transitionTime: 0.1
+      delay: 0
   defaultComposition: Idle
   defaultTransitionTime: 0.1
