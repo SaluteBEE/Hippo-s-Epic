@@ -157,7 +157,7 @@ GameObject:
   - component: {fileID: 5092693171634192639}
   - component: {fileID: 4700313269579526787}
   m_Layer: 0
-  m_Name: temple
+  m_Name: template
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -196,8 +196,7 @@ MonoBehaviour:
   spawnPoint: {fileID: 6986008919581450147}
   teleportArrival: {fileID: 720938784536345893}
   cameraBounds: {fileID: 8323662252691034781}
-  interactables:
-  - {fileID: 0}
+  interactables: []
   VisualRoot: {fileID: 5715421376510273496}
 --- !u!1 &4790935915944004069
 GameObject:

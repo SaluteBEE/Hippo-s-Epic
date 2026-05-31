@@ -44,7 +44,7 @@ GameObject:
   - component: {fileID: 8768212736992912018}
   - component: {fileID: 4157385159750846353}
   m_Layer: 3
-  m_Name: trasns
+  m_Name: trans
   m_TagString: Untagged
   m_Icon: {fileID: 8418204508859773708, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
