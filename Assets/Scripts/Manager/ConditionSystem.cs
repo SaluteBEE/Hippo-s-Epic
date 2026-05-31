@@ -16,6 +16,7 @@ public class ConditionSystem
 {
     private static ConditionSystem _instance;
     public static ConditionSystem Instance => _instance ??= new ConditionSystem();
+    public static bool HasInstance => _instance != null;
 
     private readonly Dictionary<int, bool> _cache = new Dictionary<int, bool>();
 

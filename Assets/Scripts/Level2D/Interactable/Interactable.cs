@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -277,6 +278,10 @@ public class Interactable : MonoBehaviour
                 ExecutePickup(button);
                 break;
 
+            case InteractionType.Consume:
+                ExecuteConsume(button);
+                break;
+
             case InteractionType.Teleport:
                 ExecuteTeleport(button);
                 break;
@@ -306,6 +311,28 @@ public class Interactable : MonoBehaviour
         {
             var itemCfg = BagManager.Instance.GetItemConfig(itemId);
             Debug.Log($"获得了道具: {itemCfg?.Name ?? itemId.ToString()} x{added}");
+        }
+    }
+
+    private void ExecuteConsume(ButtonOption button)
+    {
+        int itemId = button.dataId;
+        int count = 1;
+        if (!string.IsNullOrEmpty(button.param1) && int.TryParse(button.param1, out int parsed))
+            count = parsed;
+
+        if (!BagManager.Instance.HasItem(itemId, count))
+        {
+            var itemCfg = BagManager.Instance.GetItemConfig(itemId);
+            Debug.LogWarning($"[Interactable] {EntityId} 物品不足: {itemCfg?.Name ?? itemId.ToString()} 需要{count}个");
+            return;
+        }
+
+        bool removed = BagManager.Instance.RemoveItem(itemId, count);
+        if (removed)
+        {
+            var itemCfg = BagManager.Instance.GetItemConfig(itemId);
+            Debug.Log($"消耗了道具: {itemCfg?.Name ?? itemId.ToString()} x{count}");
         }
     }
 
@@ -360,6 +387,36 @@ public class Interactable : MonoBehaviour
         return null;
     }
 
+    private void OnEnable()
+    {
+        if (ConditionSystem.HasInstance)
+            ConditionSystem.Instance.OnConditionChanged += OnConditionChanged;
+    }
+
+    private void OnDisable()
+    {
+        if (ConditionSystem.HasInstance)
+            ConditionSystem.Instance.OnConditionChanged -= OnConditionChanged;
+    }
+
+    private void OnConditionChanged(int conditionId, bool isMet)
+    {
+        if (!_playerInside || _currentPhase == null || _hint == null)
+            return;
+
+        var buttons = _currentPhase.buttons;
+        if (buttons == null) return;
+
+        for (int i = 0; i < buttons.Count; i++)
+        {
+            if (buttons[i].conditionId == conditionId)
+            {
+                RefreshHint();
+                return;
+            }
+        }
+    }
+
     private void RefreshHint()
     {
         if (_hint == null || _currentPhase == null)
@@ -376,19 +433,40 @@ public class Interactable : MonoBehaviour
         var buttons = _currentPhase.buttons;
         if (buttons == null || buttons.Count == 0)
         {
-            _hint.Hide();
+            _hint.Show(_currentPhase.hintText, Array.Empty<string>(), null);
             return;
         }
 
-        string[] buttonTexts = new string[buttons.Count];
-        for (int i = 0; i < buttons.Count; i++)
-            buttonTexts[i] = buttons[i].buttonText;
+        var condSys = ConditionSystem.HasInstance ? ConditionSystem.Instance : null;
+        var visibleTexts = new List<string>();
+        var visibleIndices = new List<int>();
 
-        _hint.Show(_currentPhase.hintText, buttonTexts, OnHintButtonClicked);
+        for (int i = 0; i < buttons.Count; i++)
+        {
+            var btn = buttons[i];
+            if (btn.conditionId != 0 && condSys != null && !condSys.IsConditionMet(btn.conditionId))
+                continue;
+            visibleTexts.Add(btn.buttonText);
+            visibleIndices.Add(i);
+        }
+
+        if (visibleTexts.Count == 0)
+        {
+            _hint.Show(_currentPhase.hintText, Array.Empty<string>(), null);
+            return;
+        }
+
+        _hint.Show(_currentPhase.hintText, visibleTexts.ToArray(), OnHintButtonClicked);
+        _visibleButtonIndices = visibleIndices;
     }
 
-    private void OnHintButtonClicked(int index)
+    private List<int> _visibleButtonIndices = new List<int>();
+
+    private void OnHintButtonClicked(int visibleIndex)
     {
-        OnPlayerExecute(index);
+        if (visibleIndex < 0 || visibleIndex >= _visibleButtonIndices.Count)
+            return;
+        int actualIndex = _visibleButtonIndices[visibleIndex];
+        OnPlayerExecute(actualIndex);
     }
 }

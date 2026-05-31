@@ -80,16 +80,20 @@ public class ButtonOption
     public string buttonText = UIStrings.Interaction.DefaultButton;
 
     [Header("操作")]
-    [Tooltip("交互类型：HintOnly=仅提示 | Dialogue=对话 | Pickup=拾取 | Teleport=传送")]
+    [Tooltip("交互类型：HintOnly=仅提示 | Dialogue=对话 | Pickup=拾取 | Consume=消耗物品 | Teleport=传送")]
     public InteractionType type;
-    [Tooltip("Dialogue → 对话表ID\nPickup → 物品ID（当 param1 为空时用作物品名）")]
+    [Tooltip("Dialogue → 对话表ID\nPickup/Consume → 物品ID")]
     public int dataId;
-    [Tooltip("Teleport(场景内) → 目标地图名（Map名称）\nTeleport(跨场景) → 留空，使用 param2\nPickup → 物品名称（覆盖 dataId）")]
+    [Tooltip("Teleport(场景内) → 目标地图名（Map名称）\nTeleport(跨场景) → 留空，使用 param2\nPickup/Consume → 扣除/添加数量（默认1）")]
     public string param1;
     [Tooltip("Teleport(跨场景) → 目标场景名（如 Scene_Staff_Lounge）\n需要 GameApp 存在才能跨场景传送")]
     public string param2;
     [Tooltip("传送模式：0=传送到交互点，1=跨场景")]
     public int teleportMode;
+
+    [Header("条件")]
+    [Tooltip("关联条件表ID，0 表示无条件限制\n条件不满足时此按钮隐藏")]
+    public int conditionId;
 
     [Header("行为")]
     [Tooltip("点击后转换到的状态值，-1 表示不转换状态\n转换后会重新匹配 phases 中对应 state 的阶段")]
@@ -101,5 +105,6 @@ public enum InteractionType
     HintOnly,
     Dialogue,
     Pickup,
-    Teleport
+    Teleport,
+    Consume
 }

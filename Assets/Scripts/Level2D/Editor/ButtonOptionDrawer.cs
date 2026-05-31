@@ -28,6 +28,7 @@ public class ButtonOptionDrawer : PropertyDrawer
         var buttonTextProp = property.FindPropertyRelative("buttonText");
         var transProp = property.FindPropertyRelative("transitionToState");
         var tpModeProp = property.FindPropertyRelative("teleportMode");
+        var condProp = property.FindPropertyRelative("conditionId");
 
         float y = position.y;
         float w = position.width;
@@ -87,21 +88,32 @@ public class ButtonOptionDrawer : PropertyDrawer
         }
         else
         {
+            bool isConsume = tt == InteractionType.Consume;
+            string idLabel = isConsume ? "物品ID" : "dataId";
+            string p1Label = isConsume ? "扣除数量" : "param1";
+
             dataIdProp.intValue = EditorGUI.IntField(
-                new Rect(position.x, y, w, lineH), "dataId", dataIdProp.intValue);
+                new Rect(position.x, y, w, lineH), idLabel, dataIdProp.intValue);
             y += lineH + sp;
 
             param1Prop.stringValue = EditorGUI.TextField(
-                new Rect(position.x, y, w, lineH), "param1", param1Prop.stringValue);
+                new Rect(position.x, y, w, lineH), p1Label, param1Prop.stringValue);
             y += lineH + sp;
 
-            param2Prop.stringValue = EditorGUI.TextField(
-                new Rect(position.x, y, w, lineH), "param2", param2Prop.stringValue);
-            y += lineH + sp;
+            if (!isConsume)
+            {
+                param2Prop.stringValue = EditorGUI.TextField(
+                    new Rect(position.x, y, w, lineH), "param2", param2Prop.stringValue);
+                y += lineH + sp;
+            }
         }
 
         transProp.intValue = EditorGUI.IntField(
             new Rect(position.x, y, w, lineH), "transitionToState", transProp.intValue);
+        y += lineH + sp;
+
+        condProp.intValue = EditorGUI.IntField(
+            new Rect(position.x, y, w, lineH), "条件ID", condProp.intValue);
 
         EditorGUI.EndProperty();
     }
@@ -229,12 +241,15 @@ public class ButtonOptionDrawer : PropertyDrawer
     public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
     {
         var tt = (InteractionType)property.FindPropertyRelative("type").enumValueIndex;
-        int lines = 3;
+        int lines = 4;
 
         if (tt == InteractionType.Teleport)
         {
-            // mode dropdown + (label + popup) = 3 lines
             lines += 3;
+        }
+        else if (tt == InteractionType.Consume)
+        {
+            lines += 2;
         }
         else
         {

@@ -11,11 +11,12 @@ public static class MapCollectorTool
 {
     private const string OutputPath = "Assets/Scripts/Level2D/Map/SceneMapId.cs";
 
-    [MenuItem("Tools/Map/收集所有场景的 Map 并生成枚举")]
-    public static void CollectAllMapsAndGenerateEnum()
+    [MenuItem("Tools/Map/收集所有场景的 Map 和 Interactable")]
+    public static void CollectAllMapsAndInteractables()
     {
         var allEntries = new List<MapEntry>();
         string activeScenePath = SceneManager.GetActiveScene().path;
+        int totalInteractables = 0;
 
         string[] sceneGuids = AssetDatabase.FindAssets("t:Scene", new[] { "Assets" });
         var scenePaths = sceneGuids
@@ -32,61 +33,82 @@ public static class MapCollectorTool
 
             if (scenePath == activeScenePath)
             {
-                var maps = CollectFromActiveScene();
+                var (maps, interactableCount) = CollectFromActiveScene();
                 foreach (var mapName in maps)
                     allEntries.Add(new MapEntry { SceneName = sceneName, MapName = mapName });
-                Debug.Log($"[MapCollector] 场景 {sceneName}(活跃): 找到 {maps.Count} 个 Map");
+                totalInteractables += interactableCount;
+                Debug.Log($"[MapCollector] 场景 {sceneName}(活跃): 找到 {maps.Count} 个 Map, {interactableCount} 个 Interactable");
                 continue;
             }
 
-            var found = FindMapsInScene(scenePath);
-            foreach (var mapName in found)
+            var (foundMaps, foundInteractables) = CollectFromScene(scenePath);
+            foreach (var mapName in foundMaps)
                 allEntries.Add(new MapEntry { SceneName = sceneName, MapName = mapName });
-
-            Debug.Log($"[MapCollector] 场景 {sceneName}: 找到 {found.Count} 个 Map");
+            totalInteractables += foundInteractables;
+            Debug.Log($"[MapCollector] 场景 {sceneName}: 找到 {foundMaps.Count} 个 Map, {foundInteractables} 个 Interactable");
         }
 
         GenerateEnumFile(allEntries);
+        Debug.Log($"[MapCollector] 完成，共 {allEntries.Count} 个 Map，{totalInteractables} 个 Interactable");
     }
 
-    private static List<string> CollectFromActiveScene()
+    private static (List<string> maps, int interactableCount) CollectFromActiveScene()
     {
-        var result = new List<string>();
-        var maps = GameObject.FindObjectsOfType<Map>(true);
-        foreach (var map in maps)
+        var maps = new List<string>();
+        int interactableCount = 0;
+
+        var mapComponents = GameObject.FindObjectsOfType<Map>(true);
+        foreach (var map in mapComponents)
         {
             if (map != null && !string.IsNullOrEmpty(map.name))
-                result.Add(map.name);
+            {
+                maps.Add(map.name);
+                Undo.RecordObject(map, "Collect Interactables");
+                map.CollectInteractables();
+                EditorUtility.SetDirty(map);
+                interactableCount += map.InteractableList.Count;
+            }
         }
-        result.Sort();
-        return result;
+
+        maps.Sort();
+        return (maps, interactableCount);
     }
 
-    private static List<string> FindMapsInScene(string scenePath)
+    private static (List<string> maps, int interactableCount) CollectFromScene(string scenePath)
     {
-        var result = new List<string>();
+        var maps = new List<string>();
+        int interactableCount = 0;
 
         Scene scene = EditorSceneManager.OpenScene(scenePath, OpenSceneMode.Additive);
 
         try
         {
-            var mapComponents = GameObject.FindObjectsOfType<Map>(true);
+            var rootObjects = scene.GetRootGameObjects();
+            var mapComponents = new List<Map>();
+            foreach (var root in rootObjects)
+                mapComponents.AddRange(root.GetComponentsInChildren<Map>(true));
+
             foreach (var map in mapComponents)
             {
                 if (map != null && !string.IsNullOrEmpty(map.name))
                 {
-                    result.Add(map.name);
+                    maps.Add(map.name);
+                    Undo.RecordObject(map, "Collect Interactables");
+                    map.CollectInteractables();
+                    EditorUtility.SetDirty(map);
+                    interactableCount += map.InteractableList.Count;
                 }
             }
 
-            result.Sort();
+            EditorSceneManager.SaveScene(scene);
+            maps.Sort();
         }
         finally
         {
             EditorSceneManager.CloseScene(scene, true);
         }
 
-        return result;
+        return (maps, interactableCount);
     }
 
     private static void GenerateEnumFile(List<MapEntry> entries)
@@ -113,7 +135,7 @@ public static class MapCollectorTool
         }
 
         var sb = new StringBuilder();
-        sb.AppendLine("// 本文件由 Tools/Map/收集所有场景的 Map 并生成枚举 自动生成，请勿手动修改");
+        sb.AppendLine("// 本文件由 Tools/Map/收集所有场景的 Map 和 Interactable 自动生成，请勿手动修改");
         sb.AppendLine("using System.Collections.Generic;");
         sb.AppendLine();
         sb.AppendLine("public enum SceneMapId");

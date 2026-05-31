@@ -5,6 +5,7 @@ using TMPro;
 public class InteractHint : MonoBehaviour
 {
     [SerializeField] private GameObject root;
+    [SerializeField] private GameObject btnRoot;
     [SerializeField] private TMP_Text textLabel;
     [SerializeField] private InteractHintButton[] buttons;
 
@@ -22,6 +23,7 @@ public class InteractHint : MonoBehaviour
 
         onButtonClicked = callback;
 
+        bool anyActive = false;
         for (int i = 0; i < buttons.Length; i++)
         {
             if (buttons[i] == null) continue;
@@ -29,8 +31,26 @@ public class InteractHint : MonoBehaviour
             bool active = i < buttonTexts.Length && !string.IsNullOrEmpty(buttonTexts[i]);
             buttons[i].gameObject.SetActive(active);
             if (active)
+            {
                 buttons[i].Setup(buttonTexts[i], i);
+                anyActive = true;
+            }
         }
+
+        if (!anyActive)
+        {
+            if (btnRoot != null)
+                btnRoot.SetActive(false);
+
+            if (root != null)
+                root.SetActive(true);
+            else
+                gameObject.SetActive(true);
+            return;
+        }
+
+        if (btnRoot != null)
+            btnRoot.SetActive(true);
 
         if (root != null)
             root.SetActive(true);
@@ -45,6 +65,9 @@ public class InteractHint : MonoBehaviour
 
     public void Hide()
     {
+        if (btnRoot != null)
+            btnRoot.SetActive(false);
+
         if (root != null)
             root.SetActive(false);
         else

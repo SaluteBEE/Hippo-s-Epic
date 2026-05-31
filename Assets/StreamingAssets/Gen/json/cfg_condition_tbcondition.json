@@ -164,5 +164,155 @@
     "dialogFinishId": [
       1002001
     ]
+  },
+  {
+    "id": 6,
+    "composeType": [
+      [
+        2
+      ],
+      [
+        0
+      ],
+      [
+        0
+      ],
+      [
+        0
+      ],
+      [
+        0
+      ]
+    ],
+    "hasItem": [
+      [
+        1,
+        1
+      ]
+    ],
+    "taskState": [],
+    "hasPerkId": [],
+    "battleId": [],
+    "dialogFinishId": []
+  },
+  {
+    "id": 7,
+    "composeType": [
+      [
+        2
+      ],
+      [
+        0
+      ],
+      [
+        0
+      ],
+      [
+        0
+      ],
+      [
+        0
+      ]
+    ],
+    "hasItem": [
+      [
+        2,
+        1
+      ]
+    ],
+    "taskState": [],
+    "hasPerkId": [],
+    "battleId": [],
+    "dialogFinishId": []
+  },
+  {
+    "id": 8,
+    "composeType": [
+      [
+        0
+      ],
+      [
+        0
+      ],
+      [
+        0
+      ],
+      [
+        0
+      ],
+      [
+        5
+      ]
+    ],
+    "hasItem": [],
+    "taskState": [],
+    "hasPerkId": [],
+    "battleId": [],
+    "dialogFinishId": [
+      1002001
+    ]
+  },
+  {
+    "id": 9,
+    "composeType": [
+      [
+        1,
+        2
+      ],
+      [
+        0
+      ],
+      [
+        0
+      ],
+      [
+        0
+      ],
+      [
+        0
+      ]
+    ],
+    "hasItem": [
+      [
+        1,
+        3
+      ]
+    ],
+    "taskState": [],
+    "hasPerkId": [],
+    "battleId": [],
+    "dialogFinishId": []
+  },
+  {
+    "id": 10,
+    "composeType": [
+      [
+        2
+      ],
+      [
+        0
+      ],
+      [
+        0
+      ],
+      [
+        0
+      ],
+      [
+        5
+      ]
+    ],
+    "hasItem": [
+      [
+        1,
+        1
+      ]
+    ],
+    "taskState": [],
+    "hasPerkId": [],
+    "battleId": [],
+    "dialogFinishId": [
+      1002001
+    ]
   }
 ]
