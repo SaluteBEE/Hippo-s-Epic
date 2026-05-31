@@ -3529,6 +3529,7 @@ MonoBehaviour:
   teleportArrival: {fileID: 1587279260}
   cameraBounds: {fileID: 945918870}
   interactables:
+  - {fileID: 8866793781270711404}
   - {fileID: 1660090652}
   - {fileID: 1886808622}
   VisualRoot: {fileID: 9220051578885573660}
@@ -3542,6 +3543,8 @@ GameObject:
   m_Component:
   - component: {fileID: 8866793781270711403}
   - component: {fileID: 6231358320013909118}
+  - component: {fileID: 8866793781270711405}
+  - component: {fileID: 8866793781270711404}
   m_Layer: 0
   m_Name: Challenger 2
   m_TagString: Untagged
@@ -6202,6 +6205,84 @@ Transform:
   m_Children: []
   m_Father: {fileID: 6463840130235815370}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8866793781270711404
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3657018193388032858}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cbe9e45f38a902f4c96eba0f692e202d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  phases:
+  - state: 0
+    hintText: "\u4E00\u4E2A\u50BB\u903C\u670B\u514B\uFF0C\u88AB\u6253\u7684\u6C38\u6C38\u8FDC\u8FDC\u7761\u7740\u4E86\u3002"
+    buttons:
+    - buttonText: 
+      type: 0
+      dataId: 0
+      param1: 
+      param2: 
+      teleportMode: 0
+      transitionToState: 1
+    canRepeat: 0
+    hideAfterExecute: 0
+    destroySelf: 0
+    deactivateSelf: 0
+    _legacyType: 0
+    _legacyHintButton: 
+    _legacyDataId: 0
+    _legacyParam1: 
+    _legacyParam2: 
+    _legacyTransitionToState: 0
+--- !u!61 &8866793781270711405
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3657018193388032858}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0.20486104, y: 0.75891066}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.43516487, y: 0.048309177}
+    oldSize: {x: 3.1597223, y: 2.875}
+    newSize: {x: 3.1597223, y: 2.875}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  serializedVersion: 2
+  m_Size: {x: 3.1597223, y: 3.954401}
+  m_EdgeRadius: 0
 --- !u!1 &9058927290258381234
 GameObject:
   m_ObjectHideFlags: 0
