@@ -11,10 +11,16 @@ using UnityEngine;
         [Header("Flip")]
         [SerializeField] private bool faceRightByDefault = true;
 
+        [Header("动画")]
+        [SerializeField] private AnimationController animationController;
+
         private Interactable _currentInteractable;
         private Vector3 _originalScale;
+        private PlayerStateMachine _stateMachine;
 
         public Interactable CurrentInteractable => _currentInteractable;
+        public PlayerStateMachine StateMachine => _stateMachine;
+        public PlayerStateType CurrentStateType => _stateMachine.CurrentStateType;
 
         public void SetCurrentInteractable(Interactable interactable)
         {
@@ -29,13 +35,24 @@ using UnityEngine;
         private void Awake()
         {
             _originalScale = transform.localScale;
+
+            if (animationController == null)
+            {
+                animationController = GetComponent<AnimationController>();
+            }
+
+            _stateMachine = new PlayerStateMachine(this, animationController);
+        }
+
+        private void Start()
+        {
+            _stateMachine.Initialize();
         }
 
         public void SetMoveInput(Vector2 vector2)
         {
             rigidbody2D.velocity = vector2 * MoveSpeed;
 
-            // 根据移动方向左右转向
             if (vector2.x > 0.01f)
             {
                 SetFacing(true);
@@ -44,6 +61,8 @@ using UnityEngine;
             {
                 SetFacing(false);
             }
+
+            _stateMachine.Update(vector2);
         }
 
         private void SetFacing(bool faceRight)
