@@ -1,7 +1,7 @@
 ﻿// ============================================================
 // 自动生成文件 - 勿手动修改
-// 生成时间: 2026-05-31 18:09:48
-// 通过 Tools/Map/收集所有场景的传送目标 重新生成
+// 生成时间: 2026-05-31 23:02:00
+// 通过 Tools/Map/收集所有场景数据 重新生成
 // ============================================================
 
 public static class TeleportTargetDef
@@ -21,43 +21,6 @@ public static class TeleportTargetDef
 
     public static readonly SceneEntry[] Scenes = new SceneEntry[]
     {
-        new SceneEntry
-        {
-            sceneName = "Scene_Outer_City",
-            mapNames = new string[] { "Outer_City_Ground" },
-            interactables = System.Array.Empty<InteractableEntry>()
-        },
-        new SceneEntry
-        {
-            sceneName = "Scene_Punk_City",
-            mapNames = new string[] { "Punk_City_Ground" },
-            interactables = System.Array.Empty<InteractableEntry>()
-        },
-        new SceneEntry
-        {
-            sceneName = "Scene_Sewer",
-            mapNames = new string[] { "Sewer_Surface" },
-            interactables = System.Array.Empty<InteractableEntry>()
-        },
-        new SceneEntry
-        {
-            sceneName = "Scene_Staff_Lounge",
-            mapNames = new string[] { "Staff Lounge", "Underground Boxing Gym" },
-            interactables = new InteractableEntry[]
-            {
-                new InteractableEntry { entityId = "Main_Cup", mapName = "Staff Lounge" },
-                new InteractableEntry { entityId = "trans_Teleporter_To_Gym", mapName = "Staff Lounge" },
-                new InteractableEntry { entityId = "Main_Challenger 2", mapName = "Underground Boxing Gym" },
-                new InteractableEntry { entityId = "NPC_NPC_Coach", mapName = "Underground Boxing Gym" },
-                new InteractableEntry { entityId = "trans_Transporter", mapName = "Underground Boxing Gym" }
-            }
-        },
-        new SceneEntry
-        {
-            sceneName = "Temple",
-            mapNames = new string[] { "temple" },
-            interactables = System.Array.Empty<InteractableEntry>()
-        }
     };
 
     public static string[] AllSceneNames

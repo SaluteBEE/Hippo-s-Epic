@@ -1,4 +1,4 @@
-// 本文件由 Tools/Map/收集所有场景的 Map 并生成枚举 自动生成，请勿手动修改
+﻿// 本文件由 Tools/Map/收集所有场景数据 自动生成，请勿手动修改
 using System.Collections.Generic;
 
 public enum SceneMapId

@@ -67,19 +67,4 @@ public class MapEditor : Editor
         EditorUtility.SetDirty(map);
     }
 
-    [MenuItem("Tools/Map/收集所有场景 Map 的 Interactable")]
-    private static void CollectAllMapsInScene()
-    {
-        var maps = Object.FindObjectsOfType<Map>(true);
-        int total = 0;
-        foreach (var map in maps)
-        {
-            Undo.RecordObject(map, "Collect Interactables");
-            map.CollectInteractables();
-            EditorUtility.SetDirty(map);
-            total += map.InteractableList.Count;
-            Debug.Log($"[MapEditor] {map.name}: 收集到 {map.InteractableList.Count} 个 Interactable");
-        }
-        Debug.Log($"[MapEditor] 完成，共 {maps.Length} 个 Map，{total} 个 Interactable");
-    }
 }
