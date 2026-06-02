@@ -17,7 +17,7 @@ MonoBehaviour:
   - name: body-headhit
     animation: {fileID: 11400000, guid: 81e64bbe1fd267c49b12e875a5458267, type: 2}
     animationName: body-headhit
-    speed: 1
+    speed: 2
     loop: 1
     type: 1
   - name: body-idle
@@ -29,25 +29,25 @@ MonoBehaviour:
   - name: body-walk
     animation: {fileID: 11400000, guid: fea03fa607194c74c99873cfccdd956c, type: 2}
     animationName: body-walk
-    speed: 1
+    speed: 2
     loop: 1
     type: 1
   - name: body-walk2
     animation: {fileID: 11400000, guid: 8716b22db0ef9ae46941f7e7a973e17d, type: 2}
     animationName: body-walk2
-    speed: 1
+    speed: 2
     loop: 1
     type: 1
   - name: head-headhit
     animation: {fileID: 11400000, guid: 2f06ec1d4c5469a43ba7ed2be1f44669, type: 2}
     animationName: head-headhit
-    speed: 1
+    speed: 2.1
     loop: 1
     type: 0
   - name: head-idle
     animation: {fileID: 11400000, guid: 1a7b946d013c99b4fb135df2179aa802, type: 2}
     animationName: head-idle
-    speed: 1
+    speed: 2.1
     loop: 1
     type: 0
   - name: leg-idle
@@ -59,7 +59,7 @@ MonoBehaviour:
   - name: leg-walk
     animation: {fileID: 11400000, guid: 4a31785524a1507489c4eb234d4b1213, type: 2}
     animationName: leg-walk
-    speed: 1
+    speed: 1.7
     loop: 1
     type: 2
   layers:
