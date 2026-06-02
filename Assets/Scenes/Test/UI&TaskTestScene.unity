@@ -627,7 +627,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rootCanvas: {fileID: 3018893724781058948}
-  autoCreateLayers: 1
 --- !u!114 &8859890437416834474
 MonoBehaviour:
   m_ObjectHideFlags: 0

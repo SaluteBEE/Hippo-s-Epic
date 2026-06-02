@@ -338,7 +338,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rigidbody2D: {fileID: 5169911673293718804}
   MoveSpeed: 2.5
-  interactionLayerMask:
-    serializedVersion: 2
-    m_Bits: 8
   faceRightByDefault: 1
+  animationController: {fileID: 5078597329802929950}
