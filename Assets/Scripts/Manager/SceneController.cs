@@ -1,7 +1,9 @@
 using System;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 using UnityEngine.EventSystems;
+using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.SceneManagement;
 
 public class SceneController : MonoBehaviour
@@ -28,7 +30,34 @@ public class SceneController : MonoBehaviour
             DontDestroyOnLoad(esGo);
         }
 
+        string addressableKey = $"scenes/{sceneName}";
+        var handle = Addressables.LoadSceneAsync(addressableKey, activateOnLoad: false);
+        yield return handle;
+
+        if (handle.Status == AsyncOperationStatus.Succeeded)
+        {
+            onProgress?.Invoke(1f);
+            yield return handle.Result.ActivateAsync();
+        }
+        else
+        {
+            Addressables.Release(handle);
+            yield return LoadBuildSettingsScene(sceneName, onProgress);
+        }
+
+        RemoveDuplicateEventSystems();
+        onLoaded?.Invoke();
+    }
+
+    private IEnumerator LoadBuildSettingsScene(string sceneName, Action<float> onProgress)
+    {
         AsyncOperation operation = SceneManager.LoadSceneAsync(sceneName);
+        if (operation == null)
+        {
+            Debug.LogError($"[SceneController] 场景加载失败: {sceneName}");
+            yield break;
+        }
+
         operation.allowSceneActivation = false;
 
         while (operation.progress < 0.9f)
@@ -43,9 +72,6 @@ public class SceneController : MonoBehaviour
         operation.allowSceneActivation = true;
         while (!operation.isDone)
             yield return null;
-
-        RemoveDuplicateEventSystems();
-        onLoaded?.Invoke();
     }
 
     private void RemoveDuplicateEventSystems()

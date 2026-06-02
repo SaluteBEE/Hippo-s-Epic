@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEditor;
 using UnityEditor.AddressableAssets;
 using UnityEditor.AddressableAssets.Settings;
@@ -15,15 +16,28 @@ public static class AddressableAutoSetup
         public string label;
         public string filter;
         public bool forceSprite;
+        public string groupName;
+        public string excludeSubDir;
     }
 
     static readonly DirConfig[] _configs = new[]
     {
-        new DirConfig { dir = "Assets/Art/Backgrounds", addressPrefix = "backgrounds", label = "background", filter = "t:Texture2D", forceSprite = false },
-        new DirConfig { dir = "Assets/Art/DialogImages", addressPrefix = "dialog_images", label = null, filter = "t:Texture2D", forceSprite = false },
-        new DirConfig { dir = "Assets/Art/Sprites/UI/Item", addressPrefix = "icon/item", label = "icon", filter = "t:Texture2D", forceSprite = true },
-        new DirConfig { dir = "Assets/Art/Avatars", addressPrefix = "avatars", label = "avatar", filter = "t:Texture2D", forceSprite = true },
-        new DirConfig { dir = "Assets/Prefabs/UI", addressPrefix = "ui", label = null, filter = "t:Prefab", forceSprite = false },
+        new DirConfig { dir = "Assets/Art/Backgrounds", addressPrefix = "backgrounds", label = "background", filter = "t:Texture2D", forceSprite = false, groupName = null, excludeSubDir = null },
+        new DirConfig { dir = "Assets/Art/DialogImages", addressPrefix = "dialog_images", label = null, filter = "t:Texture2D", forceSprite = false, groupName = null, excludeSubDir = null },
+        new DirConfig { dir = "Assets/Art/Sprites/UI/Item", addressPrefix = "icon/item", label = "icon", filter = "t:Texture2D", forceSprite = true, groupName = null, excludeSubDir = null },
+        new DirConfig { dir = "Assets/Art/Avatars", addressPrefix = "avatars", label = "avatar", filter = "t:Texture2D", forceSprite = true, groupName = null, excludeSubDir = null },
+        new DirConfig { dir = "Assets/Prefabs/UI", addressPrefix = "ui", label = "ui_prefab", filter = "t:Prefab", forceSprite = false, groupName = null, excludeSubDir = null },
+        new DirConfig { dir = "Assets/Prefabs/Maps", addressPrefix = "prefabs/maps", label = "map_prefab", filter = "t:Prefab", forceSprite = false, groupName = "Maps", excludeSubDir = null },
+        new DirConfig { dir = "Assets/Prefabs/MapObjects", addressPrefix = "prefabs/mapobjects", label = "mapobject_prefab", filter = "t:Prefab", forceSprite = false, groupName = "MapObjects", excludeSubDir = null },
+        new DirConfig { dir = "Assets/Prefabs/player", addressPrefix = "prefabs/player", label = "player_prefab", filter = "t:Prefab", forceSprite = false, groupName = "DialogCharacters", excludeSubDir = null },
+        new DirConfig { dir = "Assets/Prefabs/npc", addressPrefix = "prefabs/npc", label = "npc_prefab", filter = "t:Prefab", forceSprite = false, groupName = "DialogCharacters", excludeSubDir = null },
+        new DirConfig { dir = "Assets/Scenes", addressPrefix = "scenes", label = "scene", filter = "t:Scene", forceSprite = false, groupName = "Scenes", excludeSubDir = "Test" },
+    };
+
+    static readonly HashSet<string> _excludeSceneNames = new HashSet<string>
+    {
+        "Scene_Init",
+        "Scene_Dialogue",
     };
 
     [MenuItem("Tools/自动设置 Addressable")]
@@ -37,9 +51,9 @@ public static class AddressableAutoSetup
         }
 
         EnsureDirectories();
-        EnsureDialogCharactersSchema(settings);
+        FixStartupScenes(settings);
+        EnsureGroupSchemas(settings);
 
-        var group = settings.DefaultGroup;
         int added = 0;
 
         foreach (var cfg in _configs)
@@ -49,7 +63,12 @@ public static class AddressableAutoSetup
                 Debug.LogWarning($"[AddressableAutoSetup] 目录不存在，跳过: {cfg.dir}");
                 continue;
             }
-            added += SetupDirectory(settings, group, cfg.dir, cfg.addressPrefix, cfg.filter, cfg.label, cfg.forceSprite);
+
+            var group = string.IsNullOrEmpty(cfg.groupName)
+                ? settings.DefaultGroup
+                : FindOrCreateGroup(settings, cfg.groupName);
+
+            added += SetupDirectory(settings, group, cfg.dir, cfg.addressPrefix, cfg.filter, cfg.label, cfg.forceSprite, cfg.excludeSubDir);
         }
 
         AssetDatabase.Refresh();
@@ -61,7 +80,7 @@ public static class AddressableAutoSetup
 
     static void EnsureDirectories()
     {
-        string[] dirs = { "Assets/Art/DialogImages", "Assets/Art/Avatars" };
+        string[] dirs = { "Assets/Art/DialogImages", "Assets/Art/Avatars", "Assets/Prefabs/Maps", "Assets/Prefabs/MapObjects" };
         foreach (var dir in dirs)
         {
             if (!Directory.Exists(dir))
@@ -72,40 +91,57 @@ public static class AddressableAutoSetup
         }
     }
 
-    static void EnsureDialogCharactersSchema(AddressableAssetSettings settings)
+    static AddressableAssetGroup FindOrCreateGroup(AddressableAssetSettings settings, string groupName)
     {
-        var group = settings.FindGroup("DialogCharacters");
-        if (group == null)
-        {
-            Debug.LogWarning("[AddressableAutoSetup] 未找到 DialogCharacters 组");
-            return;
-        }
+        var group = settings.FindGroup(groupName);
+        if (group != null)
+            return group;
 
-        bool hasBundled = false;
-        foreach (var schema in group.Schemas)
-        {
-            if (schema is BundledAssetGroupSchema)
-                hasBundled = true;
-        }
+        group = settings.CreateGroup(groupName, false, false, true, null, typeof(BundledAssetGroupSchema), typeof(ContentUpdateGroupSchema));
 
-        if (!hasBundled)
+        var bundledSchema = group.GetSchema<BundledAssetGroupSchema>();
+        if (bundledSchema != null)
         {
-            var bundledSchema = group.AddSchema<BundledAssetGroupSchema>();
             bundledSchema.BuildPath.SetVariableByName(settings, "Local.BuildPath");
             bundledSchema.LoadPath.SetVariableByName(settings, "Local.LoadPath");
             bundledSchema.BundleMode = BundledAssetGroupSchema.BundlePackingMode.PackTogether;
             bundledSchema.Compression = BundledAssetGroupSchema.BundleCompressionMode.LZ4;
+        }
 
-            if (!group.HasSchema<ContentUpdateGroupSchema>())
-                group.AddSchema<ContentUpdateGroupSchema>();
+        Debug.Log($"[AddressableAutoSetup] 创建组: {groupName}");
+        return group;
+    }
 
-            settings.SetDirty(AddressableAssetSettings.ModificationEvent.EntryMoved, group, true);
-            Debug.Log("[AddressableAutoSetup] 已为 DialogCharacters 组添加 BundledAssetGroupSchema + ContentUpdateGroupSchema");
+    static void EnsureGroupSchemas(AddressableAssetSettings settings)
+    {
+        string[] groupsToCheck = { "DialogCharacters", "Maps", "MapObjects", "Scenes" };
+        foreach (var groupName in groupsToCheck)
+        {
+            var group = settings.FindGroup(groupName);
+            if (group == null)
+                continue;
+
+            bool hasBundled = group.Schemas.Any(s => s is BundledAssetGroupSchema);
+
+            if (!hasBundled)
+            {
+                var bundledSchema = group.AddSchema<BundledAssetGroupSchema>();
+                bundledSchema.BuildPath.SetVariableByName(settings, "Local.BuildPath");
+                bundledSchema.LoadPath.SetVariableByName(settings, "Local.LoadPath");
+                bundledSchema.BundleMode = BundledAssetGroupSchema.BundlePackingMode.PackTogether;
+                bundledSchema.Compression = BundledAssetGroupSchema.BundleCompressionMode.LZ4;
+
+                if (!group.HasSchema<ContentUpdateGroupSchema>())
+                    group.AddSchema<ContentUpdateGroupSchema>();
+
+                settings.SetDirty(AddressableAssetSettings.ModificationEvent.EntryMoved, group, true);
+                Debug.Log($"[AddressableAutoSetup] 已为 {groupName} 组添加 BundledAssetGroupSchema + ContentUpdateGroupSchema");
+            }
         }
     }
 
     static int SetupDirectory(AddressableAssetSettings settings, AddressableAssetGroup group,
-        string dir, string addressPrefix, string filter, string label, bool forceSprite)
+        string dir, string addressPrefix, string filter, string label, bool forceSprite, string excludeSubDir = null)
     {
         int count = 0;
         var guids = AssetDatabase.FindAssets(filter, new[] { dir });
@@ -116,6 +152,20 @@ public static class AddressableAutoSetup
         foreach (var guid in guids)
         {
             var path = AssetDatabase.GUIDToAssetPath(guid);
+
+            if (excludeSubDir != null && path.Contains($"/{excludeSubDir}/"))
+                continue;
+
+            if (filter == "t:Scene")
+            {
+                string sceneName = Path.GetFileNameWithoutExtension(path);
+                if (_excludeSceneNames.Contains(sceneName))
+                {
+                    Debug.Log($"  跳过场景（需保留在 Build Settings）: {sceneName}");
+                    continue;
+                }
+            }
+
             var relativePath = path.Substring(dir.Length + 1);
             var relativeNoExt = Path.ChangeExtension(relativePath, null);
             var address = $"{addressPrefix}/{relativeNoExt}";
@@ -130,7 +180,7 @@ public static class AddressableAutoSetup
                 entry.SetLabel(label, true);
 
             count++;
-            Debug.Log($"  设置: {address} → {path}" + (label != null ? $" [label={label}]" : ""));
+            Debug.Log($"  设置: {address} → {path}" + (label != null ? $" [label={label}]" : "") + $" [group={group.Name}]");
         }
 
         return count;
@@ -153,5 +203,22 @@ public static class AddressableAutoSetup
         importer.SaveAndReimport();
 
         Debug.Log($"  修正导入: {assetPath} → Sprite");
+    }
+
+    static void FixStartupScenes(AddressableAssetSettings settings)
+    {
+        foreach (var sceneName in _excludeSceneNames)
+        {
+            string scenePath = $"Assets/Scenes/{sceneName}.unity";
+            var guid = AssetDatabase.AssetPathToGUID(scenePath);
+            if (string.IsNullOrEmpty(guid)) continue;
+
+            var entry = settings.FindAssetEntry(guid);
+            if (entry != null)
+            {
+                settings.RemoveAssetEntry(guid);
+                Debug.Log($"[AddressableAutoSetup] 从 Addressables 移除启动场景: {sceneName}");
+            }
+        }
     }
 }

@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: Maps
+  m_EditorClassIdentifier: 
+  m_GroupName: Maps
+  m_Data:
+    m_SerializedData: []
+  m_GUID: e28905b90bbdc054ea52c27a21b6bacf
+  m_SerializeEntries:
+  - m_GUID: e03d41e28039e724295f06fdb54cf7ac
+    m_Address: prefabs/maps/Outer_City_Ground
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - map_prefab
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 01985814fdb7a3549b30aa53c66e87ed
+    m_Address: prefabs/maps/Staff Lounge
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - map_prefab
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 335a63000ac1e0e43935281f53d402c2
+    m_Address: prefabs/maps/Underground Boxing Gym
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - map_prefab
+    FlaggedDuringContentUpdateRestriction: 0
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: dd90b6ecff8020e40aa537a3ddf43594, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: f831b79b936b7704b80cbb428a363b42, type: 2}
+    - {fileID: 11400000, guid: 791738d218278ff4ba4dae152d1f47db, type: 2}

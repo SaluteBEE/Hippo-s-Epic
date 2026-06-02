@@ -47,6 +47,9 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 7d8fea70f66a8bd468fff93039ca755e, type: 2}
   - {fileID: 11400000, guid: 1290d75708492224e81b0bd5c055c610, type: 2}
   - {fileID: 11400000, guid: 01671e4d39574cc4598940bcf3ca75f2, type: 2}
+  - {fileID: 11400000, guid: 74f4975caf538a349bfc3fee8088e86e, type: 2}
+  - {fileID: 11400000, guid: f1463477f38e92a4a8a372934f98be72, type: 2}
+  - {fileID: 11400000, guid: f591d6d82e3828349b4d8f9d6242ea00, type: 2}
   m_BuildSettings:
     m_CompileScriptsInVirtualMode: 0
     m_CleanupStreamingAssetsAfterBuilds: 1
@@ -91,6 +94,12 @@ MonoBehaviour:
     - background
     - icon
     - avatar
+    - ui_prefab
+    - map_prefab
+    - mapobject_prefab
+    - player_prefab
+    - npc_prefab
+    - scene
   m_SchemaTemplates: []
   m_GroupTemplateObjects:
   - {fileID: 11400000, guid: 871ac41e57a390b4fae6b1d3e7f7f56e, type: 2}

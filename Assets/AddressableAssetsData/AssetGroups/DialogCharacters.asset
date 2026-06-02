@@ -22,42 +22,49 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels:
     - dialog_character
+    - player_prefab
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 7f2b4cc40ac313947a3f43421676553a
     m_Address: prefabs/player/Hippo
     m_ReadOnly: 0
     m_SerializedLabels:
     - dialog_character
+    - player_prefab
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 5553d0deef21410409282b4bbdff67dd
     m_Address: prefabs/npc/coach
     m_ReadOnly: 0
     m_SerializedLabels:
     - dialog_character
+    - npc_prefab
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 05234a69a8ffea648af4da48217a29fc
     m_Address: prefabs/npc/quanwang_bk
     m_ReadOnly: 0
     m_SerializedLabels:
     - dialog_character
+    - npc_prefab
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 7be800446140d564b9f34a7a248473e9
     m_Address: prefabs/npc/npc_01
     m_ReadOnly: 0
     m_SerializedLabels:
     - dialog_character
+    - npc_prefab
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 5032e2d1138e79a47a46be1469cbe1c0
     m_Address: prefabs/npc/npc_02
     m_ReadOnly: 0
     m_SerializedLabels:
     - dialog_character
+    - npc_prefab
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 3a1f1ad59dc35d545b1537fc2b790d9e
     m_Address: prefabs/player/PlayerCharacter2D
     m_ReadOnly: 0
     m_SerializedLabels:
     - dialog_character
+    - player_prefab
     FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: dd90b6ecff8020e40aa537a3ddf43594, type: 2}

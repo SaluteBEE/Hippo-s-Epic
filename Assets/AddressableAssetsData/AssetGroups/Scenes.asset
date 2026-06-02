@@ -1,0 +1,79 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: Scenes
+  m_EditorClassIdentifier: 
+  m_GroupName: Scenes
+  m_Data:
+    m_SerializedData: []
+  m_GUID: 1d0b857097ee9b64f8fe86ceaae8a5cb
+  m_SerializeEntries:
+  - m_GUID: c0fac2f098b48904e9010832f41dbb2e
+    m_Address: scenes/Scene_Outer_City
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - scene
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: aa5b0925f86163d40a6d88ae515f16ec
+    m_Address: scenes/Scene_Punk_City
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - scene
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1bc47a916aa2daf49be27e05e18ccef8
+    m_Address: scenes/Scene_Sewer
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - scene
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7885e8548b0a3554cb5d16f915414e9b
+    m_Address: scenes/Scene_Staff_Lounge
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - scene
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 644874f37614fc347ba6ee7faed72df6
+    m_Address: scenes/Temple
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - scene
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 706e71b9ce7891f429ffb7b151840602
+    m_Address: scenes/Test/AnimationSceneTest
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - scene
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3c89f3a448b79a74a98a390b394cc536
+    m_Address: scenes/Test/CharacterTestScene
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - scene
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a41349c9f5825e34fa7b48621fb149aa
+    m_Address: scenes/Test/Level2DTest
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - scene
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8a78d8fa841603948a09769949c67e50
+    m_Address: scenes/Test/UI&TaskTestScene
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - scene
+    FlaggedDuringContentUpdateRestriction: 0
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: dd90b6ecff8020e40aa537a3ddf43594, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 226f431afb7733240b9e2c26a70b1cf2, type: 2}
+    - {fileID: 11400000, guid: 5f1907979d6c70a4b9ae3d2273231e3a, type: 2}

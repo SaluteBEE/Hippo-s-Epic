@@ -132,7 +132,49 @@ MonoBehaviour:
     - icon
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: a541335c14d0d1d4aa118d81b069ce9b
-    m_Address: ui/Task/TaskPanel
+    m_Address: ui/task/TaskPanel
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - ui_prefab
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: beed687bb57aeb94199f8c772406529c
+    m_Address: ui/Bag/bagitem
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - ui_prefab
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 355eaf1386fffd44f81111993a376f5d
+    m_Address: ui/Bag/equip
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - ui_prefab
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a9be672bad163ea4392e86f7da9338e8
+    m_Address: ui/common/common btn
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - ui_prefab
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: dcd6a6eb771918a42bf9200001c39441
+    m_Address: ui/common/VerScrollbar
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - ui_prefab
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 50f3289f4bcdb4c48932defb3daf3d23
+    m_Address: ui/Dialog/DialogCameraRoot
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - ui_prefab
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e7035f386eb1af6448754e2efb8cff21
+    m_Address: ui/task/taskContent
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - ui_prefab
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6cb7db52459623c4cab620e9beb4d227
+    m_Address: ui/task/taskItem
     m_ReadOnly: 0
     m_SerializedLabels:
     - ui_prefab
