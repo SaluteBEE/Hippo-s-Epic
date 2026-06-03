@@ -1,6 +1,6 @@
 ﻿// ============================================================
 // 自动生成文件 - 勿手动修改
-// 生成时间: 2026-06-03 01:14:11
+// 生成时间: 2026-06-04 01:15:36
 // 通过 Tools/Map/收集所有场景数据 重新生成
 // ============================================================
 
@@ -21,6 +21,21 @@ public static class TeleportTargetDef
 
     public static readonly SceneEntry[] Scenes = new SceneEntry[]
     {
+        new SceneEntry
+        {
+            sceneName = "Scene_Staff_Lounge",
+            mapNames = new string[] { "Staff Lounge", "Underground Boxing Gym" },
+            interactables = new InteractableEntry[]
+            {
+                new InteractableEntry { entityId = "Toilet_toliet", mapName = "Staff Lounge" },
+                new InteractableEntry { entityId = "NPC_Coach_coach", mapName = "Underground Boxing Gym" },
+                new InteractableEntry { entityId = "computer Mirror_Mirror", mapName = "Staff Lounge" },
+                new InteractableEntry { entityId = "Challenger 2_Challenger", mapName = "Underground Boxing Gym" },
+                new InteractableEntry { entityId = "Cup_Cup", mapName = "Staff Lounge" },
+                new InteractableEntry { entityId = "trans_Transporter", mapName = "Underground Boxing Gym" },
+                new InteractableEntry { entityId = "trans_Teleporter_To_Gym", mapName = "Staff Lounge" }
+            }
+        }
     };
 
     public static string[] AllSceneNames
