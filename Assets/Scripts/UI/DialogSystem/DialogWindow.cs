@@ -204,6 +204,22 @@ public class DialogWindow : UIWindow
         _speakerAvatar.enabled = false;
     }
 
+    private static Texture2D _whiteTexture;
+    private static Sprite _whiteSprite;
+
+    private static Sprite GetWhiteSprite()
+    {
+        if (_whiteSprite != null) return _whiteSprite;
+        if (_whiteTexture == null)
+        {
+            _whiteTexture = new Texture2D(1, 1);
+            _whiteTexture.SetPixel(0, 0, Color.white);
+            _whiteTexture.Apply();
+        }
+        _whiteSprite = Sprite.Create(_whiteTexture, new Rect(0, 0, 1, 1), new Vector2(0.5f, 0.5f), 100f);
+        return _whiteSprite;
+    }
+
     private async void OnSpeakerAvatar(string avatarName)
     {
         if (_speakerAvatar == null || string.IsNullOrEmpty(avatarName)) return;
@@ -244,7 +260,14 @@ public class DialogWindow : UIWindow
         }
         catch (Exception)
         {
-            Debug.LogWarning($"[DialogWindow] 头像不存在: {address}");
+            Debug.LogWarning($"[DialogWindow] 头像不存在: {address}，使用白图替代");
+            if (seq == _avatarSeq)
+            {
+                var ws = GetWhiteSprite();
+                _avatarCache[avatarName] = ws;
+                _speakerAvatar.sprite = ws;
+                _speakerAvatar.enabled = true;
+            }
             return;
         }
 
@@ -257,6 +280,13 @@ public class DialogWindow : UIWindow
                 new Vector2(0.5f, 0.5f), 100f);
             _avatarCache[avatarName] = sp;
             _speakerAvatar.sprite = sp;
+            _speakerAvatar.enabled = true;
+        }
+        else
+        {
+            var ws = GetWhiteSprite();
+            _avatarCache[avatarName] = ws;
+            _speakerAvatar.sprite = ws;
             _speakerAvatar.enabled = true;
         }
     }

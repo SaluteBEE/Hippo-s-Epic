@@ -224,30 +224,36 @@ public class Interactable : MonoBehaviour
             return;
         }
 
+        var button = buttons[buttonIndex];
+
+        if (button.conditionId != 0)
+        {
+            var condSys = ConditionSystem.HasInstance ? ConditionSystem.Instance : null;
+            if (condSys != null && !condSys.IsConditionMet(button.conditionId))
+                return;
+        }
+
         if (_hasExecuted && !_currentPhase.canRepeat)
             return;
-
-        var button = buttons[buttonIndex];
 
         ExecuteButtonAction(button);
 
         _hasExecuted = true;
-
-        if (_currentPhase.hideAfterExecute)
-        {
-            if (_hint != null)
-                _hint.Hide();
-        }
-        else if (_currentPhase.canRepeat)
-        {
-            RefreshHint();
-        }
 
         if (button.transitionToState >= 0)
         {
             int newState = button.transitionToState;
             SaveManager.Instance.SetEntityState(EntityId, newState);
             ApplyState(newState);
+        }
+
+        if (_currentPhase.hideAfterExecute)
+        {
+            if (_hint != null)
+                _hint.Hide();
+        }
+        else
+        {
             RefreshHint();
         }
 
@@ -433,38 +439,40 @@ public class Interactable : MonoBehaviour
         var buttons = _currentPhase.buttons;
         if (buttons == null || buttons.Count == 0)
         {
-            _hint.Show(_currentPhase.hintText, Array.Empty<string>(), null);
+            _hint.Show(_currentPhase.hintText, Array.Empty<string>(), Array.Empty<bool>(), null);
             return;
         }
 
         var condSys = ConditionSystem.HasInstance ? ConditionSystem.Instance : null;
         var visibleTexts = new List<string>();
+        var visibleInteractables = new List<bool>();
         var visibleIndices = new List<int>();
 
         for (int i = 0; i < buttons.Count; i++)
         {
             var btn = buttons[i];
-            if (btn.conditionId != 0 && condSys != null && !condSys.IsConditionMet(btn.conditionId))
-                continue;
             visibleTexts.Add(btn.buttonText);
             visibleIndices.Add(i);
+
+            bool conditionMet = true;
+            if (btn.conditionId != 0 && condSys != null && !condSys.IsConditionMet(btn.conditionId))
+                conditionMet = false;
+            visibleInteractables.Add(conditionMet);
         }
 
-        if (visibleTexts.Count == 0)
-        {
-            _hint.Show(_currentPhase.hintText, Array.Empty<string>(), null);
-            return;
-        }
-
-        _hint.Show(_currentPhase.hintText, visibleTexts.ToArray(), OnHintButtonClicked);
+        _hint.Show(_currentPhase.hintText, visibleTexts.ToArray(), visibleInteractables.ToArray(), OnHintButtonClicked);
         _visibleButtonIndices = visibleIndices;
+        _visibleButtonInteractables = visibleInteractables;
     }
 
     private List<int> _visibleButtonIndices = new List<int>();
+    private List<bool> _visibleButtonInteractables = new List<bool>();
 
     private void OnHintButtonClicked(int visibleIndex)
     {
         if (visibleIndex < 0 || visibleIndex >= _visibleButtonIndices.Count)
+            return;
+        if (!_visibleButtonInteractables[visibleIndex])
             return;
         int actualIndex = _visibleButtonIndices[visibleIndex];
         OnPlayerExecute(actualIndex);

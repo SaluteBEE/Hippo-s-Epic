@@ -25,7 +25,7 @@ public static class AddressableAutoSetup
         new DirConfig { dir = "Assets/Art/Backgrounds", addressPrefix = "backgrounds", label = "background", filter = "t:Texture2D", forceSprite = false, groupName = null, excludeSubDir = null },
         new DirConfig { dir = "Assets/Art/DialogImages", addressPrefix = "dialog_images", label = null, filter = "t:Texture2D", forceSprite = false, groupName = null, excludeSubDir = null },
         new DirConfig { dir = "Assets/Art/Sprites/UI/Item", addressPrefix = "icon/item", label = "icon", filter = "t:Texture2D", forceSprite = true, groupName = null, excludeSubDir = null },
-        new DirConfig { dir = "Assets/Art/Avatars", addressPrefix = "avatars", label = "avatar", filter = "t:Texture2D", forceSprite = true, groupName = null, excludeSubDir = null },
+        new DirConfig { dir = "Assets/Art/Sprites/Head", addressPrefix = "avatars", label = "avatar", filter = "t:Texture2D", forceSprite = true, groupName = null, excludeSubDir = null },
         new DirConfig { dir = "Assets/Prefabs/UI", addressPrefix = "ui", label = "ui_prefab", filter = "t:Prefab", forceSprite = false, groupName = null, excludeSubDir = null },
         new DirConfig { dir = "Assets/Prefabs/Maps", addressPrefix = "prefabs/maps", label = "map_prefab", filter = "t:Prefab", forceSprite = false, groupName = "Maps", excludeSubDir = null },
         new DirConfig { dir = "Assets/Prefabs/MapObjects", addressPrefix = "prefabs/mapobjects", label = "mapobject_prefab", filter = "t:Prefab", forceSprite = false, groupName = "MapObjects", excludeSubDir = null },
@@ -80,7 +80,7 @@ public static class AddressableAutoSetup
 
     static void EnsureDirectories()
     {
-        string[] dirs = { "Assets/Art/DialogImages", "Assets/Art/Avatars", "Assets/Prefabs/Maps", "Assets/Prefabs/MapObjects" };
+        string[] dirs = { "Assets/Art/DialogImages", "Assets/Art/Sprites/Head", "Assets/Prefabs/Maps", "Assets/Prefabs/MapObjects" };
         foreach (var dir in dirs)
         {
             if (!Directory.Exists(dir))
