@@ -314,5 +314,63 @@
     "dialogFinishId": [
       1002001
     ]
+  },
+  {
+    "id": 11,
+    "composeType": [
+      [
+        1,
+        2
+      ],
+      [
+        0
+      ],
+      [
+        0
+      ],
+      [
+        0
+      ],
+      [
+        0
+      ]
+    ],
+    "hasItem": [
+      [
+        2,
+        1
+      ]
+    ],
+    "taskState": [],
+    "hasPerkId": [],
+    "battleId": [],
+    "dialogFinishId": []
+  },
+  {
+    "id": 12,
+    "composeType": [
+      [
+        0
+      ],
+      [
+        0
+      ],
+      [
+        0
+      ],
+      [
+        0
+      ],
+      [
+        5
+      ]
+    ],
+    "hasItem": [],
+    "taskState": [],
+    "hasPerkId": [],
+    "battleId": [],
+    "dialogFinishId": [
+      1002004
+    ]
   }
 ]
