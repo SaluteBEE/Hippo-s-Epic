@@ -370,7 +370,34 @@
     "hasPerkId": [],
     "battleId": [],
     "dialogFinishId": [
-      1002004
+      1003004
+    ]
+  },
+  {
+    "id": 13,
+    "composeType": [
+      [
+        0
+      ],
+      [
+        0
+      ],
+      [
+        0
+      ],
+      [
+        0
+      ],
+      [
+        5
+      ]
+    ],
+    "hasItem": [],
+    "taskState": [],
+    "hasPerkId": [],
+    "battleId": [],
+    "dialogFinishId": [
+      1003005
     ]
   }
 ]
