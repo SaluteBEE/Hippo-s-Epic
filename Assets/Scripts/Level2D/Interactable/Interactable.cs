@@ -240,6 +240,9 @@ public class Interactable : MonoBehaviour
 
         _hasExecuted = true;
 
+        bool hideAfterExecute = _currentPhase.hideAfterExecute;
+        bool destroySelf = _currentPhase.destroySelf;
+
         if (button.transitionToState >= 0)
         {
             int newState = button.transitionToState;
@@ -247,7 +250,13 @@ public class Interactable : MonoBehaviour
             ApplyState(newState);
         }
 
-        if (_currentPhase.hideAfterExecute)
+        if (destroySelf)
+        {
+            if (_hint != null)
+                _hint.Hide();
+            Destroy(gameObject);
+        }
+        else if (hideAfterExecute)
         {
             if (_hint != null)
                 _hint.Hide();
@@ -255,13 +264,6 @@ public class Interactable : MonoBehaviour
         else
         {
             RefreshHint();
-        }
-
-        if (_currentPhase.destroySelf)
-        {
-            if (_hint != null)
-                _hint.Hide();
-            Destroy(gameObject);
         }
     }
 
