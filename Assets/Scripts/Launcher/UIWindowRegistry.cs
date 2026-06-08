@@ -10,6 +10,6 @@ public static class UIWindowRegistry
         UIManager.RegisterAddress(typeof(LoadingPanel), "ui/Global/LoadingPanel");
         UIManager.RegisterAddress(typeof(BagPanel), "ui/Bag/BagPanel");
         UIManager.RegisterAddress(typeof(UseItemTip), "ui/Bag/UseItemTip");
-        UIManager.RegisterAddress(typeof(TaskPanel), "ui/Task/TaskPanel");
+        UIManager.RegisterAddress(typeof(TaskPanel), "ui/task/TaskPanel");
     }
 }
