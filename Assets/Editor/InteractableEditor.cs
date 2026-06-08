@@ -14,40 +14,57 @@ public class InteractableEditor : Editor
     public override void OnInspectorGUI()
     {
         serializedObject.Update();
-        EditorGUILayout.PropertyField(_phasesProp, true);
+
+        for (int i = 0; i < _phasesProp.arraySize; i++)
+        {
+            var phase = _phasesProp.GetArrayElementAtIndex(i);
+            DrawPhase(phase);
+        }
+
+        if (GUILayout.Button("+ 添加 Phase"))
+        {
+            _phasesProp.InsertArrayElementAtIndex(_phasesProp.arraySize);
+        }
+
         serializedObject.ApplyModifiedProperties();
     }
-}
 
-[CustomPropertyDrawer(typeof(InteractionPhase))]
-public class InteractionPhaseDrawer : PropertyDrawer
-{
-    public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
+    private void DrawPhase(SerializedProperty phase)
     {
-        EditorGUI.BeginProperty(position, label, property);
+        var stateProp = phase.FindPropertyRelative("state");
+        var hintTextProp = phase.FindPropertyRelative("hintText");
+        var buttonsProp = phase.FindPropertyRelative("buttons");
+        var conditionTriggersProp = phase.FindPropertyRelative("conditionTriggers");
+        var canRepeatProp = phase.FindPropertyRelative("canRepeat");
+        var hideAfterExecuteProp = phase.FindPropertyRelative("hideAfterExecute");
+        var destroySelfProp = phase.FindPropertyRelative("destroySelf");
+        var deactivateSelfProp = phase.FindPropertyRelative("deactivateSelf");
 
-        var stateProp = property.FindPropertyRelative("state");
-        var hintTextProp = property.FindPropertyRelative("hintText");
-        var buttonsProp = property.FindPropertyRelative("buttons");
-        var canRepeatProp = property.FindPropertyRelative("canRepeat");
-        var hideAfterExecuteProp = property.FindPropertyRelative("hideAfterExecute");
-        var destroySelfProp = property.FindPropertyRelative("destroySelf");
-        var deactivateSelfProp = property.FindPropertyRelative("deactivateSelf");
+        phase.isExpanded = EditorGUILayout.Foldout(phase.isExpanded, $"Phase {stateProp.intValue}", true, EditorStyles.boldLabel);
+        if (!phase.isExpanded) return;
 
-        EditorGUILayout.LabelField($"Phase {stateProp.intValue}", EditorStyles.boldLabel);
+        EditorGUI.indentLevel++;
 
         EditorGUILayout.PropertyField(stateProp);
 
+        EditorGUILayout.LabelField("提示文字");
         hintTextProp.stringValue = EditorGUILayout.TextArea(hintTextProp.stringValue, GUILayout.Height(EditorGUIUtility.singleLineHeight * 4));
 
         EditorGUILayout.PropertyField(buttonsProp, true);
 
+        EditorGUILayout.Space(4);
+        EditorGUILayout.LabelField("条件触发器", EditorStyles.boldLabel);
+        EditorGUILayout.PropertyField(conditionTriggersProp, true);
+
+        EditorGUILayout.Space(4);
         EditorGUILayout.LabelField("行为", EditorStyles.boldLabel);
         EditorGUILayout.PropertyField(canRepeatProp);
         EditorGUILayout.PropertyField(hideAfterExecuteProp);
         EditorGUILayout.PropertyField(destroySelfProp);
         EditorGUILayout.PropertyField(deactivateSelfProp);
 
-        EditorGUI.EndProperty();
+        EditorGUI.indentLevel--;
+
+        EditorGUILayout.Space(4);
     }
 }

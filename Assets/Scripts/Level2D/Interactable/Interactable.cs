@@ -119,6 +119,8 @@ public class Interactable : MonoBehaviour
 
     private float _checkInterval = 0.5f;
     private float _lastCheckTime;
+    private float _triggerCheckInterval = 1f;
+    private float _lastTriggerCheckTime;
     private Collider2D _triggerCollider;
 
     private void OnTriggerEnter2D(Collider2D other)
@@ -170,6 +172,8 @@ public class Interactable : MonoBehaviour
 
     private void Update()
     {
+        CheckConditionTriggers();
+
         if (!_playerInside || _triggerCollider == null)
             return;
 
@@ -189,6 +193,30 @@ public class Interactable : MonoBehaviour
             var player = FindObjectOfType<PlayerCharacter>();
             if (player != null && player.CurrentInteractable == this)
                 player.ClearCurrentInteractable();
+        }
+    }
+
+    private void CheckConditionTriggers()
+    {
+        if (_currentPhase == null) return;
+        if (_currentPhase.conditionTriggers == null || _currentPhase.conditionTriggers.Count == 0) return;
+
+        if (Time.time - _lastTriggerCheckTime < _triggerCheckInterval) return;
+        _lastTriggerCheckTime = Time.time;
+
+        var condSys = ConditionSystem.HasInstance ? ConditionSystem.Instance : null;
+        if (condSys == null) return;
+
+        foreach (var trigger in _currentPhase.conditionTriggers)
+        {
+            if (trigger.transitionToState < 0) continue;
+            if (trigger.conditionId != 0 && condSys.IsConditionMet(trigger.conditionId))
+            {
+                int newState = trigger.transitionToState;
+                SaveManager.Instance.SetEntityState(EntityId, newState);
+                ApplyState(newState);
+                return;
+            }
         }
     }
 
@@ -409,7 +437,24 @@ public class Interactable : MonoBehaviour
 
     private void OnConditionChanged(int conditionId, bool isMet)
     {
-        if (!_playerInside || _currentPhase == null || _hint == null)
+        if (_currentPhase == null) return;
+
+        if (isMet && _currentPhase.conditionTriggers != null)
+        {
+            foreach (var trigger in _currentPhase.conditionTriggers)
+            {
+                if (trigger.conditionId == conditionId && trigger.transitionToState >= 0)
+                {
+                    SaveManager.Instance.SetEntityState(EntityId, trigger.transitionToState);
+                    ApplyState(trigger.transitionToState);
+                    if (_playerInside)
+                        RefreshHint();
+                    return;
+                }
+            }
+        }
+
+        if (!_playerInside || _hint == null)
             return;
 
         var buttons = _currentPhase.buttons;
@@ -421,6 +466,18 @@ public class Interactable : MonoBehaviour
             {
                 RefreshHint();
                 return;
+            }
+        }
+
+        if (_currentPhase.conditionTriggers != null)
+        {
+            foreach (var trigger in _currentPhase.conditionTriggers)
+            {
+                if (trigger.conditionId == conditionId)
+                {
+                    RefreshHint();
+                    return;
+                }
             }
         }
     }

@@ -17,6 +17,10 @@ public class InteractionPhase
     [Tooltip("可选按钮列表，每个按钮可触发不同的交互操作\n玩家可通过键盘按键或点击UI按钮触发")]
     public List<ButtonOption> buttons = new List<ButtonOption>();
 
+    [Header("条件触发器")]
+    [Tooltip("实时监测条件列表，条件满足时自动切换到目标状态\n无需玩家交互，每帧检测")]
+    public List<ConditionTrigger> conditionTriggers = new List<ConditionTrigger>();
+
     [Header("行为")]
     [Tooltip("是否可重复交互。false 时首次交互后不再响应")]
     public bool canRepeat = true;
@@ -71,6 +75,15 @@ public class InteractionPhase
         _legacyParam2 = "";
         _legacyTransitionToState = -1;
     }
+}
+
+[Serializable]
+public class ConditionTrigger
+{
+    [Tooltip("条件表ID，通过 ConditionSystem 检测是否满足")]
+    public int conditionId;
+    [Tooltip("条件满足后切换到的状态值，-1 表示不切换")]
+    public int transitionToState = -1;
 }
 
 [Serializable]
