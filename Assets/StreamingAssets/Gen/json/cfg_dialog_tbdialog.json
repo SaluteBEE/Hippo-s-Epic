@@ -9,7 +9,10 @@
     "selection_name": "",
     "speakerid1": 1,
     "speakerid2": 2,
-    "gain_item_id": 0
+    "gain_item_id": 0,
+    "condition_ids": [
+      0
+    ]
   },
   {
     "id": 1001002,
@@ -23,7 +26,12 @@
     "selection_name": "",
     "speakerid1": 1,
     "speakerid2": 2,
-    "gain_item_id": 0
+    "gain_item_id": 0,
+    "condition_ids": [
+      0,
+      0,
+      0
+    ]
   },
   {
     "id": 1001003,
@@ -35,7 +43,10 @@
     "selection_name": "我是来患上一种病叫查尔斯顿狂<br>热，然后一直跳舞跳到屎尿横流为止",
     "speakerid1": 1,
     "speakerid2": 2,
-    "gain_item_id": 0
+    "gain_item_id": 0,
+    "condition_ids": [
+      0
+    ]
   },
   {
     "id": 1001004,
@@ -45,7 +56,10 @@
     "selection_name": "一拳打在他脸上！",
     "speakerid1": 1,
     "speakerid2": 2,
-    "gain_item_id": 0
+    "gain_item_id": 0,
+    "condition_ids": [
+      0
+    ]
   },
   {
     "id": 1001005,
@@ -57,7 +71,10 @@
     "selection_name": "9之后的数字应该是10。",
     "speakerid1": 1,
     "speakerid2": 2,
-    "gain_item_id": 0
+    "gain_item_id": 0,
+    "condition_ids": [
+      0
+    ]
   },
   {
     "id": 1002001,
@@ -67,7 +84,10 @@
     "selection_name": "",
     "speakerid1": 1,
     "speakerid2": 2,
-    "gain_item_id": 0
+    "gain_item_id": 0,
+    "condition_ids": [
+      0
+    ]
   },
   {
     "id": 1003001,
@@ -79,7 +99,10 @@
     "selection_name": "",
     "speakerid1": 1,
     "speakerid2": 2,
-    "gain_item_id": 0
+    "gain_item_id": 0,
+    "condition_ids": [
+      0
+    ]
   },
   {
     "id": 1003002,
@@ -93,7 +116,12 @@
     "selection_name": "",
     "speakerid1": 1,
     "speakerid2": 2,
-    "gain_item_id": 0
+    "gain_item_id": 0,
+    "condition_ids": [
+      0,
+      0,
+      0
+    ]
   },
   {
     "id": 1003003,
@@ -103,7 +131,10 @@
     "selection_name": "呃，呃，其实我暂时还没有什么发现。",
     "speakerid1": 1,
     "speakerid2": 2,
-    "gain_item_id": 0
+    "gain_item_id": 0,
+    "condition_ids": [
+      0
+    ]
   },
   {
     "id": 1003004,
@@ -113,7 +144,10 @@
     "selection_name": "递给教练拳王更衣室找到的报道",
     "speakerid1": 1,
     "speakerid2": 2,
-    "gain_item_id": 0
+    "gain_item_id": 0,
+    "condition_ids": [
+      0
+    ]
   },
   {
     "id": 1003005,
@@ -123,6 +157,82 @@
     "selection_name": "我可以报名上场吗，我想成为一个伟大的人",
     "speakerid1": 1,
     "speakerid2": 2,
-    "gain_item_id": 0
+    "gain_item_id": 0,
+    "condition_ids": [
+      0
+    ]
+  },
+  {
+    "id": 9000001,
+    "type": 1,
+    "param1": [
+      9000002
+    ],
+    "param2": "",
+    "selection_name": "",
+    "speakerid1": 1,
+    "speakerid2": 2,
+    "gain_item_id": 0,
+    "condition_ids": [
+      0
+    ]
+  },
+  {
+    "id": 9000002,
+    "type": 2,
+    "param1": [
+      9000003,
+      9000004,
+      9000005
+    ],
+    "param2": "1|1|1",
+    "selection_name": "",
+    "speakerid1": 1,
+    "speakerid2": 2,
+    "gain_item_id": 0,
+    "condition_ids": [
+      6,
+      3,
+      0
+    ]
+  },
+  {
+    "id": 9000003,
+    "type": 1,
+    "param1": [],
+    "param2": "",
+    "selection_name": "我有钥匙，让我进去",
+    "speakerid1": 1,
+    "speakerid2": 2,
+    "gain_item_id": 0,
+    "condition_ids": [
+      0
+    ]
+  },
+  {
+    "id": 9000004,
+    "type": 1,
+    "param1": [],
+    "param2": "",
+    "selection_name": "我打败了拳王！",
+    "speakerid1": 1,
+    "speakerid2": 2,
+    "gain_item_id": 0,
+    "condition_ids": [
+      0
+    ]
+  },
+  {
+    "id": 9000005,
+    "type": 1,
+    "param1": [],
+    "param2": "",
+    "selection_name": "算了，我走",
+    "speakerid1": 1,
+    "speakerid2": 2,
+    "gain_item_id": 0,
+    "condition_ids": [
+      0
+    ]
   }
 ]

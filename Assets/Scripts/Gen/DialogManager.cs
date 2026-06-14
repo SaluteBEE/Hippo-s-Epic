@@ -278,13 +278,18 @@ public class DialogManager : MonoBehaviour
     private void ShowOptions()
     {
         var options = new List<OptionInfo>();
-        foreach (int childId in _currentDialog.Param1)
+        var param1 = _currentDialog.Param1;
+        var condIds = _currentDialog.ConditionIds;
+
+        for (int i = 0; i < param1.Count; i++)
         {
+            int childId = param1[i];
             var child = _tables.TbDialog.GetOrDefault(childId);
             if (child != null)
             {
                 int firstContentType = GetFirstContentType(childId);
-                options.Add(new OptionInfo(child.SelectionName, childId, firstContentType));
+                int condId = (condIds != null && i < condIds.Count) ? condIds[i] : 0;
+                options.Add(new OptionInfo(child.SelectionName, childId, firstContentType, condId));
             }
         }
 

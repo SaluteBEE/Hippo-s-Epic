@@ -44,7 +44,7 @@ public partial class GameApp : MonoBehaviour
 
     #region Dialog Test
 
-    private static readonly int[] TestDialogIds = { 1001001, 100, 200, 300, 400, 500, 600 };
+    private static readonly int[] TestDialogIds = { 1001001, 100, 200, 300, 400, 500, 600, 9000001 };
     private static readonly string[] TestDialogNames =
     {
         "1001001: 原始对话（选项循环）",
@@ -53,7 +53,8 @@ public partial class GameApp : MonoBehaviour
         "300: 嵌套选项（多层分支）",
         "400: 纯旁白（无角色）",
         "500: 物品获得测试",
-        "600: ItemBox长度测试"
+        "600: ItemBox长度测试",
+        "9000001: 条件选项测试"
     };
 
     private int _testIndex;

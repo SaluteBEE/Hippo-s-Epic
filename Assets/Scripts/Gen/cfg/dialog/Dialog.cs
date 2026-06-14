@@ -26,6 +26,7 @@ public sealed partial class Dialog : Luban.BeanBase
         Speakerid2 = _buf.ReadInt();
         Speakerid2_Ref = null;
         GainItemId = _buf.ReadInt();
+        {int n0 = _buf.ReadSize(); ConditionIds = new System.Collections.Generic.List<int>(n0);for(var i0 = 0 ; i0 < n0 ; i0++) { int _e0;  _e0 = _buf.ReadInt(); ConditionIds.Add(_e0);}}
     }
 
     public static Dialog DeserializeDialog(ByteBuf _buf)
@@ -67,6 +68,10 @@ public sealed partial class Dialog : Luban.BeanBase
     /// 对话结束后获得的物品ID(0=无)
     /// </summary>
     public readonly int GainItemId;
+    /// <summary>
+    /// 选项条件ID列表(与param1对应,0=无条件)
+    /// </summary>
+    public readonly System.Collections.Generic.List<int> ConditionIds;
    
     public const int __ID__ = -1404908348;
     public override int GetTypeId() => __ID__;
@@ -88,6 +93,7 @@ public sealed partial class Dialog : Luban.BeanBase
         + "speakerid1:" + Speakerid1 + ","
         + "speakerid2:" + Speakerid2 + ","
         + "gainItemId:" + GainItemId + ","
+        + "conditionIds:" + Luban.StringUtil.CollectionToString(ConditionIds) + ","
         + "}";
     }
 }

@@ -30,11 +30,16 @@ public sealed class ChatBubbleOptionView : MonoBehaviour
     [SerializeField] private GameObject op2e;
     [SerializeField] private GameObject op3e;
 
-    public void Bind(string[] texts, string[] extends, Action<int> onChoose)
+    [SerializeField] private Color disabledColor = new Color(0.5f, 0.5f, 0.5f, 0.5f);
+    private Color _normalColor = Color.white;
+
+    public void Bind(string[] texts, string[] extends, bool[] interactables, Action<int> onChoose)
     {
-        SetupSlot(0, op1, op1e, op1Button, op1eButton, op1Text, op1eText, texts, extends);
-        SetupSlot(1, op2, op2e, op2Button, op2eButton, op2Text, op2eText, texts, extends);
-        SetupSlot(2, op3, op3e, op3Button, op3eButton, op3Text, op3eText, texts, extends);
+        if (op1Text != null) _normalColor = op1Text.color;
+
+        SetupSlot(0, op1, op1e, op1Button, op1eButton, op1Text, op1eText, texts, extends, interactables);
+        SetupSlot(1, op2, op2e, op2Button, op2eButton, op2Text, op2eText, texts, extends, interactables);
+        SetupSlot(2, op3, op3e, op3Button, op3eButton, op3Text, op3eText, texts, extends, interactables);
 
         LayoutRebuilder.ForceRebuildLayoutImmediate(op1.GetComponent<RectTransform>());
         LayoutRebuilder.ForceRebuildLayoutImmediate(op2.GetComponent<RectTransform>());
@@ -102,11 +107,12 @@ public sealed class ChatBubbleOptionView : MonoBehaviour
         GameObject normalObj, GameObject extendObj,
         Button normalBtn, Button extendBtn,
         TMP_Text normalTxt, TMP_Text extendTxt,
-        string[] texts, string[] extends)
+        string[] texts, string[] extends, bool[] interactables)
     {
         bool hasOption = index < texts.Length && !string.IsNullOrEmpty(texts[index]);
         string text = hasOption ? texts[index] : "";
         string ext = hasOption && index < extends.Length ? extends[index] : "";
+        bool interactable = hasOption && index < interactables.Length && interactables[index];
 
         normalObj.SetActive(hasOption && string.IsNullOrEmpty(ext));
         extendObj.SetActive(hasOption && !string.IsNullOrEmpty(ext));
@@ -115,6 +121,13 @@ public sealed class ChatBubbleOptionView : MonoBehaviour
         {
             normalTxt.text = text;
             extendTxt.text = text;
+
+            normalBtn.interactable = interactable;
+            extendBtn.interactable = interactable;
+
+            Color c = interactable ? _normalColor : disabledColor;
+            normalTxt.color = c;
+            extendTxt.color = c;
         }
         else
         {

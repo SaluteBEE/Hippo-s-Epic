@@ -29,6 +29,9 @@ public class DialogManagerUI : MonoBehaviour
     private RectTransform _lastRightBubbleBeforeOption;
     private bool _pendingCollapse;
     private TypewriterEffect _currentTypewriter;
+    private ChatBubbleOptionView _currentOptionBubble;
+    private List<OptionInfo> _currentOptions;
+    private bool[] _currentInteractables;
 
     public void Initialize(
         RectTransform contentRect,
@@ -58,6 +61,9 @@ public class DialogManagerUI : MonoBehaviour
         _dialogManager.OnContent += OnContent;
         _dialogManager.OnOptions += OnOptions;
         _dialogManager.OnDialogEnded += OnDialogEnded;
+
+        if (ConditionSystem.HasInstance)
+            ConditionSystem.Instance.OnConditionChanged += OnConditionChanged;
     }
 
     private void OnDisable()
@@ -67,6 +73,13 @@ public class DialogManagerUI : MonoBehaviour
         _dialogManager.OnContent -= OnContent;
         _dialogManager.OnOptions -= OnOptions;
         _dialogManager.OnDialogEnded -= OnDialogEnded;
+
+        if (ConditionSystem.HasInstance)
+            ConditionSystem.Instance.OnConditionChanged -= OnConditionChanged;
+
+        _currentOptionBubble = null;
+        _currentOptions = null;
+        _currentInteractables = null;
     }
 
     private void Update()
@@ -106,6 +119,8 @@ public class DialogManagerUI : MonoBehaviour
         }
 
         _optionChosen = false;
+        _currentOptions = options;
+        _currentOptionBubble = null;
 
         if (_bubbleTints.Count > 0)
         {
@@ -114,19 +129,27 @@ public class DialogManagerUI : MonoBehaviour
                 _lastRightBubbleBeforeOption = latest.GetComponent<RectTransform>();
         }
 
-        var opBubble = Instantiate(optionBubblePrefab, chatContent);
-
         var texts = new string[options.Count];
         var extends = new string[options.Count];
+        var interactables = new bool[options.Count];
+        var condSys = ConditionSystem.HasInstance ? ConditionSystem.Instance : null;
+
         for (int i = 0; i < options.Count; i++)
         {
             texts[i] = options[i].Text;
             extends[i] = options[i].FirstContentType == 0 ? "narrator" : "";
+            int condId = options[i].ConditionId;
+            interactables[i] = condId == 0 || (condSys != null && condSys.IsConditionMet(condId));
         }
 
-        opBubble.Bind(texts, extends, index =>
+        var opBubble = Instantiate(optionBubblePrefab, chatContent);
+        _currentOptionBubble = opBubble;
+        _currentInteractables = interactables;
+
+        opBubble.Bind(texts, extends, interactables, index =>
         {
             if (_optionChosen) return;
+            if (!interactables[index]) return;
             _optionChosen = true;
             _blockAdvance = true;
 
@@ -135,6 +158,9 @@ public class DialogManagerUI : MonoBehaviour
 
             RemoveFromTints(opBubble.gameObject);
             DestroyImmediate(opBubble.gameObject);
+            _currentOptionBubble = null;
+            _currentOptions = null;
+            _currentInteractables = null;
 
             LayoutRebuilder.ForceRebuildLayoutImmediate(chatContent);
             ScrollToBottom();
@@ -195,9 +221,71 @@ public class DialogManagerUI : MonoBehaviour
     private void OnDialogEnded()
     {
         ClearAllBubbles();
+        _currentOptionBubble = null;
+        _currentOptions = null;
+        _currentInteractables = null;
+
         var uiManager = ManagerRegistry.Get<UIManager>();
         if (uiManager != null && uiManager.IsOpen<DialogWindow>())
             uiManager.Close<DialogWindow>();
+    }
+
+    private void OnConditionChanged(int conditionId, bool isMet)
+    {
+        if (_optionChosen) return;
+        if (_currentOptionBubble == null || _currentOptions == null) return;
+
+        bool needsRefresh = false;
+        for (int i = 0; i < _currentOptions.Count; i++)
+        {
+            if (_currentOptions[i].ConditionId == conditionId)
+            {
+                needsRefresh = true;
+                break;
+            }
+        }
+
+        if (!needsRefresh) return;
+
+        var condSys = ConditionSystem.HasInstance ? ConditionSystem.Instance : null;
+        for (int i = 0; i < _currentOptions.Count; i++)
+        {
+            int condId = _currentOptions[i].ConditionId;
+            _currentInteractables[i] = condId == 0 || (condSys != null && condSys.IsConditionMet(condId));
+        }
+
+        var texts = new string[_currentOptions.Count];
+        var extends = new string[_currentOptions.Count];
+        for (int i = 0; i < _currentOptions.Count; i++)
+        {
+            texts[i] = _currentOptions[i].Text;
+            extends[i] = _currentOptions[i].FirstContentType == 0 ? "narrator" : "";
+        }
+
+        _currentOptionBubble.Bind(texts, extends, _currentInteractables, index =>
+        {
+            if (_optionChosen) return;
+            if (!_currentInteractables[index]) return;
+            _optionChosen = true;
+            _blockAdvance = true;
+
+            if (_lastRightBubbleBeforeOption != null && !IsOptionAction(index))
+                _pendingCollapse = true;
+
+            RemoveFromTints(_currentOptionBubble.gameObject);
+            DestroyImmediate(_currentOptionBubble.gameObject);
+            _currentOptionBubble = null;
+            _currentOptions = null;
+            _currentInteractables = null;
+
+            LayoutRebuilder.ForceRebuildLayoutImmediate(chatContent);
+            ScrollToBottom();
+
+            _dialogManager.ChooseOption(index);
+        });
+
+        LayoutRebuilder.ForceRebuildLayoutImmediate(chatContent);
+        ScrollToBottom();
     }
 
     private void MarkAsLatest(GameObject bubbleRoot)
@@ -224,6 +312,9 @@ public class DialogManagerUI : MonoBehaviour
     private void ClearAllBubbles()
     {
         _currentTypewriter = null;
+        _currentOptionBubble = null;
+        _currentOptions = null;
+        _currentInteractables = null;
         for (int i = chatContent.childCount - 1; i >= 0; i--)
             Destroy(chatContent.GetChild(i).gameObject);
         _bubbleTints.Clear();
