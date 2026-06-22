@@ -179,6 +179,19 @@ MonoBehaviour:
     m_SerializedLabels:
     - ui_prefab
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: bf9322693e035f34da3a5fad76f3c6f0
+    m_Address: ui/map/MapPanel
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - ui_prefab
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e27e3731e6f74dd448abebfa2608da45
+    m_Address: ui/map/MapRoot_PunkCity
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - ui_prefab
+    - maproot
+    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: dd90b6ecff8020e40aa537a3ddf43594, type: 2}
   m_SchemaSet:

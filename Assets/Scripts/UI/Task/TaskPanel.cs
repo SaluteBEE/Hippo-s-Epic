@@ -21,6 +21,14 @@ public class TaskPanel : UIWindow
     public override void OnCreate(object args)
     {
         btnClose.onClick.AddListener(Close);
+
+        if (btnMidMap3 != null)
+            btnMidMap3.onClick.AddListener(() => OpenMapPanel(MapRootId.PunkCity));
+    }
+
+    private void OpenMapPanel(MapRootId id)
+    {
+        ManagerRegistry.Get<UIManager>()?.Open<MapPanel>(id);
     }
 
     public override void OnOpen(object args)

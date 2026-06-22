@@ -11,5 +11,6 @@ public static class UIWindowRegistry
         UIManager.RegisterAddress(typeof(BagPanel), "ui/Bag/BagPanel");
         UIManager.RegisterAddress(typeof(UseItemTip), "ui/Bag/UseItemTip");
         UIManager.RegisterAddress(typeof(TaskPanel), "ui/task/TaskPanel");
+        UIManager.RegisterAddress(typeof(MapPanel), "ui/map/MapPanel");
     }
 }

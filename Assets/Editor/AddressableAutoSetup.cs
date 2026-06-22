@@ -40,6 +40,9 @@ public static class AddressableAutoSetup
         "Scene_Dialogue",
     };
 
+    const string MapRootPrefabDir = "Assets/Prefabs/UI/map";
+    const string MapRootAddressPrefix = "ui/map";
+
     [MenuItem("Tools/自动设置 Addressable")]
     public static void Setup()
     {
@@ -70,6 +73,8 @@ public static class AddressableAutoSetup
 
             added += SetupDirectory(settings, group, cfg.dir, cfg.addressPrefix, cfg.filter, cfg.label, cfg.forceSprite, cfg.excludeSubDir);
         }
+
+        added += SetupMapRoots(settings);
 
         AssetDatabase.Refresh();
         settings.SetDirty(AddressableAssetSettings.ModificationEvent.EntryMoved, null, true);
@@ -220,5 +225,39 @@ public static class AddressableAutoSetup
                 Debug.Log($"[AddressableAutoSetup] 从 Addressables 移除启动场景: {sceneName}");
             }
         }
+    }
+
+    static int SetupMapRoots(AddressableAssetSettings settings)
+    {
+        if (!Directory.Exists(MapRootPrefabDir))
+            return 0;
+
+        int count = 0;
+        var guids = AssetDatabase.FindAssets("t:Prefab", new[] { MapRootPrefabDir });
+        var group = settings.DefaultGroup;
+
+        if (!settings.GetLabels().Contains("maproot"))
+            settings.AddLabel("maproot");
+
+        foreach (var guid in guids)
+        {
+            var path = AssetDatabase.GUIDToAssetPath(guid);
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(path);
+            if (prefab == null) continue;
+
+            if (prefab.GetComponent<MapRoot>() == null) continue;
+
+            var prefabName = prefab.name;
+            var address = $"{MapRootAddressPrefix}/{prefabName}";
+
+            var entry = settings.CreateOrMoveEntry(guid, group);
+            entry.address = address;
+            entry.SetLabel("maproot", true);
+
+            count++;
+            Debug.Log($"  [MapRoot] 设置: {address} → {path}");
+        }
+
+        return count;
     }
 }
