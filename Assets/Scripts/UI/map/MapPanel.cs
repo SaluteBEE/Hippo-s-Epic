@@ -15,13 +15,32 @@ public class MapPanel : UIWindow
     [Header("UI")]
     [SerializeField] private RectTransform mapRootContainer;
     [SerializeField] private RectTransform head;
+    [SerializeField] private Animator headAnimator;
     [SerializeField] private Button btnClose;
 
     private MapRoot _currentMapRoot;
     private GameObject _currentMapRootInstance;
     private AsyncOperationHandle<GameObject> _loadHandle;
+    private bool _isTransitioning;
+    private string _pendingAnimState;
+    private SceneMapId _pendingTargetMap;
+    private SceneMapId _pendingCurrentMap;
+    private bool _waitingForAnim;
 
     public override UILayer Layer => UILayer.Popup;
+
+    private void Update()
+    {
+        if (!_waitingForAnim || headAnimator == null) return;
+
+        var stateInfo = headAnimator.GetCurrentAnimatorStateInfo(0);
+        if (!stateInfo.IsName(_pendingAnimState) || stateInfo.normalizedTime >= 1f)
+        {
+            headAnimator.enabled = false;
+            _waitingForAnim = false;
+            TeleportToMap(_pendingTargetMap, _pendingCurrentMap);
+        }
+    }
 
     public override void OnCreate(object args)
     {
@@ -84,12 +103,24 @@ public class MapPanel : UIWindow
 
     private void PositionHead(SceneMapId currentMap)
     {
+        Debug.Log($"[MapPanel] PositionHead called: head={head != null}, mapRoot={_currentMapRoot != null}, animator={headAnimator != null}");
         if (head == null || _currentMapRoot == null) return;
 
-        var pos = _currentMapRoot.GetHeadPosition(currentMap);
-        if (pos.HasValue)
+        if (headAnimator != null)
         {
-            head.anchoredPosition = pos.Value;
+            Debug.Log($"[MapPanel] animator was enabled={headAnimator.enabled}");
+            headAnimator.enabled = false;
+            Debug.Log($"[MapPanel] animator now enabled={headAnimator.enabled}");
+        }
+
+        var btn = _currentMapRoot.GetButtonByMap(currentMap);
+        Debug.Log($"[MapPanel] btn found={btn != null}, currentMap={currentMap}");
+        if (btn != null)
+        {
+            var btnPos = btn.GetComponent<RectTransform>().position;
+            Debug.Log($"[MapPanel] btn world pos={btnPos}, head world pos before={head.position}");
+            head.position = btnPos;
+            Debug.Log($"[MapPanel] head world pos after={head.position}, head anchored={head.anchoredPosition}");
             head.gameObject.SetActive(true);
         }
         else
@@ -100,22 +131,102 @@ public class MapPanel : UIWindow
 
     private void OnNodeClicked(SceneMapId targetMap)
     {
+        if (_isTransitioning) return;
+
+        if (_currentMapRoot != null)
+        {
+            int condId = _currentMapRoot.GetConditionId(targetMap);
+            if (condId != 0 && (!ConditionSystem.HasInstance || !ConditionSystem.Instance.IsConditionMet(condId)))
+                return;
+        }
+
+        SceneMapId currentMap = GetCurrentSceneMapId();
+        Debug.Log($"[MapPanel] OnNodeClicked: targetMap={targetMap}, currentMap={currentMap}");
+
+        if (_currentMapRoot != null)
+        {
+            var fromNodeId = _currentMapRoot.GetNodeIdByMap(currentMap);
+            var toNodeId = _currentMapRoot.GetNodeIdByMap(targetMap);
+            Debug.Log($"[MapPanel] fromNodeId={fromNodeId}, toNodeId={toNodeId}");
+            var clip = (fromNodeId.HasValue && toNodeId.HasValue)
+                ? _currentMapRoot.GetTransitionClip(fromNodeId.Value, toNodeId.Value)
+                : null;
+            Debug.Log($"[MapPanel] clip={clip?.name ?? "null"}");
+            var fromBtn = _currentMapRoot.GetButtonByMap(currentMap);
+            if (clip != null)
+            {
+                PlayTransitionAndTeleport(clip, targetMap, currentMap, fromBtn);
+                return;
+            }
+        }
+
+        TeleportToMap(targetMap, currentMap);
+    }
+
+    private void PlayTransitionAndTeleport(AnimationClip clip, SceneMapId targetMap, SceneMapId currentMap, Button fromBtn)
+    {
+        Debug.Log($"[MapPanel] PlayTransition: clip={clip?.name}, animator={headAnimator != null}");
+        _isTransitioning = true;
+        SetButtonsInteractable(false);
+
+        if (headAnimator != null)
+            headAnimator.enabled = false;
+
+        if (fromBtn != null)
+        {
+            head.position = fromBtn.GetComponent<RectTransform>().position;
+            Debug.Log($"[MapPanel] head moved to fromBtn pos={head.position}");
+            head.gameObject.SetActive(true);
+        }
+
+        if (headAnimator != null)
+        {
+            headAnimator.enabled = true;
+            headAnimator.Rebind();
+            headAnimator.updateMode = AnimatorUpdateMode.UnscaledTime;
+            Debug.Log($"[MapPanel] playing animation: {clip.name}");
+            headAnimator.Play(clip.name, 0, 0f);
+            _pendingAnimState = clip.name;
+            _pendingTargetMap = targetMap;
+            _pendingCurrentMap = currentMap;
+            _waitingForAnim = true;
+            Debug.Log($"[MapPanel] waiting for anim in Update");
+        }
+        else
+        {
+            TeleportToMap(targetMap, currentMap);
+        }
+    }
+
+    private void TeleportToMap(SceneMapId targetMap, SceneMapId currentMap)
+    {
+        _isTransitioning = false;
         ManagerRegistry.Get<UIManager>()?.Close<MapPanel>();
+
+        if (targetMap == currentMap)
+            GameplayState.CloseTaskIfOpen();
+
         GameApp.Instance?.GoToMap(targetMap);
+    }
+
+    private void SetButtonsInteractable(bool interactable)
+    {
+        if (_currentMapRoot == null) return;
+        foreach (var entry in _currentMapRoot.Nodes)
+        {
+            if (entry.button != null)
+                entry.button.interactable = interactable;
+        }
     }
 
     private SceneMapId GetCurrentSceneMapId()
     {
         string mapName = GetCurrentMapName();
+        // Debug.Log($"[MapPanel] GetCurrentSceneMapId: mapName='{mapName}'");
         if (string.IsNullOrEmpty(mapName)) return SceneMapId.StaffLounge;
-
-        foreach (SceneMapId id in System.Enum.GetValues(typeof(SceneMapId)))
-        {
-            if (id.GetMapName() == mapName)
-                return id;
-        }
-
-        return SceneMapId.StaffLounge;
+        var result = SceneMapIdExtensions.GetSceneMapIdByMapName(mapName);
+        // Debug.Log($"[MapPanel] GetCurrentSceneMapId: result={result}, MapNameToId keys=[{string.Join(", ", SceneMapIdExtensions.GetAllMapNames())}]");
+        return result;
     }
 
     private string GetCurrentMapName()
@@ -135,6 +246,8 @@ public class MapPanel : UIWindow
 
     private void ClearMapRoot()
     {
+        _isTransitioning = false;
+
         if (_currentMapRootInstance != null)
         {
             Destroy(_currentMapRootInstance);

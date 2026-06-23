@@ -45,7 +45,7 @@ public class AnimationController : MonoBehaviour
                 Initialize();
             }
             
-            Debug.Log($"AnimationController.Awake: autoInitialize={autoInitialize}, config={(config != null ? "assigned" : "null")}, skeletonAnimation={(skeletonAnimation != null ? "assigned" : "null")}");
+            if (debugLog) Debug.Log($"AnimationController.Awake: autoInitialize={autoInitialize}, config={(config != null ? "assigned" : "null")}, skeletonAnimation={(skeletonAnimation != null ? "assigned" : "null")}");
         }
         catch (System.Exception e)
         {
@@ -65,7 +65,7 @@ public class AnimationController : MonoBehaviour
             if (loadedConfig != null)
             {
                 config = loadedConfig;
-                Debug.Log($"自动加载默认配置: {defaultConfigPath}");
+                if (debugLog) Debug.Log($"自动加载默认配置: {defaultConfigPath}");
                 return true;
             }
         }
@@ -78,7 +78,7 @@ public class AnimationController : MonoBehaviour
     {
         try
         {
-            Debug.Log($"AnimationController.Initialize开始: config={(config != null ? config.name : "null")}, skeletonAnimation={(skeletonAnimation != null ? "assigned" : "null")}");
+            if (debugLog) Debug.Log($"AnimationController.Initialize开始: config={(config != null ? config.name : "null")}, skeletonAnimation={(skeletonAnimation != null ? "assigned" : "null")}");
             if (isInitialized)
             {
                 if (debugLog) Debug.LogWarning("AnimationController already initialized.");
@@ -505,7 +505,7 @@ public class AnimationController : MonoBehaviour
                     return;
                 }
                 
-                Debug.Log($"播放动画: {clipName} (循环: {loop}, 速度: {speed}, 轨道: {config.trackIndex})");
+                // Debug.Log($"播放动画: {clipName} (循环: {loop}, 速度: {speed}, 轨道: {config.trackIndex})");
             }
             else
             {
@@ -532,14 +532,14 @@ public class AnimationController : MonoBehaviour
                     return;
                 }
                 
-                Debug.Log($"播放动画(直接查找): {clipName} (循环: {loop}, 速度: {speed}, 轨道: {config.trackIndex})");
+                // Debug.Log($"播放动画(直接查找): {clipName} (循环: {loop}, 速度: {speed}, 轨道: {config.trackIndex})");
             }
             
             if (animation != null)
             {
                 // 调试信息：动画时长
                 float animationDuration = animation.Duration;
-                Debug.Log($"动画 '{clipName}' 时长: {animationDuration:F2}秒 ({animationDuration * 30:F0}帧)");
+                // Debug.Log($"动画 '{clipName}' 时长: {animationDuration:F2}秒 ({animationDuration * 30:F0}帧)");
                 
                 currentTrack = animationState.SetAnimation(
                     config.trackIndex,
@@ -568,7 +568,7 @@ public class AnimationController : MonoBehaviour
                 ControlSlots(true, transitionTime);
                 
                 // 调试信息：轨道状态
-                Debug.Log($"轨道设置完成: 轨道{config.trackIndex}, Alpha={currentTrack.Alpha:F2}, TimeScale={currentTrack.TimeScale:F2}, MixDuration={currentTrack.MixDuration:F2}, Loop={loop}");
+                // Debug.Log($"轨道设置完成: 轨道{config.trackIndex}, Alpha={currentTrack.Alpha:F2}, TimeScale={currentTrack.TimeScale:F2}, MixDuration={currentTrack.MixDuration:F2}, Loop={loop}");
             }
         }
         

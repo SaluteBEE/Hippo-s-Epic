@@ -175,47 +175,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   nodes:
-  - button: {fileID: 214563403058024528}
+  - nodeId: 4
+    button: {fileID: 214563403058024528}
+    targetMap: 0
+    conditionId: 0
+  - nodeId: 1
+    button: {fileID: 6269418372276423275}
     targetMap: 4
-    headPosition: {x: 0, y: 0}
-    interactable: 1
-  - button: {fileID: 6269418372276423275}
-    targetMap: 3
-    headPosition: {x: 0, y: 0}
-    interactable: 1
-  - button: {fileID: 621856698228769782}
+    conditionId: 0
+  - nodeId: 3
+    button: {fileID: 621856698228769782}
     targetMap: 2
-    headPosition: {x: 0, y: 0}
-    interactable: 1
-  - button: {fileID: 6247996960224392723}
-    targetMap: 0
-    headPosition: {x: 0, y: 0}
-    interactable: 1
-  - button: {fileID: 3450277092458789610}
-    targetMap: 5
-    headPosition: {x: 0, y: 0}
-    interactable: 1
-  - button: {fileID: 0}
-    targetMap: 0
-    headPosition: {x: 0, y: 0}
-    interactable: 0
-  - button: {fileID: 0}
-    targetMap: 0
-    headPosition: {x: 0, y: 0}
-    interactable: 0
-  - button: {fileID: 0}
-    targetMap: 0
-    headPosition: {x: 0, y: 0}
-    interactable: 0
-  - button: {fileID: 0}
-    targetMap: 0
-    headPosition: {x: 0, y: 0}
-    interactable: 0
-  - button: {fileID: 0}
-    targetMap: 0
-    headPosition: {x: 0, y: 0}
-    interactable: 0
-  head: {fileID: 0}
+    conditionId: 0
+  transitions:
+  - fromNode: 1
+    toNode: 4
+    forwardClip: {fileID: 7400000, guid: b228bffc06bd26c4b92d57cd2dbc2d60, type: 2}
+    reverseClip: {fileID: 7400000, guid: b228bffc06bd26c4b92d57cd2dbc2d60, type: 2}
 --- !u!1 &3373653342798877329
 GameObject:
   m_ObjectHideFlags: 0

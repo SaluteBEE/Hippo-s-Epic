@@ -57,6 +57,18 @@ public static class SceneMapIdExtensions
         { SceneMapId.UndergroundBoxingGym_Level2DTest, "Level2DTest" },
     };
 
+    private static readonly Dictionary<string, SceneMapId> MapNameToId = new Dictionary<string, SceneMapId>
+    {
+        { "Outer_City_Ground", SceneMapId.OuterCityGround },
+        { "Punk_City_Ground", SceneMapId.PunkCityGround },
+        { "Sewer_Surface", SceneMapId.SewerSurface },
+        { "Staff Lounge", SceneMapId.StaffLounge },
+        { "Underground Boxing Gym", SceneMapId.UndergroundBoxingGym },
+        { "temple", SceneMapId.Temple },
+    };
+
     public static string GetMapName(this SceneMapId id) => MapNames[id];
     public static string GetSceneName(this SceneMapId id) => SceneNames[id];
+    public static SceneMapId GetSceneMapIdByMapName(string mapName) => MapNameToId.TryGetValue(mapName, out var id) ? id : SceneMapId.StaffLounge;
+    public static IEnumerable<string> GetAllMapNames() => MapNameToId.Keys;
 }

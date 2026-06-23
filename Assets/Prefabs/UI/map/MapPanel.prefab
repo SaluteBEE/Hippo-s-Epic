@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 8568966315606868267}
   - component: {fileID: 1430782216034369885}
   - component: {fileID: 7440559815983392801}
-  - component: {fileID: 6010931278308875071}
+  - component: {fileID: 8889674196904923996}
   m_Layer: 5
   m_Name: head
   m_TagString: Untagged
@@ -60,7 +60,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -76,7 +76,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!95 &6010931278308875071
+--- !u!95 &8889674196904923996
 Animator:
   serializedVersion: 5
   m_ObjectHideFlags: 0
@@ -84,11 +84,11 @@ Animator:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2679669240744122024}
-  m_Enabled: 1
+  m_Enabled: 0
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 6c5cb001d1f048c41a33adfdb425bb46, type: 2}
+  m_Controller: {fileID: 9100000, guid: 86cad0a4cbe6a634ea824e57a39d8fdb, type: 2}
   m_CullingMode: 0
-  m_UpdateMode: 0
+  m_UpdateMode: 2
   m_ApplyRootMotion: 0
   m_LinearVelocityBlending: 0
   m_StabilizeFeet: 0
@@ -296,12 +296,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 726f88a576b670643bb3e777010df9c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mapRootConfigs:
-  - rootName: PunkCity
-    address: ui/map/MapRoot_PunkCity
-    associatedMaps: 01000000
   mapRootContainer: {fileID: 474739481340463107}
   head: {fileID: 8568966315606868267}
+  headAnimator: {fileID: 8889674196904923996}
   btnClose: {fileID: 804932460842653550}
 --- !u!1001 &1460712594549649615
 PrefabInstance:

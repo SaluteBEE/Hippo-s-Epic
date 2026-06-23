@@ -397,6 +397,8 @@ public partial class GameApp : MonoBehaviour
 
     public void GoToMap(SceneMapId mapId)
     {
+        SaveManager.Instance.CurrentMapId = (int)mapId;
+
         string targetScene = mapId.GetSceneName();
         string targetMap = mapId.GetMapName();
         string currentScene = SceneManager.GetActiveScene().name;

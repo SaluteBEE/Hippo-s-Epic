@@ -205,8 +205,18 @@ public static class MapCollectorTool
         sb.AppendLine("    };");
         sb.AppendLine();
 
+        sb.AppendLine("    private static readonly Dictionary<string, SceneMapId> MapNameToId = new Dictionary<string, SceneMapId>");
+        sb.AppendLine("    {");
+        foreach (var item in enumEntries)
+        {
+            sb.AppendLine($"        {{ \"{item.mapName}\", SceneMapId.{item.enumName} }},");
+        }
+        sb.AppendLine("    };");
+        sb.AppendLine();
+
         sb.AppendLine("    public static string GetMapName(this SceneMapId id) => MapNames[id];");
         sb.AppendLine("    public static string GetSceneName(this SceneMapId id) => SceneNames[id];");
+        sb.AppendLine("    public static SceneMapId GetSceneMapIdByMapName(string mapName) => MapNameToId.TryGetValue(mapName, out var id) ? id : SceneMapId.StaffLounge;");
         sb.AppendLine("}");
 
         WriteFile(SceneMapIdOutputPath, sb.ToString());

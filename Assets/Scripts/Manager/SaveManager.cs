@@ -10,9 +10,16 @@ public class SaveManager
     private const string SaveFileName = "save.json";
 
     private Dictionary<string, int> _entityStates = new Dictionary<string, int>();
+    private int _currentMapId = -1;
     private string SavePath => Path.Combine(Application.persistentDataPath, SaveFileName);
 
     public IReadOnlyDictionary<string, int> EntityStates => _entityStates;
+
+    public int CurrentMapId
+    {
+        get => _currentMapId;
+        set => _currentMapId = value;
+    }
 
     public int GetEntityState(string entityId)
     {
@@ -38,7 +45,8 @@ public class SaveManager
             equip = EquipManager.Instance.BuildSaveData(),
             quest = QuestManager.Instance.BuildSaveData(),
             finishedDialogs = new List<int>(DialogManager.FinishedDialogs),
-            metConditions = ConditionSystem.Instance.BuildMetConditionIds()
+            metConditions = ConditionSystem.Instance.BuildMetConditionIds(),
+            currentMapId = (int)_currentMapId
         };
 
         foreach (var kvp in _entityStates)
@@ -81,6 +89,9 @@ public class SaveManager
         DialogManager.RestoreFinishedDialogs(wrapper?.finishedDialogs);
         ConditionSystem.Instance.RestoreMetConditions(wrapper?.metConditions);
 
+        if (wrapper != null && wrapper.currentMapId >= 0)
+            _currentMapId = wrapper.currentMapId;
+
         Debug.Log($"[SaveManager] 存档已加载: {_entityStates.Count} 条记录");
     }
 
@@ -104,6 +115,7 @@ public class SaveManager
         public QuestSaveData quest;
         public List<int> finishedDialogs;
         public List<int> metConditions;
+        public int currentMapId;
     }
 
     [System.Serializable]
