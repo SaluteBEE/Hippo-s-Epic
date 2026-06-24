@@ -188,10 +188,10 @@ MonoBehaviour:
     targetMap: 2
     conditionId: 0
   transitions:
-  - fromNode: 1
-    toNode: 4
+  - fromNode: 4
+    toNode: 1
     forwardClip: {fileID: 7400000, guid: b228bffc06bd26c4b92d57cd2dbc2d60, type: 2}
-    reverseClip: {fileID: 7400000, guid: b228bffc06bd26c4b92d57cd2dbc2d60, type: 2}
+    reverseClip: {fileID: 7400000, guid: 14bed599b77be3c4ca4f858e44e93ec5, type: 2}
 --- !u!1 &3373653342798877329
 GameObject:
   m_ObjectHideFlags: 0

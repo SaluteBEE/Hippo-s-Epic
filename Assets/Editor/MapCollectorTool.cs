@@ -217,6 +217,7 @@ public static class MapCollectorTool
         sb.AppendLine("    public static string GetMapName(this SceneMapId id) => MapNames[id];");
         sb.AppendLine("    public static string GetSceneName(this SceneMapId id) => SceneNames[id];");
         sb.AppendLine("    public static SceneMapId GetSceneMapIdByMapName(string mapName) => MapNameToId.TryGetValue(mapName, out var id) ? id : SceneMapId.StaffLounge;");
+        sb.AppendLine("    public static IEnumerable<string> GetAllMapNames() => MapNameToId.Keys;");
         sb.AppendLine("}");
 
         WriteFile(SceneMapIdOutputPath, sb.ToString());

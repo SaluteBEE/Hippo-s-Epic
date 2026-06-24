@@ -34,7 +34,7 @@ public class MapRoot : MonoBehaviour
         [Tooltip("正向动画（from→to）")]
         public AnimationClip forwardClip;
 
-        [Tooltip("反向动画（to→from）")]
+        [Tooltip("反向动画（to→from），由工具自动生成，无需手动配置")]
         public AnimationClip reverseClip;
     }
 

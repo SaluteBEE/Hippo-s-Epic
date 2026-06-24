@@ -26,7 +26,6 @@ public class MapPanel : UIWindow
     private SceneMapId _pendingTargetMap;
     private SceneMapId _pendingCurrentMap;
     private bool _waitingForAnim;
-
     public override UILayer Layer => UILayer.Popup;
 
     private void Update()
@@ -34,7 +33,7 @@ public class MapPanel : UIWindow
         if (!_waitingForAnim || headAnimator == null) return;
 
         var stateInfo = headAnimator.GetCurrentAnimatorStateInfo(0);
-        if (!stateInfo.IsName(_pendingAnimState) || stateInfo.normalizedTime >= 1f)
+        if (stateInfo.IsName(_pendingAnimState) && stateInfo.normalizedTime >= 1f)
         {
             headAnimator.enabled = false;
             _waitingForAnim = false;
@@ -184,13 +183,11 @@ public class MapPanel : UIWindow
             headAnimator.enabled = true;
             headAnimator.Rebind();
             headAnimator.updateMode = AnimatorUpdateMode.UnscaledTime;
-            Debug.Log($"[MapPanel] playing animation: {clip.name}");
             headAnimator.Play(clip.name, 0, 0f);
             _pendingAnimState = clip.name;
             _pendingTargetMap = targetMap;
             _pendingCurrentMap = currentMap;
             _waitingForAnim = true;
-            Debug.Log($"[MapPanel] waiting for anim in Update");
         }
         else
         {
@@ -247,6 +244,7 @@ public class MapPanel : UIWindow
     private void ClearMapRoot()
     {
         _isTransitioning = false;
+        _waitingForAnim = false;
 
         if (_currentMapRootInstance != null)
         {
