@@ -60,8 +60,8 @@ public class AnimationConfig : ScriptableObject
     public class AnimationComposition
     {
         [Tooltip("组合名称")]
-        public string name;
-        
+        public CompositionName name;
+
         [Tooltip("组合描述")]
         [TextArea(1, 3)]
         public string description;
@@ -115,7 +115,7 @@ public class AnimationConfig : ScriptableObject
     
     [Header("默认设置")]
     [Tooltip("默认动画组合")]
-    public string defaultComposition = "Idle";
+    public CompositionName defaultComposition = CompositionName.Idle;
     
     [Tooltip("默认过渡时间")]
     [Min(0f)]
@@ -132,7 +132,7 @@ public class AnimationConfig : ScriptableObject
         return layers.Find(l => l.name == layerName);
     }
     
-    public AnimationComposition GetComposition(string compositionName)
+    public AnimationComposition GetComposition(CompositionName compositionName)
     {
         return compositions.Find(c => c.name == compositionName);
     }
@@ -147,7 +147,7 @@ public class AnimationConfig : ScriptableObject
         return GetLayer(layerName) != null;
     }
     
-    public bool HasComposition(string compositionName)
+    public bool HasComposition(CompositionName compositionName)
     {
         return GetComposition(compositionName) != null;
     }

@@ -1,0 +1,19 @@
+public enum CompositionName
+{
+    Idle,
+    Idle1,
+    Idle2,
+    Idle3,
+    Attack,
+    Skill,
+    Walk,
+    Hurt,
+    Die,
+    Dead,
+    Talk,
+    Angry,
+    Think1,
+    Think2,
+    Think3,
+    Throw,
+}

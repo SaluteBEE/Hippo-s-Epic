@@ -123,8 +123,7 @@ public class AnimationController : MonoBehaviour
             InitializeLayers();
             
             // 播放默认组合
-            if (!string.IsNullOrEmpty(config.defaultComposition) && 
-                config.HasComposition(config.defaultComposition))
+            if (config.HasComposition(config.defaultComposition))
             {
                 PlayComposition(config.defaultComposition);
             }
@@ -235,7 +234,7 @@ public class AnimationController : MonoBehaviour
         }
     }
     
-    public void PlayComposition(string compositionName)
+    public void PlayComposition(CompositionName compositionName)
     {
         if (!isInitialized)
         {
@@ -288,6 +287,17 @@ public class AnimationController : MonoBehaviour
         {
             Debug.LogWarning($"Animation composition not found: {compositionName}");
         }
+    }
+
+    public void PlayComposition(string compositionName)
+    {
+        if (System.Enum.TryParse<CompositionName>(compositionName, true, out var enumName))
+        {
+            PlayComposition(enumName);
+            return;
+        }
+
+        Debug.LogWarning($"Animation composition name cannot parse to enum: {compositionName}");
     }
     
     private System.Collections.IEnumerator DelayedSetWeight(string layerName, float weight, float delay)
@@ -425,9 +435,9 @@ public class AnimationController : MonoBehaviour
         return new List<string>(layers.Keys);
     }
     
-    public List<string> GetCompositionNames()
+    public List<CompositionName> GetCompositionNames()
     {
-        var names = new List<string>();
+        var names = new List<CompositionName>();
         if (config == null || config.compositions == null)
         {
             if (debugLog) Debug.LogWarning("GetCompositionNames: config or compositions is null");
@@ -436,7 +446,7 @@ public class AnimationController : MonoBehaviour
         
         foreach (var composition in config.compositions)
         {
-            if (composition != null && !string.IsNullOrEmpty(composition.name))
+            if (composition != null)
             {
                 names.Add(composition.name);
             }

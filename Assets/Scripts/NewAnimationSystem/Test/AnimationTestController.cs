@@ -18,7 +18,7 @@ public class AnimationTestController : MonoBehaviour
     [Header("组合动画测试")]
     [SerializeField] private string[] testCompositions = { "Idle", "Walk", "Run" };
     [SerializeField] private int currentCompositionIndex = 0;
-    private List<string> availableCompositions = new List<string>();
+    private List<CompositionName> availableCompositions = new List<CompositionName>();
     
     [Header("调试选项")]
     [SerializeField] private string configAssetPath = "Assets/Configs/Animations/玩家占位符_AnimationConfig.asset";
@@ -76,17 +76,16 @@ public class AnimationTestController : MonoBehaviour
         // 播放初始组合
         if (!string.IsNullOrEmpty(testComposition) && animationController.IsInitialized)
         {
-            if (availableCompositions.Contains(testComposition))
+            if (System.Enum.TryParse<CompositionName>(testComposition, true, out var enumName) && availableCompositions.Contains(enumName))
             {
-                animationController.PlayComposition(testComposition);
+                animationController.PlayComposition(enumName);
                 Debug.Log($"播放初始组合: {testComposition}");
-                currentCompositionIndex = availableCompositions.IndexOf(testComposition);
+                currentCompositionIndex = availableCompositions.IndexOf(enumName);
             }
             else if (availableCompositions.Count > 0)
             {
-                // 回退到第一个可用组合
-                testComposition = availableCompositions[0];
-                animationController.PlayComposition(testComposition);
+                testComposition = availableCompositions[0].ToString();
+                animationController.PlayComposition(availableCompositions[0]);
                 Debug.Log($"播放第一个可用组合: {testComposition}");
                 currentCompositionIndex = 0;
             }
@@ -176,13 +175,12 @@ public class AnimationTestController : MonoBehaviour
     
     private void PlayTestComposition(int index)
     {
-        // 优先使用动态获取的可用组合列表
-        List<string> compositionList = availableCompositions.Count > 0 ? availableCompositions : 
-                                      new List<string>(testCompositions);
-        
+        List<CompositionName> compositionList = availableCompositions.Count > 0 ? availableCompositions : 
+                                               new List<CompositionName>();
+
         if (index >= 0 && index < compositionList.Count)
         {
-            string compositionName = compositionList[index];
+            CompositionName compositionName = compositionList[index];
             
             if (animationController.IsInitialized)
             {
@@ -190,10 +188,9 @@ public class AnimationTestController : MonoBehaviour
                 Debug.Log($"播放组合动画: {compositionName}");
                 currentCompositionIndex = index;
                 
-                // 更新当前组合名称（如果与testCompositions不同）
                 if (testCompositions != null && index < testCompositions.Length)
                 {
-                    testComposition = testCompositions[index];
+                    testComposition = compositionName.ToString();
                 }
             }
             else
@@ -255,11 +252,12 @@ public class AnimationTestController : MonoBehaviour
             availableCompositions.AddRange(compositionNames);
             Debug.Log($"找到 {availableCompositions.Count} 个可用组合: {string.Join(", ", availableCompositions)}");
             
-            // 如果 testCompositions 数组为空或与可用组合不匹配，更新它
             if (testCompositions == null || testCompositions.Length == 0 || 
                 !ArraysMatch(testCompositions, availableCompositions))
             {
-                testCompositions = availableCompositions.ToArray();
+                testCompositions = new string[availableCompositions.Count];
+                for (int i = 0; i < availableCompositions.Count; i++)
+                    testCompositions[i] = availableCompositions[i].ToString();
                 Debug.Log("已更新测试组合列表以匹配可用组合");
             }
         }
@@ -269,14 +267,14 @@ public class AnimationTestController : MonoBehaviour
         }
     }
     
-    private bool ArraysMatch(string[] array1, List<string> list2)
+    private bool ArraysMatch(string[] array1, List<CompositionName> list2)
     {
         if (array1 == null || list2 == null) return false;
         if (array1.Length != list2.Count) return false;
         
         for (int i = 0; i < array1.Length; i++)
         {
-            if (array1[i] != list2[i]) return false;
+            if (array1[i] != list2[i].ToString()) return false;
         }
         return true;
     }
@@ -398,7 +396,7 @@ public class AnimationTestController : MonoBehaviour
         string currentCompName = "无";
         if (availableCompositions.Count > 0 && currentCompositionIndex < availableCompositions.Count)
         {
-            currentCompName = availableCompositions[currentCompositionIndex];
+            currentCompName = availableCompositions[currentCompositionIndex].ToString();
         }
         else if (testCompositions.Length > 0 && currentCompositionIndex < testCompositions.Length)
         {
@@ -430,7 +428,7 @@ public class AnimationTestController : MonoBehaviour
         GUILayout.Label($"可用组合 ({availableCompositions.Count}个):");
         for (int i = 0; i < availableCompositions.Count; i++)
         {
-            string compName = availableCompositions[i];
+            string compName = availableCompositions[i].ToString();
             string indicator = (i == currentCompositionIndex) ? "▶ " : "  ";
             GUILayout.Label($"{indicator}{i+1}. {compName}");
         }

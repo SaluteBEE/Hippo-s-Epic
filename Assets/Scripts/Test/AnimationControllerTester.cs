@@ -233,9 +233,9 @@ public class AnimationControllerTester : MonoBehaviour
             var compositions = currentController.GetCompositionNames();
             foreach (var composition in compositions)
             {
-                if (!string.IsNullOrEmpty(composition) && !cachedCompositionNames.Contains(composition))
+                if (!string.IsNullOrEmpty(composition.ToString()) && !cachedCompositionNames.Contains(composition.ToString()))
                 {
-                    cachedCompositionNames.Add(composition);
+                    cachedCompositionNames.Add(composition.ToString());
                 }
             }
         }

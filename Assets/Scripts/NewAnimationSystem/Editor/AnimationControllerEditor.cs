@@ -188,9 +188,9 @@ public class AnimationControllerEditor : Editor
         AddDefaultLayers(config);
         
         // 确保有默认组合
-        if (string.IsNullOrEmpty(config.defaultComposition))
+        if (string.IsNullOrEmpty(config.defaultComposition.ToString()))
         {
-            config.defaultComposition = "Idle";
+            config.defaultComposition = CompositionName.Idle;
         }
         
         // 保存修改

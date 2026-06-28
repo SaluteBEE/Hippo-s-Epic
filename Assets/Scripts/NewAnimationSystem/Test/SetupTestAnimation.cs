@@ -58,11 +58,11 @@ public class SetupTestAnimation : MonoBehaviour
         AddAnimationLayer(config, "LowerBody", 2, 1.0f);
         
         // 添加动画组合
-        AddAnimationComposition(config, "Idle", "空闲状态",
+        AddAnimationComposition(config, CompositionName.Idle, "空闲状态",
             new string[] { "Base", "UpperBody", "LowerBody" },
             new string[] { "body_idle", "body_idle", "leg_idle" });
             
-        AddAnimationComposition(config, "Walk", "行走状态",
+        AddAnimationComposition(config, CompositionName.Walk, "行走状态",
             new string[] { "Base", "UpperBody", "LowerBody" },
             new string[] { "body_walk", "body_walk", "leg_walk" });
         
@@ -102,7 +102,7 @@ public class SetupTestAnimation : MonoBehaviour
         config.layers.Add(layer);
     }
     
-    private void AddAnimationComposition(AnimationConfig config, string name, string description, 
+    private void AddAnimationComposition(AnimationConfig config, CompositionName name, string description, 
                                         string[] layerNames, string[] clipNames)
     {
         var composition = new AnimationConfig.AnimationComposition();
@@ -128,7 +128,7 @@ public class SetupTestAnimation : MonoBehaviour
         var animController = GetComponent<AnimationController>();
         if (animController != null && animController.IsInitialized)
         {
-            animController.PlayComposition("Idle");
+            animController.PlayComposition(CompositionName.Idle);
             Debug.Log("播放空闲动画组合");
         }
     }
@@ -139,7 +139,7 @@ public class SetupTestAnimation : MonoBehaviour
         var animController = GetComponent<AnimationController>();
         if (animController != null && animController.IsInitialized)
         {
-            animController.PlayComposition("Walk");
+            animController.PlayComposition(CompositionName.Walk);
             Debug.Log("播放行走动画组合");
         }
     }

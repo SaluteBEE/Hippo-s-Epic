@@ -152,7 +152,9 @@ public static class ReverseAnimationGenerator
             float newInSlope = -key.outTangent;
             float newOutSlope = -key.inTangent;
             var newKey = new Keyframe(newTime, key.value, newInSlope, newOutSlope);
+#pragma warning disable CS0618
             newKey.tangentMode = key.tangentMode;
+#pragma warning restore CS0618
             newKey.weightedMode = key.weightedMode;
             newKey.inWeight = key.outWeight;
             newKey.outWeight = key.inWeight;

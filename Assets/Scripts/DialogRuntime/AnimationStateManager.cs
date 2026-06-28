@@ -164,6 +164,19 @@ public class AnimationStateManager : MonoBehaviour
         }
     }
 
+    public void ApplyState(int personId, CompositionName compositionName)
+    {
+        var keys = new List<(int, int)>(_animControllers.Keys);
+        foreach (var key in keys)
+        {
+            if (key.Item1 == personId)
+            {
+                if (_animControllers.TryGetValue(key, out var ctrl) && ctrl.IsInitialized)
+                    ctrl.PlayComposition(compositionName);
+            }
+        }
+    }
+
     public void ApplyState(int personId, int prefabType, string stateName)
     {
         if (string.IsNullOrEmpty(stateName)) return;

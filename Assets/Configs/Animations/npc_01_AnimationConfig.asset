@@ -55,7 +55,7 @@ MonoBehaviour:
     slotNames: []
     availableClipNames: []
   compositions:
-  - name: idle1
+  - name: 1
     description: "\u63CF\u8FF0"
     layers:
     - layerName: UpperBody
@@ -63,7 +63,7 @@ MonoBehaviour:
       weight: 1
       transitionTime: 0.1
       delay: 0
-  - name: idle2
+  - name: 2
     description: "\u63CF\u8FF0"
     layers:
     - layerName: UpperBody
@@ -71,7 +71,7 @@ MonoBehaviour:
       weight: 1
       transitionTime: 0.1
       delay: 0
-  - name: idle3
+  - name: 3
     description: "\u63CF\u8FF0"
     layers:
     - layerName: UpperBody
@@ -79,5 +79,5 @@ MonoBehaviour:
       weight: 1
       transitionTime: 0.1
       delay: 0
-  defaultComposition: Idle
+  defaultComposition: 0
   defaultTransitionTime: 0.1

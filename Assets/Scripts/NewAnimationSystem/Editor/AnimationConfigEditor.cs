@@ -132,7 +132,12 @@ public class AnimationConfigEditor : Editor
         EditorGUILayout.EndHorizontal();
         
         EditorGUILayout.Space();
-        EditorGUILayout.LabelField("Luban 数据导出", EditorStyles.boldLabel);
+        EditorGUILayout.LabelField("枚举管理", EditorStyles.boldLabel);
+        
+        if (GUILayout.Button("新增组合动画枚举名", GUILayout.Height(25)))
+        {
+            AddCompositionEnumEntry();
+        }
 
         if (!_matchChecked)
         {
@@ -238,7 +243,7 @@ public class AnimationConfigEditor : Editor
         
         EditorGUILayout.EndHorizontal();
         
-        EditorGUILayout.HelpBox($"骨骼数据: {skeletonInfo}\n默认组合: {defaultCompositionProp.stringValue}", MessageType.Info);
+        EditorGUILayout.HelpBox($"骨骼数据: {skeletonInfo}\n默认组合: {defaultCompositionProp.enumValueIndex}", MessageType.Info);
         EditorGUILayout.Space();
         
         // 测试按钮（开发用）
@@ -727,7 +732,7 @@ public class AnimationConfigEditor : Editor
         // 删除按钮
         if (GUILayout.Button("删除", GUILayout.Width(60)))
         {
-            if (EditorUtility.DisplayDialog("删除动画组合", $"确定要删除动画组合 '{nameProp.stringValue}' 吗？", "删除", "取消"))
+            if (EditorUtility.DisplayDialog("删除动画组合", $"确定要删除动画组合 '{((CompositionName)nameProp.enumValueIndex).ToString()}' 吗？", "删除", "取消"))
             {
                 compositionsProp.DeleteArrayElementAtIndex(index);
                 EditorGUILayout.EndHorizontal();
@@ -932,7 +937,7 @@ public class AnimationConfigEditor : Editor
         compositionsProp.arraySize++;
         var newCompProp = compositionsProp.GetArrayElementAtIndex(compositionsProp.arraySize - 1);
         
-        newCompProp.FindPropertyRelative("name").stringValue = "新组合";
+        newCompProp.FindPropertyRelative("name").enumValueIndex = 0;
         newCompProp.FindPropertyRelative("description").stringValue = "描述";
         newCompProp.FindPropertyRelative("layers").ClearArray();
     }
@@ -971,7 +976,7 @@ public class AnimationConfigEditor : Editor
         compositionsProp.ClearArray();
         
         // 重置默认组合
-        defaultCompositionProp.stringValue = "Idle";
+        defaultCompositionProp.enumValueIndex = 0;
         
         // 清空所有层的 availableClipNames
         for (int i = 0; i < layersProp.arraySize; i++)
@@ -1168,7 +1173,7 @@ public class AnimationConfigEditor : Editor
         {
             var comp = config.compositions[i];
             if (i > 0) sb.Append(",");
-            sb.Append($"{{\"personid\":{personId},\"statename\":\"{comp.name}\",\"prefabtype\":{prefabType}}}");
+            sb.Append($"{{\"personid\":{personId},\"statename\":\"{comp.name.ToString().ToLower()}\",\"prefabtype\":{prefabType}}}");
         }
         sb.Append("]");
 
@@ -1433,5 +1438,36 @@ public class AnimationConfigEditor : Editor
 
             return proc.ExitCode;
         }
+    }
+
+    private void AddCompositionEnumEntry()
+    {
+        CompositionNameAdderWindow.ShowWindow();
+    }
+
+    private static string FindCompositionNameFile()
+    {
+        string[] guids = AssetDatabase.FindAssets("CompositionName t:MonoScript", new[] { "Assets" });
+        if (guids.Length == 0) return "";
+        return AssetDatabase.GUIDToAssetPath(guids[0]);
+    }
+
+    private static string ToPascalCase(string raw)
+    {
+        var sb = new System.Text.StringBuilder();
+        bool nextUpper = true;
+        foreach (char c in raw)
+        {
+            if (char.IsLetterOrDigit(c))
+            {
+                sb.Append(nextUpper ? char.ToUpper(c) : c);
+                nextUpper = false;
+            }
+            else
+            {
+                nextUpper = true;
+            }
+        }
+        return sb.ToString();
     }
 }
