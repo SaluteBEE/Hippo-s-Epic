@@ -1,3 +1,4 @@
+﻿// 本文件由 Tools/Map/收集所有场景数据 自动生成，请勿手动修改
 
 public enum MapNodeId
 {
@@ -7,4 +8,6 @@ public enum MapNodeId
     SewerSurface = 3,
     OuterCityGround = 4,
     Temple = 5,
+    OutHospital = 6,
+    PunkCityGround = 7,
 }

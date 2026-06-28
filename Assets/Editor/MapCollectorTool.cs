@@ -11,6 +11,7 @@ public static class MapCollectorTool
 {
     private const string SceneMapIdOutputPath = "Assets/Scripts/Level2D/Map/SceneMapId.cs";
     private const string TeleportTargetOutputPath = "Assets/Scripts/Level2D/Interactable/TeleportTargetDef.cs";
+    private const string MapNodeIdOutputPath = "Assets/Scripts/UI/map/MapNodeId.cs";
 
     [MenuItem("Tools/Map/收集所有场景数据")]
     public static void CollectAll()
@@ -70,6 +71,7 @@ public static class MapCollectorTool
         EditorUtility.ClearProgressBar();
 
         GenerateSceneMapIdFile(mapEntries);
+        GenerateMapNodeIdFile(mapEntries);
         GenerateTeleportTargetFile(teleportEntries);
 
         Debug.Log($"[MapCollector] 完成，共 {mapEntries.Count} 个 Map，{totalInteractables} 个 Interactable，{teleportEntries.Count} 个场景有传送数据");
@@ -222,6 +224,98 @@ public static class MapCollectorTool
 
         WriteFile(SceneMapIdOutputPath, sb.ToString());
         Debug.Log($"[MapCollector] 已生成 {SceneMapIdOutputPath}，共 {entries.Count} 个 Map 枚举项");
+    }
+
+    #endregion
+
+    #region MapNodeId 自动生成
+
+    private static void GenerateMapNodeIdFile(List<MapEntry> entries)
+    {
+        var usedNames = new HashSet<string>();
+        var allEnumNames = new List<string>();
+
+        foreach (var entry in entries)
+        {
+            if (string.IsNullOrWhiteSpace(entry.MapName)) continue;
+
+            string baseName = ToEnumName(entry.MapName);
+            string enumName = baseName;
+            int suffix = 2;
+
+            while (usedNames.Contains(enumName))
+            {
+                enumName = baseName + "_" + ToEnumName(entry.SceneName) + (suffix > 2 ? suffix.ToString() : "");
+                suffix++;
+            }
+
+            usedNames.Add(enumName);
+            allEnumNames.Add(enumName);
+        }
+
+        var existingMap = ParseExistingMapNodeId();
+        int maxValue = 0;
+        foreach (var v in existingMap.Values)
+            if (v > maxValue) maxValue = v;
+
+        var finalEntries = new List<(string name, int value)>();
+
+        foreach (var kvp in existingMap)
+            finalEntries.Add((kvp.Key, kvp.Value));
+
+        foreach (var name in allEnumNames)
+        {
+            if (existingMap.ContainsKey(name)) continue;
+
+            maxValue++;
+            finalEntries.Add((name, maxValue));
+        }
+
+        var sb = new StringBuilder();
+        sb.AppendLine("// 本文件由 Tools/Map/收集所有场景数据 自动生成，请勿手动修改");
+        sb.AppendLine();
+        sb.AppendLine("public enum MapNodeId");
+        sb.AppendLine("{");
+        sb.AppendLine("    None = 0,");
+
+        foreach (var entry in finalEntries)
+            sb.AppendLine($"    {entry.name} = {entry.value},");
+
+        sb.AppendLine("}");
+
+        WriteFile(MapNodeIdOutputPath, sb.ToString());
+        Debug.Log($"[MapCollector] 已生成 {MapNodeIdOutputPath}，共 {finalEntries.Count} 个节点枚举项");
+    }
+
+    private static Dictionary<string, int> ParseExistingMapNodeId()
+    {
+        var result = new Dictionary<string, int>();
+
+        if (!File.Exists(MapNodeIdOutputPath))
+            return result;
+
+        string[] lines = File.ReadAllLines(MapNodeIdOutputPath);
+        foreach (var line in lines)
+        {
+            var trimmed = line.Trim();
+            if (trimmed.StartsWith("//") || string.IsNullOrEmpty(trimmed))
+                continue;
+
+            if (trimmed.StartsWith("None"))
+                continue;
+
+            int eqIdx = trimmed.IndexOf('=');
+            int commaIdx = trimmed.IndexOf(',');
+            if (eqIdx < 0 || commaIdx < 0) continue;
+
+            string name = trimmed.Substring(0, eqIdx).Trim();
+            string valueStr = trimmed.Substring(eqIdx + 1, commaIdx - eqIdx - 1).Trim();
+
+            if (int.TryParse(valueStr, out int value))
+                result[name] = value;
+        }
+
+        return result;
     }
 
     #endregion

@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 public enum SceneMapId
 {
+    // --- Scene_Doomed_Hospital ---
+    OutHospital, // Out_hospital
+
     // --- Scene_Outer_City ---
     OuterCityGround, // Outer_City_Ground
 
@@ -24,6 +27,7 @@ public static class SceneMapIdExtensions
 {
     private static readonly Dictionary<SceneMapId, string> MapNames = new Dictionary<SceneMapId, string>
     {
+        { SceneMapId.OutHospital, "Out_hospital" },
         { SceneMapId.OuterCityGround, "Outer_City_Ground" },
         { SceneMapId.PunkCityGround, "Punk_City_Ground" },
         { SceneMapId.SewerSurface, "Sewer_Surface" },
@@ -34,6 +38,7 @@ public static class SceneMapIdExtensions
 
     private static readonly Dictionary<SceneMapId, string> SceneNames = new Dictionary<SceneMapId, string>
     {
+        { SceneMapId.OutHospital, "Scene_Doomed_Hospital" },
         { SceneMapId.OuterCityGround, "Scene_Outer_City" },
         { SceneMapId.PunkCityGround, "Scene_Punk_City" },
         { SceneMapId.SewerSurface, "Scene_Sewer" },
@@ -44,6 +49,7 @@ public static class SceneMapIdExtensions
 
     private static readonly Dictionary<string, SceneMapId> MapNameToId = new Dictionary<string, SceneMapId>
     {
+        { "Out_hospital", SceneMapId.OutHospital },
         { "Outer_City_Ground", SceneMapId.OuterCityGround },
         { "Punk_City_Ground", SceneMapId.PunkCityGround },
         { "Sewer_Surface", SceneMapId.SewerSurface },
