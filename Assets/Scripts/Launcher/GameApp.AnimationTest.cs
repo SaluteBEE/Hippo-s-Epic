@@ -143,8 +143,9 @@ public partial class GameApp
         var compositions = _animCurrentCtrl.GetCompositionNames();
         foreach (var comp in compositions)
         {
-            if (!string.IsNullOrEmpty(comp) && !_animCachedCompNames.Contains(comp))
-                _animCachedCompNames.Add(comp);
+            var compStr = comp.ToString();
+            if (!string.IsNullOrEmpty(compStr) && !_animCachedCompNames.Contains(compStr))
+                _animCachedCompNames.Add(compStr);
         }
     }
 

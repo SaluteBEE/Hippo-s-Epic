@@ -55,6 +55,26 @@ public class Interactable : MonoBehaviour
         }
 
         gameObject.SetActive(true);
+
+        ApplyChildNodes(_currentPhase);
+    }
+
+    private void ApplyChildNodes(InteractionPhase phase)
+    {
+        var styleRoot = transform.Find("Style");
+        if (styleRoot == null) return;
+        if (phase.activeChildNames == null || phase.activeChildNames.Count == 0) return;
+
+        var activeSet = new HashSet<string>(phase.activeChildNames);
+
+        for (int i = 0; i < styleRoot.childCount; i++)
+        {
+            Transform child = styleRoot.GetChild(i);
+            bool shouldBeActive = activeSet.Contains(child.name);
+
+            if (child.gameObject.activeSelf != shouldBeActive)
+                child.gameObject.SetActive(shouldBeActive);
+        }
     }
 
     public void InitializeHint()

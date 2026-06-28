@@ -76,7 +76,7 @@ MonoBehaviour:
     slotNames: []
     availableClipNames: []
   compositions:
-  - name: talk
+  - name: 10
     description: "\u6CB3\u9A6C\u8BF4\u8BDD\u52A8\u753B"
     layers:
     - layerName: Base
@@ -89,7 +89,7 @@ MonoBehaviour:
       weight: 1
       transitionTime: 0.1
       delay: 0
-  - name: think1
+  - name: 12
     description: "\u6CB3\u9A6C\u601D\u8003\u52A8\u753B\uFF0C\u770B\u5411\u4E0A\u8FB9"
     layers:
     - layerName: Base
@@ -102,7 +102,7 @@ MonoBehaviour:
       weight: 1
       transitionTime: 0.1
       delay: 0
-  - name: idle
+  - name: 0
     description: "\u6CB3\u9A6C\u5F85\u673A\u52A8\u753B"
     layers:
     - layerName: Base
@@ -115,7 +115,7 @@ MonoBehaviour:
       weight: 1
       transitionTime: 0.1
       delay: 0
-  - name: think2
+  - name: 13
     description: "\u6CB3\u9A6C\u601D\u8003\u52A8\u753B\uFF0C\u770B\u5411\u4E2D\u95F4"
     layers:
     - layerName: Base
@@ -128,7 +128,7 @@ MonoBehaviour:
       weight: 1
       transitionTime: 0.1
       delay: 0
-  - name: think3
+  - name: 14
     description: "\u6CB3\u9A6C\u601D\u8003\u52A8\u753B\uFF0C\u770B\u5411\u4E0B\u8FB9"
     layers:
     - layerName: Base
@@ -141,5 +141,5 @@ MonoBehaviour:
       weight: 1
       transitionTime: 0.1
       delay: 0
-  defaultComposition: Idle
+  defaultComposition: 0
   defaultTransitionTime: 0.1

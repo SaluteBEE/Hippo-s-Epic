@@ -21,6 +21,10 @@ public class InteractionPhase
     [Tooltip("实时监测条件列表，条件满足时自动切换到目标状态\n无需玩家交互，每帧检测")]
     public List<ConditionTrigger> conditionTriggers = new List<ConditionTrigger>();
 
+    [Header("子节点样式")]
+    [Tooltip("此状态下激活的 Style 子节点名称列表\nStyle 下的子节点代表不同样式，未在列表中的 Style 子节点将被停用")]
+    public List<string> activeChildNames = new List<string>();
+
     [Header("行为")]
     [Tooltip("是否可重复交互。false 时首次交互后不再响应")]
     public bool canRepeat = true;

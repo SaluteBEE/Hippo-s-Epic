@@ -90,7 +90,7 @@ MonoBehaviour:
     - leg-idle
     - leg-walk
   compositions:
-  - name: idle
+  - name: 0
     description: "\u63CF\u8FF0"
     layers:
     - layerName: Base
@@ -108,7 +108,7 @@ MonoBehaviour:
       weight: 1
       transitionTime: 0.1
       delay: 0
-  - name: walk
+  - name: 6
     description: "\u63CF\u8FF0"
     layers:
     - layerName: Base
@@ -126,5 +126,5 @@ MonoBehaviour:
       weight: 1
       transitionTime: 0.1
       delay: 0
-  defaultComposition: Idle
+  defaultComposition: 0
   defaultTransitionTime: 0.1

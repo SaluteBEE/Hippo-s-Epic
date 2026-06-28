@@ -30,7 +30,7 @@ public class PlayerIdleState : IPlayerState
     public void Enter()
     {
         if (_animationController != null)
-            _animationController.PlayComposition("idle");
+            _animationController.PlayComposition(CompositionName.Idle);
     }
 
     public void Exit()
@@ -62,7 +62,7 @@ public class PlayerWalkState : IPlayerState
     public void Enter()
     {
         if (_animationController != null)
-            _animationController.PlayComposition("walk");
+            _animationController.PlayComposition(CompositionName.Walk);
     }
 
     public void Exit()

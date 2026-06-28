@@ -56,7 +56,9 @@ public class BagPanel : UIWindow
 
     private GameObject _dragIcon;
     private BagItem _dragBagItem;
+#pragma warning disable CS0414
     private bool _isDragging;
+#pragma warning restore CS0414
 
     public override void OnCreate(object args)
     {
