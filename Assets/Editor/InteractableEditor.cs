@@ -98,6 +98,14 @@ public class InteractableEditor : Editor
             return;
         }
 
+        var childSet = new HashSet<string>(childNames);
+
+        for (int i = activeChildNamesProp.arraySize - 1; i >= 0; i--)
+        {
+            if (!childSet.Contains(activeChildNamesProp.GetArrayElementAtIndex(i).stringValue))
+                activeChildNamesProp.DeleteArrayElementAtIndex(i);
+        }
+
         var selected = new HashSet<string>();
         for (int i = 0; i < activeChildNamesProp.arraySize; i++)
             selected.Add(activeChildNamesProp.GetArrayElementAtIndex(i).stringValue);
