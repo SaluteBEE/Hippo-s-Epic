@@ -5,27 +5,21 @@ using UnityEngine;
 [Serializable]
 public class InteractionPhase
 {
-    [Header("状态")]
     [Tooltip("状态值，与 SaveManager 存档中的 EntityState 对应\nInteractableManager 初始化时根据存档选择对应阶段")]
     public int state;
 
-    [Header("提示")]
     [Tooltip("玩家进入范围时显示的提示文字，如 \"按 E 交谈\"")]
     public string hintText = UIStrings.Interaction.DefaultHint;
 
-    [Header("按钮选项")]
     [Tooltip("可选按钮列表，每个按钮可触发不同的交互操作\n玩家可通过键盘按键或点击UI按钮触发")]
     public List<ButtonOption> buttons = new List<ButtonOption>();
 
-    [Header("条件触发器")]
     [Tooltip("实时监测条件列表，条件满足时自动切换到目标状态\n无需玩家交互，每帧检测")]
     public List<ConditionTrigger> conditionTriggers = new List<ConditionTrigger>();
 
-    [Header("子节点样式")]
     [Tooltip("此状态下激活的 Style 子节点名称列表\nStyle 下的子节点代表不同样式，未在列表中的 Style 子节点将被停用")]
     public List<string> activeChildNames = new List<string>();
 
-    [Header("动画插槽")]
     [Tooltip("此状态下是否播放动画")]
     public bool playAnimation;
     [Tooltip("此状态下播放动画的 AnimationController 组件\n留空则不播放动画")]
@@ -33,7 +27,6 @@ public class InteractionPhase
     [Tooltip("此状态下播放的组合动画名称")]
     public CompositionName composition = CompositionName.Idle;
 
-    [Header("行为")]
     [Tooltip("是否可重复交互。false 时首次交互后不再响应")]
     public bool canRepeat = true;
     [Tooltip("交互后隐藏提示UI")]
