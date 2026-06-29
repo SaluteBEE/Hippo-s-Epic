@@ -3971,7 +3971,6 @@ MonoBehaviour:
   - {fileID: 1798091458}
   - {fileID: 880836500}
   - {fileID: 352465160}
-  - {fileID: 0}
   - {fileID: 2002129720}
   VisualRoot: {fileID: 8832733064989031346}
 --- !u!4 &81510701032051241

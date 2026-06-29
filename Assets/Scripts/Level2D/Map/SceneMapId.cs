@@ -4,6 +4,8 @@ using System.Collections.Generic;
 public enum SceneMapId
 {
     // --- Scene_Doomed_Hospital ---
+    BodyHouse, // Body_house
+    InnerHospital, // Inner_hospital
     OutHospital, // Out_hospital
 
     // --- Scene_Outer_City ---
@@ -27,6 +29,8 @@ public static class SceneMapIdExtensions
 {
     private static readonly Dictionary<SceneMapId, string> MapNames = new Dictionary<SceneMapId, string>
     {
+        { SceneMapId.BodyHouse, "Body_house" },
+        { SceneMapId.InnerHospital, "Inner_hospital" },
         { SceneMapId.OutHospital, "Out_hospital" },
         { SceneMapId.OuterCityGround, "Outer_City_Ground" },
         { SceneMapId.PunkCityGround, "Punk_City_Ground" },
@@ -38,6 +42,8 @@ public static class SceneMapIdExtensions
 
     private static readonly Dictionary<SceneMapId, string> SceneNames = new Dictionary<SceneMapId, string>
     {
+        { SceneMapId.BodyHouse, "Scene_Doomed_Hospital" },
+        { SceneMapId.InnerHospital, "Scene_Doomed_Hospital" },
         { SceneMapId.OutHospital, "Scene_Doomed_Hospital" },
         { SceneMapId.OuterCityGround, "Scene_Outer_City" },
         { SceneMapId.PunkCityGround, "Scene_Punk_City" },
@@ -49,6 +55,8 @@ public static class SceneMapIdExtensions
 
     private static readonly Dictionary<string, SceneMapId> MapNameToId = new Dictionary<string, SceneMapId>
     {
+        { "Body_house", SceneMapId.BodyHouse },
+        { "Inner_hospital", SceneMapId.InnerHospital },
         { "Out_hospital", SceneMapId.OutHospital },
         { "Outer_City_Ground", SceneMapId.OuterCityGround },
         { "Punk_City_Ground", SceneMapId.PunkCityGround },

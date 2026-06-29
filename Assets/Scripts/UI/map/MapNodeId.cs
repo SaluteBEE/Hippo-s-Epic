@@ -10,4 +10,6 @@ public enum MapNodeId
     Temple = 5,
     OutHospital = 6,
     PunkCityGround = 7,
+    BodyHouse = 8,
+    InnerHospital = 9,
 }
