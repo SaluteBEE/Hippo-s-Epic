@@ -2166,19 +2166,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8323662252691034781, guid: 6d0c92056d579ca49bff51535d5f53c8, type: 3}
       propertyPath: m_Size.x
-      value: 37.634937
+      value: 25.135979
       objectReference: {fileID: 0}
     - target: {fileID: 8323662252691034781, guid: 6d0c92056d579ca49bff51535d5f53c8, type: 3}
       propertyPath: m_Size.y
-      value: 13.30229
+      value: 14.16658
       objectReference: {fileID: 0}
     - target: {fileID: 8323662252691034781, guid: 6d0c92056d579ca49bff51535d5f53c8, type: 3}
       propertyPath: m_Offset.x
-      value: -0.09624672
+      value: -0.029766083
       objectReference: {fileID: 0}
     - target: {fileID: 8323662252691034781, guid: 6d0c92056d579ca49bff51535d5f53c8, type: 3}
       propertyPath: m_Offset.y
-      value: -1.1531048
+      value: 0.47574997
       objectReference: {fileID: 0}
     - target: {fileID: 9017272189742533073, guid: 6d0c92056d579ca49bff51535d5f53c8, type: 3}
       propertyPath: m_Sprite
@@ -2288,11 +2288,17 @@ EdgeCollider2D:
   m_Offset: {x: 0, y: 0}
   m_EdgeRadius: 0
   m_Points:
-  - {x: 18.07585, y: -8.077763}
-  - {x: -18.058638, y: -7.8803954}
-  - {x: -17.892704, y: -2.8289704}
-  - {x: 18.142815, y: -2.5368547}
-  - {x: 18.036556, y: -8.012267}
+  - {x: 9.006552, y: -5.5892353}
+  - {x: 7.265465, y: -7.015978}
+  - {x: -6.041321, y: -6.9039273}
+  - {x: -7.459629, y: -6.03148}
+  - {x: -0.70277786, y: -5.4244194}
+  - {x: -0.30939484, y: -2.870559}
+  - {x: -2.906271, y: -2.0738316}
+  - {x: -8.174534, y: -3.6578085}
+  - {x: -9.431705, y: 0.10196185}
+  - {x: 8.741713, y: 0.06227398}
+  - {x: 9.077858, y: -5.5790405}
   m_AdjacentStartPoint: {x: 0, y: 0}
   m_AdjacentEndPoint: {x: 0, y: 0}
   m_UseAdjacentStartPoint: 0
