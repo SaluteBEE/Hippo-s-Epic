@@ -25,6 +25,14 @@ public class InteractionPhase
     [Tooltip("此状态下激活的 Style 子节点名称列表\nStyle 下的子节点代表不同样式，未在列表中的 Style 子节点将被停用")]
     public List<string> activeChildNames = new List<string>();
 
+    [Header("动画插槽")]
+    [Tooltip("此状态下是否播放动画")]
+    public bool playAnimation;
+    [Tooltip("此状态下播放动画的 AnimationController 组件\n留空则不播放动画")]
+    public AnimationController animationController;
+    [Tooltip("此状态下播放的组合动画名称")]
+    public CompositionName composition = CompositionName.Idle;
+
     [Header("行为")]
     [Tooltip("是否可重复交互。false 时首次交互后不再响应")]
     public bool canRepeat = true;

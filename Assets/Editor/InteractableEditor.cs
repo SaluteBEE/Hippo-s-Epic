@@ -37,6 +37,9 @@ public class InteractableEditor : Editor
         var buttonsProp = phase.FindPropertyRelative("buttons");
         var conditionTriggersProp = phase.FindPropertyRelative("conditionTriggers");
         var activeChildNamesProp = phase.FindPropertyRelative("activeChildNames");
+        var playAnimationProp = phase.FindPropertyRelative("playAnimation");
+        var animationControllerProp = phase.FindPropertyRelative("animationController");
+        var compositionProp = phase.FindPropertyRelative("composition");
         var canRepeatProp = phase.FindPropertyRelative("canRepeat");
         var hideAfterExecuteProp = phase.FindPropertyRelative("hideAfterExecute");
         var destroySelfProp = phase.FindPropertyRelative("destroySelf");
@@ -61,6 +64,17 @@ public class InteractableEditor : Editor
         EditorGUILayout.Space(4);
         EditorGUILayout.LabelField("子节点样式", EditorStyles.boldLabel);
         DrawActiveChildNames(activeChildNamesProp);
+
+        EditorGUILayout.Space(4);
+        EditorGUILayout.LabelField("动画插槽", EditorStyles.boldLabel);
+        EditorGUILayout.PropertyField(playAnimationProp, new GUIContent("播放动画"));
+        if (playAnimationProp.boolValue)
+        {
+            EditorGUI.indentLevel++;
+            EditorGUILayout.PropertyField(animationControllerProp, new GUIContent("AnimationController"));
+            DrawCompositionDropdown(compositionProp, animationControllerProp, playAnimationProp);
+            EditorGUI.indentLevel--;
+        }
 
         EditorGUILayout.Space(4);
         EditorGUILayout.LabelField("行为", EditorStyles.boldLabel);
@@ -137,5 +151,53 @@ public class InteractableEditor : Editor
             }
         }
         EditorGUI.indentLevel--;
+    }
+
+    private void DrawCompositionDropdown(SerializedProperty compositionProp, SerializedProperty animCtrlProp, SerializedProperty playAnimationProp)
+    {
+        var ctrl = animCtrlProp.objectReferenceValue as AnimationController;
+
+        if (ctrl == null || ctrl.Config == null)
+        {
+            EditorGUILayout.PropertyField(compositionProp, new GUIContent("Composition"));
+            return;
+        }
+
+        var available = ctrl.GetCompositionNames();
+        if (available == null || available.Count == 0)
+        {
+            EditorGUILayout.PropertyField(compositionProp, new GUIContent("Composition"));
+            return;
+        }
+
+        var names = new List<string>();
+        var values = new List<int>();
+
+        names.Add("(不播放)");
+        values.Add(-1);
+
+        for (int i = 0; i < available.Count; i++)
+        {
+            names.Add(available[i].ToString());
+            values.Add((int)available[i]);
+        }
+
+        int currentVal = (int)compositionProp.enumValueIndex;
+        int selected = values.IndexOf(currentVal);
+        if (selected < 0) selected = 0;
+
+        int newSelected = EditorGUILayout.Popup("Composition", selected, names.ToArray());
+        if (newSelected != selected)
+        {
+            if (values[newSelected] < 0)
+            {
+                compositionProp.enumValueIndex = 0;
+                playAnimationProp.boolValue = false;
+            }
+            else
+            {
+                compositionProp.enumValueIndex = values[newSelected];
+            }
+        }
     }
 }

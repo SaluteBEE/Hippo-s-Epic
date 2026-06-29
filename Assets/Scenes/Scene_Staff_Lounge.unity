@@ -685,6 +685,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 6767596025099428987, guid: 05234a69a8ffea648af4da48217a29fc, type: 3}
   m_PrefabInstance: {fileID: 185174478}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &185174480 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5540068380807553075, guid: 05234a69a8ffea648af4da48217a29fc, type: 3}
+  m_PrefabInstance: {fileID: 185174478}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 60ee02cbe6949d7408cd1459d1dfa416, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &191254399
 GameObject:
   m_ObjectHideFlags: 0
@@ -2007,6 +2018,9 @@ MonoBehaviour:
     conditionTriggers: []
     activeChildNames:
     - Normal
+    playAnimation: 0
+    animationController: {fileID: 0}
+    composition: 0
     canRepeat: 0
     hideAfterExecute: 0
     destroySelf: 0
@@ -2031,6 +2045,9 @@ MonoBehaviour:
     conditionTriggers: []
     activeChildNames:
     - Active
+    playAnimation: 0
+    animationController: {fileID: 0}
+    composition: 0
     canRepeat: 0
     hideAfterExecute: 0
     destroySelf: 0
@@ -2055,6 +2072,9 @@ MonoBehaviour:
     conditionTriggers: []
     activeChildNames:
     - Disabled
+    playAnimation: 0
+    animationController: {fileID: 0}
+    composition: 0
     canRepeat: 0
     hideAfterExecute: 0
     destroySelf: 0
@@ -3808,6 +3828,9 @@ MonoBehaviour:
       transitionToState: 0
     conditionTriggers: []
     activeChildNames: []
+    playAnimation: 0
+    animationController: {fileID: 0}
+    composition: 0
     canRepeat: 1
     hideAfterExecute: 0
     destroySelf: 0
@@ -3903,6 +3926,14 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4157385159750846353, guid: 0b5aa9fbd5f4a5e4da770a37602b9c3c, type: 3}
+      propertyPath: phases.Array.data[0].composition
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4157385159750846353, guid: 0b5aa9fbd5f4a5e4da770a37602b9c3c, type: 3}
+      propertyPath: phases.Array.data[0].playAnimation
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4157385159750846353, guid: 0b5aa9fbd5f4a5e4da770a37602b9c3c, type: 3}
       propertyPath: phases.Array.data[1].buttons.Array.size
       value: 1
       objectReference: {fileID: 0}
@@ -3918,6 +3949,10 @@ PrefabInstance:
       propertyPath: phases.Array.data[4].buttons.Array.size
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 4157385159750846353, guid: 0b5aa9fbd5f4a5e4da770a37602b9c3c, type: 3}
+      propertyPath: phases.Array.data[0].animationController
+      value: 
+      objectReference: {fileID: 185174480}
     - target: {fileID: 4157385159750846353, guid: 0b5aa9fbd5f4a5e4da770a37602b9c3c, type: 3}
       propertyPath: phases.Array.data[0].conditionTriggers.Array.size
       value: 2
@@ -4330,6 +4365,9 @@ MonoBehaviour:
       transitionToState: 0
     conditionTriggers: []
     activeChildNames: []
+    playAnimation: 0
+    animationController: {fileID: 0}
+    composition: 0
     canRepeat: 1
     hideAfterExecute: 0
     destroySelf: 0

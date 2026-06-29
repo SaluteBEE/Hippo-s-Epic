@@ -57,6 +57,21 @@ public class Interactable : MonoBehaviour
         gameObject.SetActive(true);
 
         ApplyChildNodes(_currentPhase);
+        ApplyAnimation(_currentPhase);
+    }
+
+    private void ApplyAnimation(InteractionPhase phase)
+    {
+        if (!phase.playAnimation) return;
+        if (phase.animationController == null) return;
+
+        var ctrl = phase.animationController;
+        if (!ctrl.IsInitialized) return;
+
+        if (ctrl.Config != null && ctrl.Config.HasComposition(phase.composition))
+        {
+            ctrl.PlayComposition(phase.composition);
+        }
     }
 
     private void ApplyChildNodes(InteractionPhase phase)
