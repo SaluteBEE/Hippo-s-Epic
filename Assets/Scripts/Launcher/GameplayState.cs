@@ -21,6 +21,7 @@ public class GameplayState : IGameState
 
         _ui.Close<LoadingPanel>();
         _ui.Close<MainMenuPanel>();
+        _ui.Open<MainPanelController>();
 
         _audio.PlayBGM("Gameplay");
 
@@ -122,6 +123,16 @@ public class GameplayState : IGameState
         var app = GameApp.Instance;
         if (app != null && app.StateMachine.Current is GameplayState gs && gs._bagOpen)
             gs.CloseBag();
+    }
+
+    public void OpenBagPublic()
+    {
+        if (!_bagOpen) OpenBag();
+    }
+
+    public void OpenTaskPublic()
+    {
+        if (!_taskOpen) OpenTask();
     }
 
     private void OpenTask()

@@ -20,7 +20,7 @@ public class BagManager
 
     public int GetItemCount(int itemId)
     {
-        return _items.Count(x => x.itemId == itemId);
+        return _items.Where(x => x.itemId == itemId).Sum(x => x.count);
     }
 
     public bool HasItem(int itemId, int count = 1)

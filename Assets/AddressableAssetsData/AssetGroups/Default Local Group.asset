@@ -192,6 +192,12 @@ MonoBehaviour:
     - ui_prefab
     - maproot
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3ad0146421d356f42a2f03c56f03ee4a
+    m_Address: ui/Global/MainPanel
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - ui_prefab
+    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: dd90b6ecff8020e40aa537a3ddf43594, type: 2}
   m_SchemaSet:
