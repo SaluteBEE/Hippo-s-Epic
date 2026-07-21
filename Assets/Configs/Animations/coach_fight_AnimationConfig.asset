@@ -1,0 +1,133 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 667ecdb9b442b9f49a7a2aaee87ac430, type: 3}
+  m_Name: coach_fight_AnimationConfig
+  m_EditorClassIdentifier: 
+  skeletonData: {fileID: 11400000, guid: 23742b265223ea746b3ba4bd03ff4cdf, type: 2}
+  clips:
+  - name: body_attack
+    animation: {fileID: 11400000, guid: b467065eb5dd2f549b49844bfdce7c70, type: 2}
+    animationName: body_attack
+    speed: 1
+    loop: 1
+    type: 0
+  - name: body_attack2
+    animation: {fileID: 11400000, guid: 32d67eba95c505443ac8fbf1e491592e, type: 2}
+    animationName: body_attack2
+    speed: 1
+    loop: 1
+    type: 0
+  - name: body_die
+    animation: {fileID: 11400000, guid: a2975d8c2b4be824d8973f5930b12eb1, type: 2}
+    animationName: body_die
+    speed: 1
+    loop: 1
+    type: 0
+  - name: body_idle
+    animation: {fileID: 11400000, guid: a15398f6a472de64eb8df491c8c57605, type: 2}
+    animationName: body_idle
+    speed: 1
+    loop: 1
+    type: 0
+  - name: body_walk
+    animation: {fileID: 11400000, guid: 1e9264ce9e98035409f1b53c93ae9456, type: 2}
+    animationName: body_walk
+    speed: 1
+    loop: 1
+    type: 0
+  - name: start_test
+    animation: {fileID: 11400000, guid: 29aba6617b5ff334c9d8d19e835d8615, type: 2}
+    animationName: start_test
+    speed: 1
+    loop: 1
+    type: 0
+  layers:
+  - name: Base
+    trackIndex: 0
+    defaultWeight: 1
+    additive: 0
+    slotNames: []
+    availableClipNames:
+    - body_attack
+    - body_attack2
+    - body_die
+    - body_idle
+    - body_walk
+  - name: UpperBody
+    trackIndex: 1
+    defaultWeight: 1
+    additive: 0
+    slotNames: []
+    availableClipNames:
+    - start_test
+  - name: LowerBody
+    trackIndex: 2
+    defaultWeight: 1
+    additive: 0
+    slotNames: []
+    availableClipNames: []
+  compositions:
+  - name: 0
+    description: "\u63CF\u8FF0"
+    layers:
+    - layerName: Base
+      clipName: body_idle
+      weight: 1
+      transitionTime: 0.1
+      delay: 0
+    - layerName: UpperBody
+      clipName: start_test
+      weight: 1
+      transitionTime: 0.1
+      delay: 0
+  - name: 4
+    description: "\u63CF\u8FF0"
+    layers:
+    - layerName: Base
+      clipName: body_attack
+      weight: 1
+      transitionTime: 0.1
+      delay: 0
+  - name: 16
+    description: "\u63CF\u8FF0"
+    layers:
+    - layerName: Base
+      clipName: body_attack2
+      weight: 1
+      transitionTime: 0.1
+      delay: 0
+  - name: 8
+    description: "\u63CF\u8FF0"
+    layers:
+    - layerName: Base
+      clipName: body_die
+      weight: 1
+      transitionTime: 0.1
+      delay: 0
+  - name: 8
+    description: "\u63CF\u8FF0"
+    layers:
+    - layerName: Base
+      clipName: body_die
+      weight: 1
+      transitionTime: 0.1
+      delay: 0
+  - name: 6
+    description: "\u63CF\u8FF0"
+    layers:
+    - layerName: Base
+      clipName: body_walk
+      weight: 1
+      transitionTime: 0.1
+      delay: 0
+  defaultComposition: 0
+  defaultTransitionTime: 0.1

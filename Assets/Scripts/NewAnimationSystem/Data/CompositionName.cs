@@ -1,4 +1,4 @@
-public enum CompositionName
+﻿public enum CompositionName
 {
     Idle,
     Idle1,
@@ -16,4 +16,5 @@ public enum CompositionName
     Think2,
     Think3,
     Throw,
+    Attack2,
 }
