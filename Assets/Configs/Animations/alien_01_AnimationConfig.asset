@@ -1,0 +1,113 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 667ecdb9b442b9f49a7a2aaee87ac430, type: 3}
+  m_Name: alien_01_AnimationConfig
+  m_EditorClassIdentifier: 
+  skeletonData: {fileID: 11400000, guid: a4a970625c85e2c41a1efdd1f6163801, type: 2}
+  clips:
+  - name: huaiyi
+    animation: {fileID: 11400000, guid: b6e801bd3ec7f504f8e4824d8dd3252d, type: 2}
+    animationName: huaiyi
+    speed: 1
+    loop: 1
+    type: 0
+  - name: idle
+    animation: {fileID: 11400000, guid: 154cf1987406d52468aa81c77597c6ec, type: 2}
+    animationName: idle
+    speed: 1
+    loop: 1
+    type: 0
+  - name: talk
+    animation: {fileID: 11400000, guid: 093ee84a90ae7f944a1587ea1682ba56, type: 2}
+    animationName: talk
+    speed: 1
+    loop: 1
+    type: 0
+  - name: talk2
+    animation: {fileID: 11400000, guid: 5785bc50be8b5bb4b86cf010552e8c70, type: 2}
+    animationName: talk2
+    speed: 1
+    loop: 1
+    type: 0
+  - name: yaohuang
+    animation: {fileID: 11400000, guid: 4b8e9e1788f343e41ab4aa4da9c9a65a, type: 2}
+    animationName: yaohuang
+    speed: 1
+    loop: 1
+    type: 0
+  layers:
+  - name: Base
+    trackIndex: 0
+    defaultWeight: 1
+    additive: 0
+    slotNames: []
+    availableClipNames:
+    - huaiyi
+    - talk
+    - idle
+    - talk2
+    - yaohuang
+  - name: UpperBody
+    trackIndex: 1
+    defaultWeight: 1
+    additive: 0
+    slotNames: []
+    availableClipNames: []
+  - name: LowerBody
+    trackIndex: 2
+    defaultWeight: 1
+    additive: 0
+    slotNames: []
+    availableClipNames: []
+  compositions:
+  - name: 0
+    description: "\u63CF\u8FF0"
+    layers:
+    - layerName: Base
+      clipName: idle
+      weight: 1
+      transitionTime: 0.1
+      delay: 0
+  - name: 12
+    description: "\u63CF\u8FF0"
+    layers:
+    - layerName: Base
+      clipName: huaiyi
+      weight: 1
+      transitionTime: 0.1
+      delay: 0
+  - name: 10
+    description: "\u63CF\u8FF0"
+    layers:
+    - layerName: Base
+      clipName: talk
+      weight: 1
+      transitionTime: 0.1
+      delay: 0
+  - name: 12
+    description: "\u63CF\u8FF0"
+    layers:
+    - layerName: Base
+      clipName: talk2
+      weight: 1
+      transitionTime: 0.1
+      delay: 0
+  - name: 1
+    description: "\u63CF\u8FF0"
+    layers:
+    - layerName: Base
+      clipName: yaohuang
+      weight: 1
+      transitionTime: 0.1
+      delay: 0
+  defaultComposition: 0
+  defaultTransitionTime: 0.1
