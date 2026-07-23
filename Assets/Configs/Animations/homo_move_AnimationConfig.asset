@@ -14,54 +14,84 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   skeletonData: {fileID: 11400000, guid: fc24484f15958984fb6a47b29c02ebc0, type: 2}
   clips:
-  - name: body-headhit
-    animation: {fileID: 11400000, guid: 81e64bbe1fd267c49b12e875a5458267, type: 2}
-    animationName: body-headhit
-    speed: 2
-    loop: 1
-    type: 1
-  - name: body-idle
-    animation: {fileID: 11400000, guid: 42f72b81f44a91b48ab229c8388345b9, type: 2}
-    animationName: body-idle
+  - name: attack
+    animation: {fileID: 11400000, guid: 75857af6823533c4c9ba6da4a93971d8, type: 2}
+    animationName: attack
     speed: 1
     loop: 1
-    type: 1
-  - name: body-walk
-    animation: {fileID: 11400000, guid: fea03fa607194c74c99873cfccdd956c, type: 2}
-    animationName: body-walk
-    speed: 2
-    loop: 1
-    type: 1
-  - name: body-walk2
-    animation: {fileID: 11400000, guid: 8716b22db0ef9ae46941f7e7a973e17d, type: 2}
-    animationName: body-walk2
-    speed: 2
-    loop: 1
-    type: 1
-  - name: head-headhit
-    animation: {fileID: 11400000, guid: 2f06ec1d4c5469a43ba7ed2be1f44669, type: 2}
-    animationName: head-headhit
-    speed: 2.1
-    loop: 1
     type: 0
-  - name: head-idle
-    animation: {fileID: 11400000, guid: 1a7b946d013c99b4fb135df2179aa802, type: 2}
-    animationName: head-idle
-    speed: 2.1
-    loop: 1
-    type: 0
-  - name: leg-idle
-    animation: {fileID: 11400000, guid: d9927d99cf7274b40945faf3abdef9ef, type: 2}
-    animationName: leg-idle
+  - name: attack2
+    animation: {fileID: 11400000, guid: 9932cc31eba64e845b247b292b64be81, type: 2}
+    animationName: attack2
     speed: 1
     loop: 1
-    type: 2
-  - name: leg-walk
-    animation: {fileID: 11400000, guid: 4a31785524a1507489c4eb234d4b1213, type: 2}
-    animationName: leg-walk
-    speed: 1.7
+    type: 0
+  - name: body_idle
+    animation: {fileID: 11400000, guid: 4e2bc26281d370d4ca84a965bf835408, type: 2}
+    animationName: body_idle
+    speed: 1
     loop: 1
-    type: 2
+    type: 0
+  - name: body_idle2
+    animation: {fileID: 11400000, guid: 8119cbafc44c4fb49a41bfd3d08436de, type: 2}
+    animationName: body_idle2
+    speed: 1
+    loop: 1
+    type: 0
+  - name: body_idle3
+    animation: {fileID: 11400000, guid: ef5f44377e6c1034090ac7d55a9f7eea, type: 2}
+    animationName: body_idle3
+    speed: 1
+    loop: 1
+    type: 0
+  - name: dead1
+    animation: {fileID: 11400000, guid: 25a6b318047c3d742b01c2c449d37e9f, type: 2}
+    animationName: dead1
+    speed: 1
+    loop: 1
+    type: 0
+  - name: dead1_2
+    animation: {fileID: 11400000, guid: fe530e96986130f41a1cce8b3e33b3d7, type: 2}
+    animationName: dead1_2
+    speed: 1
+    loop: 1
+    type: 0
+  - name: dead2
+    animation: {fileID: 11400000, guid: ea875083c21d3714aae06234a2cced01, type: 2}
+    animationName: dead2
+    speed: 1
+    loop: 1
+    type: 0
+  - name: dead2_2
+    animation: {fileID: 11400000, guid: e68ba3ea66eb3644382224e6dc06d8b8, type: 2}
+    animationName: dead2_2
+    speed: 1
+    loop: 1
+    type: 0
+  - name: hit
+    animation: {fileID: 11400000, guid: f0d18b13152a50b4ea280345c6b98e7e, type: 2}
+    animationName: hit
+    speed: 1
+    loop: 1
+    type: 0
+  - name: scold
+    animation: {fileID: 11400000, guid: 39484ad4803ab5f4d806440e31e35e52, type: 2}
+    animationName: scold
+    speed: 1
+    loop: 1
+    type: 0
+  - name: vertigo
+    animation: {fileID: 11400000, guid: f21d5375231d9d24eafd4ae192a22273, type: 2}
+    animationName: vertigo
+    speed: 1
+    loop: 1
+    type: 0
+  - name: walk
+    animation: {fileID: 11400000, guid: 6342617b087830a46ae5664b4f78c89f, type: 2}
+    animationName: walk
+    speed: 1
+    loop: 1
+    type: 0
   layers:
   - name: Base
     trackIndex: 0
@@ -69,60 +99,125 @@ MonoBehaviour:
     additive: 0
     slotNames: []
     availableClipNames:
-    - head-headhit
-    - head-idle
+    - attack
+    - attack2
+    - body_idle
+    - body_idle2
+    - body_idle3
+    - dead1
+    - dead1_2
+    - dead2
+    - dead2_2
+    - hit
+    - scold
+    - vertigo
+    - walk
   - name: UpperBody
     trackIndex: 1
     defaultWeight: 1
     additive: 0
     slotNames: []
-    availableClipNames:
-    - body-headhit
-    - body-idle
-    - body-walk
-    - body-walk2
+    availableClipNames: []
   - name: LowerBody
     trackIndex: 2
     defaultWeight: 1
     additive: 0
     slotNames: []
-    availableClipNames:
-    - leg-idle
-    - leg-walk
+    availableClipNames: []
   compositions:
-  - name: 0
-    description: "\u63CF\u8FF0"
-    layers:
-    - layerName: Base
-      clipName: head-idle
-      weight: 1
-      transitionTime: 0.1
-      delay: 0
-    - layerName: UpperBody
-      clipName: body-idle
-      weight: 1
-      transitionTime: 0.1
-      delay: 0
-    - layerName: LowerBody
-      clipName: leg-idle
-      weight: 1
-      transitionTime: 0.1
-      delay: 0
   - name: 6
     description: "\u63CF\u8FF0"
     layers:
     - layerName: Base
-      clipName: head-idle
+      clipName: walk
       weight: 1
       transitionTime: 0.1
       delay: 0
-    - layerName: UpperBody
-      clipName: body-walk
+  - name: 4
+    description: "\u63CF\u8FF0"
+    layers:
+    - layerName: Base
+      clipName: attack
       weight: 1
       transitionTime: 0.1
       delay: 0
-    - layerName: LowerBody
-      clipName: leg-walk
+  - name: 7
+    description: "\u63CF\u8FF0"
+    layers:
+    - layerName: Base
+      clipName: hit
+      weight: 1
+      transitionTime: 0.1
+      delay: 0
+  - name: 0
+    description: "\u63CF\u8FF0"
+    layers:
+    - layerName: Base
+      clipName: body_idle
+      weight: 1
+      transitionTime: 0.1
+      delay: 0
+  - name: 2
+    description: "\u63CF\u8FF0"
+    layers:
+    - layerName: Base
+      clipName: body_idle2
+      weight: 1
+      transitionTime: 0.1
+      delay: 0
+  - name: 3
+    description: "\u63CF\u8FF0"
+    layers:
+    - layerName: Base
+      clipName: body_idle3
+      weight: 1
+      transitionTime: 0.1
+      delay: 0
+  - name: 8
+    description: "\u63CF\u8FF0"
+    layers:
+    - layerName: Base
+      clipName: dead1
+      weight: 1
+      transitionTime: 0.1
+      delay: 0
+  - name: 9
+    description: "\u63CF\u8FF0"
+    layers:
+    - layerName: Base
+      clipName: dead1_2
+      weight: 1
+      transitionTime: 0.1
+      delay: 0
+  - name: 17
+    description: "\u63CF\u8FF0"
+    layers:
+    - layerName: Base
+      clipName: vertigo
+      weight: 1
+      transitionTime: 0.1
+      delay: 0
+  - name: 18
+    description: "\u63CF\u8FF0"
+    layers:
+    - layerName: Base
+      clipName: dead2
+      weight: 1
+      transitionTime: 0.1
+      delay: 0
+  - name: 19
+    description: "\u63CF\u8FF0"
+    layers:
+    - layerName: Base
+      clipName: dead2_2
+      weight: 1
+      transitionTime: 0.1
+      delay: 0
+  - name: 5
+    description: "\u63CF\u8FF0"
+    layers:
+    - layerName: Base
+      clipName: scold
       weight: 1
       transitionTime: 0.1
       delay: 0

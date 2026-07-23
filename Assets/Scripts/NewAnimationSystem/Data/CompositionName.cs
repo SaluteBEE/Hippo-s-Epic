@@ -17,4 +17,7 @@
     Think3,
     Throw,
     Attack2,
+    Vertigo,
+    Die2,
+    Dead2,
 }
