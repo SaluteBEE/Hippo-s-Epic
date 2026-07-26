@@ -100,31 +100,70 @@ public class BattleStageManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 根据战斗单位列表生成角色
+    /// 根据战斗单位列表生成角色（清空后重建）
     /// </summary>
-    public void SpawnUnits(List<BattleUnit> units)
+    public void SpawnUnits(List<BattleUnit> units, System.Action onComplete = null)
     {
         ClearAllUnits();
-
-        foreach (var unit in units)
-        {
-            if (unit == null || unit.PersonId <= 0) continue;
-            StartCoroutine(SpawnUnitCoroutine(unit));
-        }
+        SpawnUnitsInternal(units, onComplete);
     }
 
-    private IEnumerator SpawnUnitCoroutine(BattleUnit unit)
+    /// <summary>
+    /// 新增角色（不清空现有角色，用于增援）
+    /// </summary>
+    public void SpawnNewUnits(List<BattleUnit> units, System.Action onComplete = null)
+    {
+        SpawnUnitsInternal(units, onComplete);
+    }
+
+    private void SpawnUnitsInternal(List<BattleUnit> units, System.Action onComplete)
+    {
+        if (units.Count == 0)
+        {
+            onComplete?.Invoke();
+            return;
+        }
+
+        StartCoroutine(SpawnAllUnitsCoroutine(units, onComplete));
+    }
+
+    private IEnumerator SpawnAllUnitsCoroutine(List<BattleUnit> units, System.Action onComplete)
+    {
+        int remaining = units.Count;
+        foreach (var unit in units)
+        {
+            if (unit == null || unit.PersonId <= 0)
+            {
+                remaining--;
+                continue;
+            }
+            StartCoroutine(SpawnUnitCoroutine(unit, () =>
+            {
+                remaining--;
+            }));
+        }
+        // 等待所有协程完成
+        while (remaining > 0)
+            yield return null;
+
+        Debug.Log($"[BattleStageManager] 所有角色生成完成");
+        onComplete?.Invoke();
+    }
+
+    private IEnumerator SpawnUnitCoroutine(BattleUnit unit, System.Action onComplete = null)
     {
         var tables = ManagerRegistry.GetTables<cfg.Tables>();
         if (tables == null)
         {
             Debug.LogWarning("[BattleStageManager] Tables 未加载");
+            onComplete?.Invoke();
             yield break;
         }
         var person = tables.TbPerson.Get(unit.PersonId);
         if (person == null)
         {
             Debug.LogWarning($"[BattleStageManager] Person不存在: {unit.PersonId}");
+            onComplete?.Invoke();
             yield break;
         }
 
@@ -133,6 +172,7 @@ public class BattleStageManager : MonoBehaviour
         if (slot == null)
         {
             Debug.LogWarning($"[BattleStageManager] 站位点不存在: side={unit.IsPlayerSide}, slot={unit.SlotIndex}");
+            onComplete?.Invoke();
             yield break;
         }
 
@@ -141,6 +181,7 @@ public class BattleStageManager : MonoBehaviour
         if (string.IsNullOrEmpty(prefabPath))
         {
             Debug.LogWarning($"[BattleStageManager] Person {person.Name} 没有战斗预制体(Prefab2)");
+            onComplete?.Invoke();
             yield break;
         }
 
@@ -159,9 +200,9 @@ public class BattleStageManager : MonoBehaviour
         }
         else
         {
-            // 回退：尝试AssetDatabase（编辑器模式）
 #if UNITY_EDITOR
-            prefab = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
+            string assetPath = prefabPath.StartsWith("Assets/") ? prefabPath : "Assets/" + prefabPath;
+            prefab = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>(assetPath);
             if (prefab != null) loaded = true;
 #endif
         }
@@ -169,6 +210,7 @@ public class BattleStageManager : MonoBehaviour
         if (!loaded || prefab == null)
         {
             Debug.LogWarning($"[BattleStageManager] 无法加载预制体: {prefabPath}");
+            onComplete?.Invoke();
             yield break;
         }
 
@@ -214,6 +256,7 @@ public class BattleStageManager : MonoBehaviour
         CreateHealthBar(unit, go.transform);
 
         Debug.Log($"[BattleStageManager] 生成角色: {person.Name} at slot {unit.SlotIndex} ({(unit.IsPlayerSide ? "Player" : "Enemy")})");
+        onComplete?.Invoke();
     }
 
     #endregion

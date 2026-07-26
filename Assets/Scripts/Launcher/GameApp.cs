@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -33,9 +33,11 @@ public partial class GameApp : MonoBehaviour
     [SerializeField] private SceneMapId startMap = SceneMapId.StaffLounge;
     [SerializeField] private LaunchConfig launchConfig;
 
-    [Header("对话测试")]
-    [SerializeField] private bool enableDialogTest;
-    [SerializeField] private int testDialogId = 1001001;
+    [Header("对话调试")]
+    [SerializeField] private bool debugEnableDialogTest;
+    [Tooltip("对话起始ID")]
+    [SerializeField] private int debugDialogId = 1001001;
+    [Tooltip("启动时自动播放对话")]
     [SerializeField] private bool autoStartTest;
 
     public SceneMapId StartMap => startMap;
@@ -60,22 +62,14 @@ public partial class GameApp : MonoBehaviour
 
     private int _testIndex;
     private string _testStatus = "";
-    private bool _testGuiMinimized;
     private string _testSearchInput = "";
-    private bool _testSearchFocused;
-    private GUIStyle _testLabelStyle;
-    private GUIStyle _testRichStyle;
-    private GUIStyle _testFieldStyle;
-    private GUIStyle _testBtnStyle;
-    private Texture2D _testBgTex;
-    private Texture2D _testBtnBgTex;
     private DialogManager _testDialogManager;
 
-    public bool IsDialogTestEnabled => enableDialogTest;
+    public bool IsDialogTestEnabled => debugEnableDialogTest;
 
     public void InitDialogTest()
     {
-        if (!enableDialogTest) return;
+        if (!debugEnableDialogTest) return;
 
         _testDialogManager = ManagerRegistry.Get<DialogManager>();
         if (_testDialogManager == null) return;
@@ -83,11 +77,11 @@ public partial class GameApp : MonoBehaviour
         _testDialogManager.OnOptions += OnTestOptions;
         _testDialogManager.OnDialogEnded += OnTestDialogEnded;
 
-        _testIndex = Array.IndexOf(TestDialogIds, testDialogId);
+        _testIndex = Array.IndexOf(TestDialogIds, debugDialogId);
         if (_testIndex < 0) _testIndex = 0;
-        testDialogId = TestDialogIds[_testIndex];
+        debugDialogId = TestDialogIds[_testIndex];
 
-        Debug.Log($"[GameApp] 对话测试已启用, 起始ID={testDialogId}, autoStart={autoStartTest}");
+        Debug.Log($"[GameApp] 对话测试已启用, 起始ID={debugDialogId}, autoStart={autoStartTest}");
 
         if (autoStartTest)
             RunTestDialog();
@@ -104,9 +98,9 @@ public partial class GameApp : MonoBehaviour
 
         var uiMgr = ManagerRegistry.Get<UIManager>();
         if (uiMgr != null)
-            uiMgr.Open<DialogWindow>(testDialogId);
+            uiMgr.Open<DialogWindow>(debugDialogId);
         else
-            _testDialogManager.StartDialog(testDialogId);
+            _testDialogManager.StartDialog(debugDialogId);
     }
 
     public void ShutdownDialogTest()
@@ -117,7 +111,7 @@ public partial class GameApp : MonoBehaviour
             _testDialogManager.OnDialogEnded -= OnTestDialogEnded;
             _testDialogManager = null;
         }
-        enableDialogTest = false;
+        debugEnableDialogTest = false;
     }
 
     private void UpdateDialogTest()
@@ -127,7 +121,7 @@ public partial class GameApp : MonoBehaviour
     private void SwitchTestDialog(int delta)
     {
         _testIndex = (_testIndex + delta + TestDialogIds.Length) % TestDialogIds.Length;
-        testDialogId = TestDialogIds[_testIndex];
+        debugDialogId = TestDialogIds[_testIndex];
         _testStatus = $"切换到: {TestDialogNames[_testIndex]}";
         RunTestDialog();
     }
@@ -144,89 +138,36 @@ public partial class GameApp : MonoBehaviour
         _testStatus = "对话结束。Space=重开, Tab/箭头=切换, F1=开关";
     }
 
-    private void DrawDialogTestGUI()
+    private void DrawDialogTestContent(GUIStyle lbl, GUIStyle btn, GUIStyle fld, float s)
     {
-        if (!enableDialogTest || _testDialogManager == null) return;
-
-        if (_testLabelStyle == null)
+        if (_testDialogManager == null)
         {
-            _testLabelStyle = new GUIStyle(GUI.skin.label) { fontSize = 14, wordWrap = true };
-            _testRichStyle = new GUIStyle(GUI.skin.label) { richText = true, fontSize = 16, wordWrap = true };
-            _testFieldStyle = new GUIStyle(GUI.skin.textField) { fontSize = 14 };
-            _testBtnBgTex = new Texture2D(1, 1);
-            _testBtnBgTex.SetPixel(0, 0, new Color(0.2f, 0.2f, 0.3f, 0.92f));
-            _testBtnBgTex.Apply();
-            _testBtnStyle = new GUIStyle(GUI.skin.button)
-            {
-                fontSize = 13,
-                normal = { textColor = Color.white, background = _testBtnBgTex },
-                hover = { textColor = Color.white, background = _testBtnBgTex }
-            };
-        }
-
-        if (_testGuiMinimized)
-        {
-            if (GUI.Button(new Rect(10, 10, 100, 30), "展开测试面板", _testBtnStyle))
-                _testGuiMinimized = false;
+            GUILayout.Label("DialogManager 未就绪", lbl);
             return;
         }
 
-        var area = new Rect(10, 10, 700, 200);
-        if (_testBgTex == null)
-        {
-            _testBgTex = new Texture2D(1, 1);
-            _testBgTex.SetPixel(0, 0, new Color(0.1f, 0.1f, 0.15f, 0.92f));
-            _testBgTex.Apply();
-        }
-        GUI.DrawTexture(area, _testBgTex);
-
-        GUILayout.BeginArea(area);
+        GUILayout.Label($"[{TestDialogNames[_testIndex]}]", new GUIStyle(lbl) { fontStyle = FontStyle.Bold });
+        GUILayout.Label($"状态: {_testDialogManager.State}  |  {_testStatus}", lbl);
+        GUILayout.Space(4 * s);
 
         GUILayout.BeginHorizontal();
-        GUILayout.Label($"<b>[{TestDialogNames[_testIndex]}]</b>", new GUIStyle(_testRichStyle) { fontSize = 16 });
-        GUILayout.FlexibleSpace();
-        if (GUILayout.Button("收起", GUILayout.Width(50)))
-        {
-            _testGuiMinimized = true;
-            GUILayout.EndHorizontal();
-            GUILayout.EndArea();
-            return;
-        }
+        if (GUILayout.Button("重新开始", btn, GUILayout.Height(30 * s))) RunTestDialog();
+        if (GUILayout.Button("上一个", btn, GUILayout.Height(30 * s))) SwitchTestDialog(-1);
+        if (GUILayout.Button("下一个", btn, GUILayout.Height(30 * s))) SwitchTestDialog(1);
         GUILayout.EndHorizontal();
 
-        GUILayout.Space(2);
-        GUILayout.Label($"状态: {_testDialogManager.State}  |  {_testStatus}", _testLabelStyle);
-        GUILayout.Space(2);
-
+        GUILayout.Space(4 * s);
         GUILayout.BeginHorizontal();
-        if (GUILayout.Button("重新开始", GUILayout.Width(80)))
-            RunTestDialog();
-        if (GUILayout.Button("上一个", GUILayout.Width(60)))
-            SwitchTestDialog(-1);
-        if (GUILayout.Button("下一个", GUILayout.Width(60)))
-            SwitchTestDialog(1);
-        GUILayout.FlexibleSpace();
-        if (GUILayout.Button("关闭测试", GUILayout.Width(70)))
-            ShutdownDialogTest();
-        GUILayout.EndHorizontal();
-
-        GUILayout.Space(4);
-        GUILayout.BeginHorizontal();
-        GUILayout.Label("跳转ID:", _testLabelStyle, GUILayout.Width(60));
+        GUILayout.Label("跳转ID:", lbl, GUILayout.Width(80 * s));
         GUI.SetNextControlName("TestDialogSearch");
-        _testSearchInput = GUILayout.TextField(_testSearchInput, _testFieldStyle, GUILayout.Width(120));
-        _testSearchFocused = GUI.GetNameOfFocusedControl() == "TestDialogSearch";
-        if (GUILayout.Button("开始", GUILayout.Width(60)))
+        _testSearchInput = GUILayout.TextField(_testSearchInput, fld, GUILayout.Width(160 * s));
+        if (GUILayout.Button("开始", btn, GUILayout.Height(30 * s)))
             TryJumpTestDialog();
         GUILayout.EndHorizontal();
-
-        GUILayout.EndArea();
 
         if (Event.current.isKey && Event.current.keyCode == KeyCode.Return
             && GUI.GetNameOfFocusedControl() == "TestDialogSearch")
-        {
             TryJumpTestDialog();
-        }
     }
 
     private void TryJumpTestDialog()
@@ -239,7 +180,7 @@ public partial class GameApp : MonoBehaviour
         var dialog = tables.TbDialog.GetOrDefault(id);
         if (dialog != null)
         {
-            testDialogId = id;
+            debugDialogId = id;
             _testIndex = Array.IndexOf(TestDialogIds, id);
             if (_testIndex < 0) _testIndex = 0;
             _testStatus = $"已跳转到对话 {id}";
@@ -324,6 +265,7 @@ public partial class GameApp : MonoBehaviour
         InitAnimationTest();
         InitBagTest();
         InitBattleTest();
+        SelectFirstEnabledHubTab();
 
         GoMainMenu();
     }
@@ -391,9 +333,10 @@ public partial class GameApp : MonoBehaviour
 
     private void Update()
     {
-        StateMachine.Update();
         UpdateDialogTest();
     }
+
+    [ContextMenu("清除存档")]
 
     [ContextMenu("清除存档")]
     public void ClearSave()
@@ -404,10 +347,7 @@ public partial class GameApp : MonoBehaviour
 
     private void OnGUI()
     {
-        DrawDialogTestGUI();
-        DrawAnimationTestGUI();
-        DrawBagTestGUI();
-        DrawBattleTestGUI();
+        DrawDebugHub();
     }
 
     public void GoMainMenu()
@@ -525,24 +465,41 @@ public partial class GameApp : MonoBehaviour
         // 切换游戏状态
         StateMachine.ChangeState(new BattleGameState(this));
 
-        // 生成战斗角色
+        // 生成战斗角色，完成后开始战斗
         var stageManager = FindObjectOfType<BattleStageManager>();
         if (stageManager != null && BattleManager != null)
         {
             var allUnits = new List<BattleUnit>();
             allUnits.AddRange(BattleManager.PlayerUnits);
             allUnits.AddRange(BattleManager.EnemyUnits);
-            stageManager.SpawnUnits(allUnits);
+            stageManager.SpawnUnits(allUnits, () =>
+            {
+                Debug.Log("[GameApp] 角色生成完成，开始战斗流程");
+                BattleManager.StartBattle();
+            });
         }
-        else if (stageManager == null)
+        else
         {
             Debug.LogWarning("[GameApp] 战斗场景中未找到 BattleStageManager");
+            if (BattleManager != null)
+                BattleManager.StartBattle();
         }
 
         // 打开战斗UI
         var ui = ManagerRegistry.Get<UIManager>();
         if (ui != null)
             ui.Open<BattleWindow>();
+
+        // 订阅增援入场事件：新单位进入时生成视觉
+        if (BattleManager != null)
+        {
+            BattleManager.OnNewUnitsReady += (newUnits) =>
+            {
+                var sm = FindObjectOfType<BattleStageManager>();
+                if (sm != null)
+                    sm.SpawnNewUnits(newUnits);
+            };
+        }
     }
 
     private void OnBattleFinished(int battleId, BattleResult result)

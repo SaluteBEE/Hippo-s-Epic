@@ -1,12 +1,13 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public partial class GameApp
 {
     #region Battle Test Inspector
 
-    [Header("战斗测试")]
-    [SerializeField] private bool enableBattleTest;
-    [SerializeField] private int testBattleId = 1;
+    [Header("战斗调试")]
+    [SerializeField] private bool debugEnableBattleTest;
+    [Tooltip("战斗配置表ID")]
+    [SerializeField] private int debugBattleId = 1;
 
     #endregion
 
@@ -14,128 +15,66 @@ public partial class GameApp
 
     private string _battleTestStatus = "";
     private string _battleTestInput = "1";
-    private Rect _battleTestPanelRect = new Rect(-1, -1, 380, 260);
-    private bool _isResizing;
-    private Vector2 _resizeStartMouse;
-    private Rect _resizeStartRect;
-    private GUIStyle _battleLabelStyle;
-    private GUIStyle _battleBtnStyle;
-    private GUIStyle _battleFieldStyle;
-    private Texture2D _battleBgTex;
-    private Texture2D _battleBtnBgTex;
+    private Vector2 _battleLogScroll;
+    private bool _showBattleLog = true;
+
+    public bool IsBattleTestEnabled => debugEnableBattleTest;
 
     #endregion
 
-    public bool IsBattleTestEnabled => enableBattleTest;
-
     public void InitBattleTest()
     {
-        if (!enableBattleTest) return;
+        if (!debugEnableBattleTest) return;
+        _battleTestInput = debugBattleId.ToString();
         _battleTestStatus = "战斗测试就绪";
         Debug.Log("[GameApp] 战斗测试已启用");
     }
 
-    private void DrawBattleTestGUI()
+    private void DrawBattleTestContent(GUIStyle lbl, GUIStyle btn, GUIStyle fld, float s)
     {
-        if (!enableBattleTest) return;
-
-        InitBattleTestStyles();
-
-        // 首次初始化面板位置（屏幕中央偏上）
-        if (_battleTestPanelRect.x < 0)
-            _battleTestPanelRect = new Rect(Screen.width / 2f - 190, 10, 380, 260);
-
-        // 限制最小/最大尺寸
-        _battleTestPanelRect.width = Mathf.Clamp(_battleTestPanelRect.width, 300, Screen.width);
-        _battleTestPanelRect.height = Mathf.Clamp(_battleTestPanelRect.height, 180, Screen.height);
-
-        // 可拖动+可拉伸窗口
-        _battleTestPanelRect = GUI.Window(8888, _battleTestPanelRect, DrawBattleTestWindow, "", GUIStyle.none);
-        HandleResize();
-    }
-
-    private void DrawBattleTestWindow(int windowID)
-    {
-        var area = new Rect(0, 0, _battleTestPanelRect.width, _battleTestPanelRect.height);
-        GUI.DrawTexture(area, _battleBgTex);
-
-        GUILayout.BeginArea(new Rect(4, 4, area.width - 8, area.height - 8));
-
         GUILayout.BeginHorizontal();
-        GUILayout.Label("<b>战斗测试</b>", new GUIStyle(_battleLabelStyle) { fontSize = 16, fontStyle = FontStyle.Bold });
-        GUILayout.FlexibleSpace();
-        if (GUILayout.Button("关闭", _battleBtnStyle, GUILayout.Width(50)))
-        {
-            enableBattleTest = false;
-            GUILayout.EndHorizontal();
-            GUILayout.EndArea();
-            return;
-        }
-        GUILayout.EndHorizontal();
-
-        GUILayout.Space(4);
-        GUILayout.Label(_battleTestStatus, _battleLabelStyle);
-        GUILayout.Space(8);
-
-        GUILayout.BeginHorizontal();
-        GUILayout.Label("战斗ID:", GUILayout.Width(55));
-        _battleTestInput = GUILayout.TextField(_battleTestInput, _battleFieldStyle, GUILayout.Width(80));
-        GUILayout.FlexibleSpace();
-        if (GUILayout.Button("进入战斗", _battleBtnStyle, GUILayout.Width(90)))
+        GUILayout.Label("战斗ID:", lbl, GUILayout.Width(80 * s));
+        _battleTestInput = GUILayout.TextField(_battleTestInput, fld, GUILayout.Width(100 * s));
+        if (GUILayout.Button("进入战斗", btn, GUILayout.Height(30 * s)))
             BattleTestEnter();
         GUILayout.EndHorizontal();
 
-        GUILayout.Space(8);
+        GUILayout.Space(4 * s);
+        GUILayout.Label(_battleTestStatus, lbl);
 
         var bm = BattleManager;
         if (bm != null)
         {
-            GUILayout.Label($"当前战斗: 阶段={bm.Phase}  等待操作={bm.IsWaitingForPlayerAction}", _battleLabelStyle);
-            GUILayout.Label($"友方: {bm.PlayerUnits.Count}人  敌方: {bm.EnemyUnits.Count}人  第{bm.RoundCount}轮", _battleLabelStyle);
+            GUILayout.Label($"阶段: {bm.Phase}  当前: {(bm.CurrentUnit != null ? $"P{bm.CurrentUnit.PersonId}" : "无")}", lbl);
+            GUILayout.Label($"友方: {bm.PlayerUnits.Count}人  敌方: {bm.EnemyUnits.Count}人  第{bm.RoundCount}轮", lbl);
+            if (bm.CurrentUnit != null)
+                GUILayout.Label($"HP: {bm.CurrentUnit.Stats.Hp}/{bm.CurrentUnit.Stats.FinalHpMax}  等待: {(bm.IsWaitingForPlayerAction ? "是" : "否")}", lbl);
+
+            if (bm.TurnQueue != null && bm.TurnQueue.Count > 0)
+            {
+                string q = "";
+                int idx = 0;
+                foreach (var u in bm.TurnQueue)
+                {
+                    if (idx++ > 8) { q += "..."; break; }
+                    q += $"P{u.PersonId}{(u.IsPlayerSide ? "A" : "E")} ";
+                }
+                GUILayout.Label($"队列: {q}", lbl);
+            }
         }
-        else
+
+        if (BattleLogger.Entries.Count > 0)
         {
-            GUILayout.Label("当前无活跃战斗", _battleLabelStyle);
-        }
-
-        GUILayout.EndArea();
-
-        // 标题栏区域拖动
-        GUI.DragWindow(new Rect(0, 0, area.width - 70, 24));
-
-        // 右下角拉伸手柄
-        var handleRect = new Rect(area.width - 20, area.height - 20, 20, 20);
-        GUI.Box(handleRect, "◢");
-        EditorResizeHandle(handleRect);
-    }
-
-    private void EditorResizeHandle(Rect handleRect)
-    {
-        var e = Event.current;
-        if (e.type == EventType.MouseDown && handleRect.Contains(e.mousePosition))
-        {
-            _isResizing = true;
-            _resizeStartMouse = e.mousePosition;
-            _resizeStartRect = _battleTestPanelRect;
-            e.Use();
-        }
-        else if (e.type == EventType.MouseUp)
-        {
-            _isResizing = false;
-        }
-    }
-
-    private void HandleResize()
-    {
-        if (!_isResizing) return;
-        var e = Event.current;
-        if (e.type == EventType.MouseDrag)
-        {
-            float dw = e.mousePosition.x - _resizeStartMouse.x;
-            float dh = e.mousePosition.y - _resizeStartMouse.y;
-            _battleTestPanelRect.width = _resizeStartRect.width + dw;
-            _battleTestPanelRect.height = _resizeStartRect.height + dh;
-            e.Use();
+            GUILayout.Space(4 * s);
+            if (GUILayout.Button(_showBattleLog ? "▼ 日志" : "▶ 日志", btn, GUILayout.Height(28 * s)))
+                _showBattleLog = !_showBattleLog;
+            if (_showBattleLog)
+            {
+                _battleLogScroll = GUILayout.BeginScrollView(_battleLogScroll, GUILayout.ExpandHeight(true));
+                foreach (var e in BattleLogger.Entries)
+                    GUILayout.Label(e, lbl);
+                GUILayout.EndScrollView();
+            }
         }
     }
 
@@ -143,39 +82,16 @@ public partial class GameApp
     {
         if (!int.TryParse(_battleTestInput, out int battleId))
         {
-            _battleTestStatus = "无效的战斗ID";
+            _battleTestStatus = "无效ID";
             return;
         }
-
-        var tables = ManagerRegistry.GetTables<cfg.Tables>();
-        var battleCfg = tables?.TbBattle.GetOrDefault(battleId);
-        if (battleCfg == null)
+        var bm = ManagerRegistry.GetTables<cfg.Tables>()?.TbBattle.GetOrDefault(battleId);
+        if (bm == null)
         {
             _battleTestStatus = $"战斗{battleId}不存在";
             return;
         }
-
-        _battleTestStatus = $"正在进入战斗: {battleCfg.Name}";
+        _battleTestStatus = $"进入: {bm.Name}";
         EnterBattle(battleId);
-    }
-
-    private void InitBattleTestStyles()
-    {
-        if (_battleLabelStyle != null) return;
-
-        _battleLabelStyle = new GUIStyle(GUI.skin.label) { fontSize = 13, wordWrap = false };
-        _battleFieldStyle = new GUIStyle(GUI.skin.textField) { fontSize = 13 };
-        _battleBtnBgTex = new Texture2D(1, 1);
-        _battleBtnBgTex.SetPixel(0, 0, new Color(0.25f, 0.25f, 0.35f, 0.95f));
-        _battleBtnBgTex.Apply();
-        _battleBtnStyle = new GUIStyle(GUI.skin.button)
-        {
-            fontSize = 12,
-            normal = { textColor = Color.white, background = _battleBtnBgTex },
-            hover = { textColor = Color.white, background = _battleBtnBgTex }
-        };
-        _battleBgTex = new Texture2D(1, 1);
-        _battleBgTex.SetPixel(0, 0, new Color(0.08f, 0.08f, 0.12f, 0.93f));
-        _battleBgTex.Apply();
     }
 }
