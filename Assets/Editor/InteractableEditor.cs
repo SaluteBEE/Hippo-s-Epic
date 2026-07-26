@@ -45,7 +45,20 @@ public class InteractableEditor : Editor
         var destroySelfProp = phase.FindPropertyRelative("destroySelf");
         var deactivateSelfProp = phase.FindPropertyRelative("deactivateSelf");
 
+        EditorGUILayout.BeginHorizontal();
         phase.isExpanded = EditorGUILayout.Foldout(phase.isExpanded, $"Phase {stateProp.intValue}", true, EditorStyles.boldLabel);
+        if (GUILayout.Button("删除", EditorStyles.miniButton, GUILayout.Width(45)))
+        {
+            if (EditorUtility.DisplayDialog("确认删除", $"确定要删除 Phase {stateProp.intValue} 吗？", "删除", "取消"))
+            {
+                _phasesProp.DeleteArrayElementAtIndex(index);
+                serializedObject.ApplyModifiedProperties();
+                EditorGUILayout.EndHorizontal();
+                return;
+            }
+        }
+        EditorGUILayout.EndHorizontal();
+
         if (!phase.isExpanded) return;
 
         EditorGUI.indentLevel++;

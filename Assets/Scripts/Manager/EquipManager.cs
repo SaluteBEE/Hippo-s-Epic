@@ -87,10 +87,22 @@ public class EquipManager
 
         if (_equips.TryGetValue(slot, out var oldEquip) && oldEquip.itemId > 0)
         {
+            var oldItemCfg = GetItemConfig(oldEquip.itemId);
+            if (oldItemCfg != null)
+            {
+                int oldBuffId = BuffManager.ParseBuffId(oldItemCfg.Param1);
+                if (oldBuffId > 0)
+                    BuffManager.Instance.RemoveBuff(oldBuffId);
+            }
             BagManager.Instance.AddItem(oldEquip.itemId);
         }
 
         _equips[slot] = new EquipEntry { instanceId = instanceId, itemId = itemId };
+
+        int buffId = BuffManager.ParseBuffId(itemCfg.Param1);
+        if (buffId > 0)
+            BuffManager.Instance.ApplyBuff(buffId, fromEquip: true);
+
         OnEquipChanged?.Invoke(slot, itemId);
         return true;
     }
@@ -101,6 +113,15 @@ public class EquipManager
             return false;
 
         int itemId = equip.itemId;
+
+        var itemCfg = GetItemConfig(itemId);
+        if (itemCfg != null)
+        {
+            int buffId = BuffManager.ParseBuffId(itemCfg.Param1);
+            if (buffId > 0)
+                BuffManager.Instance.RemoveBuff(buffId);
+        }
+
         _equips.Remove(slot);
         BagManager.Instance.AddItem(itemId);
         OnEquipChanged?.Invoke(slot, 0);

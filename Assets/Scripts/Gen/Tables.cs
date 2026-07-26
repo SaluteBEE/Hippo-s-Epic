@@ -65,6 +65,22 @@ public partial class Tables
     /// 实体表
     /// </summary>
     public cfg.entity.TbEntity TbEntity {get; }
+    /// <summary>
+    /// 养成属性表
+    /// </summary>
+    public cfg.build.TbBuild TbBuild {get; }
+    /// <summary>
+    /// 角色等级表
+    /// </summary>
+    public cfg.characterlevel.TbCharacterlevel TbCharacterlevel {get; }
+    /// <summary>
+    /// 技能表
+    /// </summary>
+    public cfg.skill.TbSkill TbSkill {get; }
+    /// <summary>
+    /// 战斗表
+    /// </summary>
+    public cfg.battle.TbBattle TbBattle {get; }
 
     public Tables(System.Func<string, ByteBuf> loader)
     {
@@ -81,6 +97,10 @@ public partial class Tables
         TbSlotstate = new cfg.slotstate.TbSlotstate(loader("cfg_slotstate_tbslotstate"));
         TbScene = new cfg.scene.TbScene(loader("cfg_scene_tbscene"));
         TbEntity = new cfg.entity.TbEntity(loader("cfg_entity_tbentity"));
+        TbBuild = new cfg.build.TbBuild(loader("cfg_build_tbbuild"));
+        TbCharacterlevel = new cfg.characterlevel.TbCharacterlevel(loader("cfg_characterlevel_tbcharacterlevel"));
+        TbSkill = new cfg.skill.TbSkill(loader("cfg_skill_tbskill"));
+        TbBattle = new cfg.battle.TbBattle(loader("cfg_battle_tbbattle"));
         ResolveRef();
     }
     
@@ -99,6 +119,10 @@ public partial class Tables
         TbSlotstate.ResolveRef(this);
         TbScene.ResolveRef(this);
         TbEntity.ResolveRef(this);
+        TbBuild.ResolveRef(this);
+        TbCharacterlevel.ResolveRef(this);
+        TbSkill.ResolveRef(this);
+        TbBattle.ResolveRef(this);
     }
 }
 

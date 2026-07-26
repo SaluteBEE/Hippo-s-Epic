@@ -27,6 +27,8 @@ public sealed partial class Buff : Luban.BeanBase
         Num = _buf.ReadInt();
         Time = _buf.ReadInt();
         Param1 = _buf.ReadInt();
+        Trigger = _buf.ReadInt();
+        Param2 = _buf.ReadInt();
     }
 
     public static Buff DeserializeBuff(ByteBuf _buf)
@@ -78,6 +80,14 @@ public sealed partial class Buff : Luban.BeanBase
     /// 参数
     /// </summary>
     public readonly int Param1;
+    /// <summary>
+    /// 触发时机
+    /// </summary>
+    public readonly int Trigger;
+    /// <summary>
+    /// 第二参数
+    /// </summary>
+    public readonly int Param2;
    
     public const int __ID__ = 456626212;
     public override int GetTypeId() => __ID__;
@@ -100,6 +110,8 @@ public sealed partial class Buff : Luban.BeanBase
         + "num:" + Num + ","
         + "time:" + Time + ","
         + "param1:" + Param1 + ","
+        + "trigger:" + Trigger + ","
+        + "param2:" + Param2 + ","
         + "}";
     }
 }

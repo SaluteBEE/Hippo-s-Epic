@@ -1,0 +1,330 @@
+using System;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class CharacterStatsManager
+{
+    private static CharacterStatsManager _instance;
+    public static CharacterStatsManager Instance => _instance ??= new CharacterStatsManager();
+
+    private const int PlayerPersonId = 1;
+
+    private CharacterStats _playerStats;
+    public CharacterStats PlayerStats => _playerStats;
+
+    public event Action OnStatsChanged;
+
+    public void InitFromConfig()
+    {
+        _playerStats = new CharacterStats();
+
+        var tables = GetTables();
+        if (tables == null)
+        {
+            Debug.LogError("[CharacterStatsManager] Tables 未加载");
+            return;
+        }
+
+        var person = tables.TbPerson.GetOrDefault(PlayerPersonId);
+        if (person == null)
+        {
+            Debug.LogError("[CharacterStatsManager] 玩家角色配置不存在: " + PlayerPersonId);
+            return;
+        }
+
+        _playerStats.Destroy = person.Destroy;
+        _playerStats.Selfmatain = person.Selfmatain;
+        _playerStats.Creatorwilling = person.Creatorwilling;
+        _playerStats.DestroyPlus = person.DestroyPlus;
+        _playerStats.SelfmatainPlus = person.SelfmatainPlus;
+        _playerStats.CreatorwillingPlus = person.CreatorwillingPlus;
+        _playerStats.DestroyPer = person.DestroyPer;
+        _playerStats.SelfmatainPer = person.SelfmatainPer;
+        _playerStats.CreatorwillingPer = person.CreatorwillingPer;
+        _playerStats.SpeedBase = person.Speed;
+
+        InitBuildValues(tables);
+
+        _playerStats.Hp = _playerStats.FinalHpMax;
+
+        Debug.Log($"[CharacterStatsManager] 从配置初始化: " +
+            $"Destroy={_playerStats.FinalDestroy}, " +
+            $"Selfmatain={_playerStats.FinalSelfmatain}, " +
+            $"Creatorwilling={_playerStats.FinalCreatorwilling}, " +
+            $"HpMax={_playerStats.FinalHpMax}, " +
+            $"Level={_playerStats.Level}, Exp={_playerStats.Exp}, SkillPoint={_playerStats.SkillPoint}");
+    }
+
+    private void InitBuildValues(cfg.Tables tables)
+    {
+        foreach (var build in tables.TbBuild.DataList)
+        {
+            switch (build.Buildtype)
+            {
+                case 1:
+                    if (int.TryParse(build.Buildvalue, out int expVal))
+                        _playerStats.Exp = expVal;
+                    break;
+                case 2:
+                    if (int.TryParse(build.Buildvalue, out int spVal))
+                        _playerStats.SkillPoint = spVal;
+                    break;
+                case 3:
+                    if (int.TryParse(build.Buildvalue, out int lvVal))
+                        _playerStats.Level = lvVal;
+                    break;
+                case 1001:
+                    if (float.TryParse(build.Buildvalue, out float expBonus))
+                        _playerStats.ExpBonus = expBonus;
+                    break;
+                case 4001:
+                    if (float.TryParse(build.Buildvalue, out float curBonus))
+                        _playerStats.CurrencyBonus = curBonus;
+                    break;
+            }
+        }
+    }
+
+    public void AddExp(int amount)
+    {
+        if (amount <= 0 || _playerStats == null) return;
+
+        int actual = Mathf.RoundToInt(amount * _playerStats.ExpBonus);
+        _playerStats.Exp += actual;
+
+        CheckLevelUp();
+        _playerStats.NotifyChanged();
+        OnStatsChanged?.Invoke();
+
+        Debug.Log($"[CharacterStatsManager] 获得经验: {actual}(x{_playerStats.ExpBonus}), 总经验={_playerStats.Exp}, 等级={_playerStats.Level}");
+    }
+
+    private void CheckLevelUp()
+    {
+        var tables = GetTables();
+        if (tables == null) return;
+
+        bool leveledUp = false;
+
+        foreach (var cl in tables.TbCharacterlevel.DataList)
+        {
+            if (cl.Level <= _playerStats.Level)
+                continue;
+
+            if (_playerStats.Exp >= cl.Id)
+            {
+                _playerStats.Level = cl.Level;
+                _playerStats.SkillPoint += cl.Skillpoint;
+
+                if (cl.Skillpoint > 0)
+                    Debug.Log($"[CharacterStatsManager] 升级! Level={cl.Level}, 获得技能点+{cl.Skillpoint}");
+
+                leveledUp = true;
+            }
+            else
+            {
+                break;
+            }
+        }
+
+        if (leveledUp)
+        {
+            _playerStats.ClampHp();
+        }
+    }
+
+    public bool UnlockSkill(int skillId)
+    {
+        if (_playerStats == null) return false;
+
+        var tables = GetTables();
+        if (tables == null) return false;
+
+        var skillCfg = tables.TbSkill.GetOrDefault(skillId);
+        if (skillCfg == null)
+        {
+            Debug.LogWarning($"[CharacterStatsManager] 技能配置不存在: {skillId}");
+            return false;
+        }
+
+        int currentLevel = _playerStats.SkillLevels.TryGetValue(skillId, out int lv) ? lv : 0;
+
+        if (currentLevel >= skillCfg.Maxlevel)
+        {
+            Debug.LogWarning($"[CharacterStatsManager] 技能 {skillId} 已达最大等级");
+            return false;
+        }
+
+        if (currentLevel == 0 && skillCfg.Prerequisite > 0)
+        {
+            if (!_playerStats.UnlockedSkills.Contains(skillCfg.Prerequisite))
+            {
+                Debug.LogWarning($"[CharacterStatsManager] 前置技能 {skillCfg.Prerequisite} 未解锁");
+                return false;
+            }
+        }
+
+        if (_playerStats.SkillPoint < skillCfg.Cost)
+        {
+            Debug.LogWarning($"[CharacterStatsManager] 技能点不足: 需要{skillCfg.Cost}, 当前{_playerStats.SkillPoint}");
+            return false;
+        }
+
+        _playerStats.SkillPoint -= skillCfg.Cost;
+
+        if (currentLevel > 0)
+        {
+            int oldBuffId = skillCfg.Buffid + (currentLevel - 1);
+            BuffManager.Instance.RemoveBuff(oldBuffId);
+        }
+
+        int newLevel = currentLevel + 1;
+        _playerStats.SkillLevels[skillId] = newLevel;
+
+        if (!_playerStats.UnlockedSkills.Contains(skillId))
+            _playerStats.UnlockedSkills.Add(skillId);
+
+        int newBuffId = skillCfg.Buffid + (newLevel - 1);
+        BuffManager.Instance.ApplyBuff(newBuffId, fromSkill: true);
+
+        _playerStats.NotifyChanged();
+        OnStatsChanged?.Invoke();
+
+        Debug.Log($"[CharacterStatsManager] 解锁/升级技能: {skillCfg.Name}(id={skillId}) Lv{newLevel}, 消耗技能点{skillCfg.Cost}");
+
+        ConditionSystem.Instance.Notify(ConditionChangeType.Perk);
+        return true;
+    }
+
+    public void ModifyBase(AttrType type, int delta)
+    {
+        if (_playerStats == null) return;
+
+        int current = _playerStats.GetBase(type);
+        _playerStats.SetBase(type, current + delta);
+
+        _playerStats.NotifyChanged();
+        OnStatsChanged?.Invoke();
+    }
+
+    public void ModifyPlus(AttrType type, int delta)
+    {
+        if (_playerStats == null) return;
+
+        int current = _playerStats.GetPlus(type);
+        _playerStats.SetPlus(type, current + delta);
+
+        _playerStats.NotifyChanged();
+        OnStatsChanged?.Invoke();
+    }
+
+    public void ModifyPer(AttrType type, int delta)
+    {
+        if (_playerStats == null) return;
+
+        int current = _playerStats.GetPer(type);
+        _playerStats.SetPer(type, current + delta);
+
+        _playerStats.NotifyChanged();
+        OnStatsChanged?.Invoke();
+    }
+
+    public void TakeDamage(int damage)
+    {
+        if (_playerStats == null || damage <= 0) return;
+
+        _playerStats.Hp -= damage;
+        _playerStats.ClampHp();
+        _playerStats.NotifyChanged();
+        OnStatsChanged?.Invoke();
+
+        Debug.Log($"[CharacterStatsManager] 受到伤害: {damage}, 剩余HP={_playerStats.Hp}/{_playerStats.FinalHpMax}");
+    }
+
+    public void Heal(int amount)
+    {
+        if (_playerStats == null || amount <= 0) return;
+
+        _playerStats.Hp += amount;
+        _playerStats.ClampHp();
+        _playerStats.NotifyChanged();
+        OnStatsChanged?.Invoke();
+
+        Debug.Log($"[CharacterStatsManager] 治疗: {amount}, 当前HP={_playerStats.Hp}/{_playerStats.FinalHpMax}");
+    }
+
+    public void ResetHp()
+    {
+        if (_playerStats == null) return;
+
+        _playerStats.Hp = _playerStats.FinalHpMax;
+        _playerStats.NotifyChanged();
+        OnStatsChanged?.Invoke();
+    }
+
+    public CharacterStats CreateTempStats(int personId)
+    {
+        var tables = GetTables();
+        if (tables == null) return null;
+
+        var person = tables.TbPerson.GetOrDefault(personId);
+        if (person == null) return null;
+
+        var stats = new CharacterStats
+        {
+            Destroy = person.Destroy,
+            Selfmatain = person.Selfmatain,
+            Creatorwilling = person.Creatorwilling,
+            DestroyPlus = person.DestroyPlus,
+            SelfmatainPlus = person.SelfmatainPlus,
+            CreatorwillingPlus = person.CreatorwillingPlus,
+            DestroyPer = person.DestroyPer,
+            SelfmatainPer = person.SelfmatainPer,
+            CreatorwillingPer = person.CreatorwillingPer,
+            SpeedBase = person.Speed
+        };
+
+        stats.Hp = stats.FinalHpMax;
+
+        return stats;
+    }
+
+    public CharacterStats.StatsSaveData BuildSaveData()
+    {
+        return _playerStats?.ToSaveData();
+    }
+
+    public void RestoreFromSaveData(CharacterStats.StatsSaveData data)
+    {
+        if (data == null)
+        {
+            InitFromConfig();
+            return;
+        }
+
+        if (_playerStats == null)
+            _playerStats = new CharacterStats();
+
+        _playerStats.FromSaveData(data);
+        _playerStats.ClampHp();
+
+        Debug.Log($"[CharacterStatsManager] 从存档恢复: " +
+            $"Destroy={_playerStats.FinalDestroy}, " +
+            $"Selfmatain={_playerStats.FinalSelfmatain}, " +
+            $"Creatorwilling={_playerStats.FinalCreatorwilling}, " +
+            $"Hp={_playerStats.Hp}/{_playerStats.FinalHpMax}, " +
+            $"Level={_playerStats.Level}, Exp={_playerStats.Exp}");
+    }
+
+    public void Clear()
+    {
+        _playerStats = null;
+    }
+
+    private cfg.Tables GetTables()
+    {
+        if (ManagerRegistry.TryGet<DataTableManager>(out var dtm) && dtm.Tables != null)
+            return dtm.Tables;
+        return null;
+    }
+}

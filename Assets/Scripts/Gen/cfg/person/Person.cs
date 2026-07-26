@@ -20,12 +20,22 @@ public sealed partial class Person : Luban.BeanBase
         Name = _buf.ReadString();
         Hp = _buf.ReadInt();
         Hpmax = _buf.ReadInt();
+        Destroy = _buf.ReadInt();
+        Selfmatain = _buf.ReadInt();
+        Creatorwilling = _buf.ReadInt();
+        DestroyPlus = _buf.ReadInt();
+        SelfmatainPlus = _buf.ReadInt();
+        CreatorwillingPlus = _buf.ReadInt();
+        DestroyPer = _buf.ReadInt();
+        SelfmatainPer = _buf.ReadInt();
+        CreatorwillingPer = _buf.ReadInt();
         Animstate = _buf.ReadInt();
         Prefab1 = _buf.ReadString();
         Prefab2 = _buf.ReadString();
         {int n0 = _buf.ReadSize(); BuffIds = new System.Collections.Generic.List<int>(n0);for(var i0 = 0 ; i0 < n0 ; i0++) { int _e0;  _e0 = _buf.ReadInt(); BuffIds.Add(_e0);}}
         {int n0 = _buf.ReadSize(); Animconfigs = new System.Collections.Generic.List<string>(n0);for(var i0 = 0 ; i0 < n0 ; i0++) { string _e0;  _e0 = _buf.ReadString(); Animconfigs.Add(_e0);}}
         Avatar = _buf.ReadString();
+        Speed = _buf.ReadInt();
     }
 
     public static Person DeserializePerson(ByteBuf _buf)
@@ -50,6 +60,42 @@ public sealed partial class Person : Luban.BeanBase
     /// </summary>
     public readonly int Hpmax;
     /// <summary>
+    /// 毁灭值
+    /// </summary>
+    public readonly int Destroy;
+    /// <summary>
+    /// 自我值
+    /// </summary>
+    public readonly int Selfmatain;
+    /// <summary>
+    /// 创作者意志值
+    /// </summary>
+    public readonly int Creatorwilling;
+    /// <summary>
+    /// 毁灭值加成
+    /// </summary>
+    public readonly int DestroyPlus;
+    /// <summary>
+    /// 自我值加成
+    /// </summary>
+    public readonly int SelfmatainPlus;
+    /// <summary>
+    /// 创作者意志值加成
+    /// </summary>
+    public readonly int CreatorwillingPlus;
+    /// <summary>
+    /// 毁灭值万分比加成
+    /// </summary>
+    public readonly int DestroyPer;
+    /// <summary>
+    /// 自我值万分比加成
+    /// </summary>
+    public readonly int SelfmatainPer;
+    /// <summary>
+    /// 创作者意志值万分比加成
+    /// </summary>
+    public readonly int CreatorwillingPer;
+    /// <summary>
     /// 动画状态
     /// </summary>
     public readonly int Animstate;
@@ -71,6 +117,10 @@ public sealed partial class Person : Luban.BeanBase
     /// </summary>
     public readonly System.Collections.Generic.List<string> Animconfigs;
     public readonly string Avatar;
+    /// <summary>
+    /// 0
+    /// </summary>
+    public readonly int Speed;
    
     public const int __ID__ = 944002084;
     public override int GetTypeId() => __ID__;
@@ -89,12 +139,22 @@ public sealed partial class Person : Luban.BeanBase
         + "name:" + Name + ","
         + "hp:" + Hp + ","
         + "hpmax:" + Hpmax + ","
+        + "destroy:" + Destroy + ","
+        + "selfmatain:" + Selfmatain + ","
+        + "creatorwilling:" + Creatorwilling + ","
+        + "destroyPlus:" + DestroyPlus + ","
+        + "selfmatainPlus:" + SelfmatainPlus + ","
+        + "creatorwillingPlus:" + CreatorwillingPlus + ","
+        + "destroyPer:" + DestroyPer + ","
+        + "selfmatainPer:" + SelfmatainPer + ","
+        + "creatorwillingPer:" + CreatorwillingPer + ","
         + "animstate:" + Animstate + ","
         + "prefab1:" + Prefab1 + ","
         + "prefab2:" + Prefab2 + ","
         + "buffIds:" + Luban.StringUtil.CollectionToString(BuffIds) + ","
         + "animconfigs:" + Luban.StringUtil.CollectionToString(Animconfigs) + ","
         + "avatar:" + Avatar + ","
+        + "speed:" + Speed + ","
         + "}";
     }
 }

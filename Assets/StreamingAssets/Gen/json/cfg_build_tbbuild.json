@@ -1,0 +1,32 @@
+[
+  {
+    "id": 1,
+    "buildtype": 1,
+    "buildname": "经验",
+    "buildvalue": "1"
+  },
+  {
+    "id": 2,
+    "buildtype": 2,
+    "buildname": "技能点",
+    "buildvalue": "1"
+  },
+  {
+    "id": 3,
+    "buildtype": 3,
+    "buildname": "等级",
+    "buildvalue": "1"
+  },
+  {
+    "id": 1001,
+    "buildtype": 1001,
+    "buildname": "经验加成比例",
+    "buildvalue": "1.2"
+  },
+  {
+    "id": 4001,
+    "buildtype": 4001,
+    "buildname": "货币获取加成",
+    "buildvalue": "1.2"
+  }
+]

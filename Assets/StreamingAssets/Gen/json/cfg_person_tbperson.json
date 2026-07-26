@@ -2,8 +2,17 @@
   {
     "id": 1,
     "name": "河马",
-    "hp": 100,
-    "hpmax": 100,
+    "hp": 20,
+    "hpmax": 20,
+    "destroy": 1,
+    "selfmatain": 1,
+    "creatorwilling": 1,
+    "destroy_plus": 0,
+    "selfmatain_plus": 0,
+    "creatorwilling_plus": 0,
+    "destroy_per": 0,
+    "selfmatain_per": 0,
+    "creatorwilling_per": 0,
     "animstate": 1,
     "prefab1": "prefabs/player/homo_talk",
     "prefab2": "Assets\\Prefabs\\player\\Hippo",
@@ -14,13 +23,23 @@
       "homo_talk",
       "homo_move"
     ],
-    "avatar": "avatar_hippo"
+    "avatar": "avatar_hippo",
+    "speed": 5
   },
   {
     "id": 2,
     "name": "教练",
-    "hp": 100,
-    "hpmax": 100,
+    "hp": 10,
+    "hpmax": 10,
+    "destroy": 10,
+    "selfmatain": 2,
+    "creatorwilling": 0,
+    "destroy_plus": 0,
+    "selfmatain_plus": 0,
+    "creatorwilling_plus": 0,
+    "destroy_per": 40000,
+    "selfmatain_per": 40000,
+    "creatorwilling_per": 40000,
     "animstate": 1,
     "prefab1": "prefabs/npc/coach",
     "prefab2": "Assets\\Prefabs\\npc\\coach",
@@ -30,13 +49,23 @@
     "animconfigs": [
       "coach"
     ],
-    "avatar": "avatar_coach"
+    "avatar": "avatar_coach",
+    "speed": 5
   },
   {
     "id": 3,
     "name": "拳王",
-    "hp": 200,
-    "hpmax": 200,
+    "hp": 60,
+    "hpmax": 60,
+    "destroy": 0,
+    "selfmatain": 0,
+    "creatorwilling": 0,
+    "destroy_plus": 0,
+    "selfmatain_plus": 0,
+    "creatorwilling_plus": 0,
+    "destroy_per": 0,
+    "selfmatain_per": 0,
+    "creatorwilling_per": 0,
     "animstate": 1,
     "prefab1": "prefabs/npc/quanwang_bk",
     "prefab2": "Assets\\Prefabs\\npc\\quanwang_bk",
@@ -44,13 +73,23 @@
     "animconfigs": [
       "quanwang_bk"
     ],
-    "avatar": "avatar_quanwang"
+    "avatar": "avatar_quanwang",
+    "speed": 5
   },
   {
     "id": 4,
     "name": "乌合之众1",
     "hp": 50,
     "hpmax": 50,
+    "destroy": 0,
+    "selfmatain": 0,
+    "creatorwilling": 0,
+    "destroy_plus": 0,
+    "selfmatain_plus": 0,
+    "creatorwilling_plus": 0,
+    "destroy_per": 0,
+    "selfmatain_per": 0,
+    "creatorwilling_per": 0,
     "animstate": 1,
     "prefab1": "prefabs/npc/npc_01",
     "prefab2": "Assets\\Prefabs\\npc\\npc_01",
@@ -58,13 +97,23 @@
     "animconfigs": [
       "npc_01"
     ],
-    "avatar": "avatar_mob1"
+    "avatar": "avatar_mob1",
+    "speed": 5
   },
   {
     "id": 5,
     "name": "乌合之众2",
     "hp": 50,
     "hpmax": 50,
+    "destroy": 0,
+    "selfmatain": 0,
+    "creatorwilling": 0,
+    "destroy_plus": 0,
+    "selfmatain_plus": 0,
+    "creatorwilling_plus": 0,
+    "destroy_per": 0,
+    "selfmatain_per": 0,
+    "creatorwilling_per": 0,
     "animstate": 1,
     "prefab1": "prefabs/npc/npc_02",
     "prefab2": "Assets\\Prefabs\\npc\\npc_02",
@@ -72,6 +121,7 @@
     "animconfigs": [
       "npc_02"
     ],
-    "avatar": "avatar_mob2"
+    "avatar": "avatar_mob2",
+    "speed": 5
   }
 ]

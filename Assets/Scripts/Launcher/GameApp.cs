@@ -41,6 +41,7 @@ public partial class GameApp : MonoBehaviour
     public SceneMapId StartMap => startMap;
 
     public GameStateMachine StateMachine { get; private set; }
+    public BattleManager BattleManager { get; private set; }
 
     #region Dialog Test
 
@@ -292,8 +293,6 @@ public partial class GameApp : MonoBehaviour
 
     private void Start()
     {
-        SaveManager.Instance.Load();
-
         if (launchConfig != null && launchConfig.LaunchTasks != null && launchConfig.LaunchTasks.Length > 0)
         {
             foreach (var task in launchConfig.LaunchTasks)
@@ -308,8 +307,12 @@ public partial class GameApp : MonoBehaviour
             dataTable.LoadTables();
         }
 
+        SaveManager.Instance.Load();
+
         InitBag();
         InitEquip();
+        InitCharacterStats();
+        InitBuffs();
         InitQuest();
 
         ConditionSystem.Instance.Initialize();
@@ -320,6 +323,7 @@ public partial class GameApp : MonoBehaviour
         InitDialogTest();
         InitAnimationTest();
         InitBagTest();
+        InitBattleTest();
 
         GoMainMenu();
     }
@@ -362,6 +366,29 @@ public partial class GameApp : MonoBehaviour
         }
     }
 
+    private void InitCharacterStats()
+    {
+        var statsMgr = CharacterStatsManager.Instance;
+        if (statsMgr.PlayerStats == null)
+        {
+            statsMgr.InitFromConfig();
+        }
+        else
+        {
+            Debug.Log($"[GameApp] 角色属性从存档恢复: Lv{statsMgr.PlayerStats.Level}");
+        }
+    }
+
+    private void InitBuffs()
+    {
+        var buffMgr = BuffManager.Instance;
+
+        buffMgr.ReapplyEquipBuffs();
+        buffMgr.ReapplySkillBuffs();
+
+        Debug.Log($"[GameApp] Buff初始化完成: {buffMgr.ActiveBuffs.Count} 个活跃Buff");
+    }
+
     private void Update()
     {
         StateMachine.Update();
@@ -380,6 +407,7 @@ public partial class GameApp : MonoBehaviour
         DrawDialogTestGUI();
         DrawAnimationTestGUI();
         DrawBagTestGUI();
+        DrawBattleTestGUI();
     }
 
     public void GoMainMenu()
@@ -446,6 +474,8 @@ public partial class GameApp : MonoBehaviour
     }
 
     private IGameState _stateBeforeDialog;
+    private IGameState _stateBeforeBattle;
+    private string _returnSceneName; // 战斗结束后返回的场景名
 
     public void EnterDialog()
     {
@@ -459,6 +489,104 @@ public partial class GameApp : MonoBehaviour
             StateMachine.ChangeState(new GameplayState(this));
         else if (_stateBeforeDialog != null)
             StateMachine.ChangeState(_stateBeforeDialog);
+        else
+            StateMachine.ChangeState(new GameplayState(this));
+    }
+
+    public void EnterBattle(int battleId)
+    {
+        // 记录当前场景，战斗结束后返回
+        _returnSceneName = SceneManager.GetActiveScene().name;
+        _stateBeforeBattle = StateMachine.Current;
+
+        // 初始化战斗数据（不依赖场景）
+        BattleManager = new BattleManager();
+        BattleManager.OnBattleEnd += result => OnBattleFinished(battleId, result);
+        BattleManager.InitBattle(battleId);
+
+        // 切换到战斗场景
+        var sceneCtrl = ManagerRegistry.Get<SceneController>();
+        if (sceneCtrl != null)
+        {
+            sceneCtrl.LoadScene("Scene_Battle", onLoaded: () => OnBattleSceneLoaded());
+        }
+        else
+        {
+            // 无SceneController时直接在当前场景战斗
+            OnBattleSceneLoaded();
+        }
+    }
+
+    /// <summary>
+    /// 战斗场景加载完成回调
+    /// </summary>
+    private void OnBattleSceneLoaded()
+    {
+        // 切换游戏状态
+        StateMachine.ChangeState(new BattleGameState(this));
+
+        // 生成战斗角色
+        var stageManager = FindObjectOfType<BattleStageManager>();
+        if (stageManager != null && BattleManager != null)
+        {
+            var allUnits = new List<BattleUnit>();
+            allUnits.AddRange(BattleManager.PlayerUnits);
+            allUnits.AddRange(BattleManager.EnemyUnits);
+            stageManager.SpawnUnits(allUnits);
+        }
+        else if (stageManager == null)
+        {
+            Debug.LogWarning("[GameApp] 战斗场景中未找到 BattleStageManager");
+        }
+
+        // 打开战斗UI
+        var ui = ManagerRegistry.Get<UIManager>();
+        if (ui != null)
+            ui.Open<BattleWindow>();
+    }
+
+    private void OnBattleFinished(int battleId, BattleResult result)
+    {
+        if (result == BattleResult.Win)
+        {
+            SaveManager.Instance.RecordCompletedBattle(battleId);
+            ConditionSystem.Instance.Notify(ConditionChangeType.Battle);
+        }
+    }
+
+    /// <summary>
+    /// 战斗结果确认后回调，关闭UI并返回原场景
+    /// </summary>
+    public void OnBattleResultConfirmed()
+    {
+        // 关闭战斗UI
+        var ui = ManagerRegistry.Get<UIManager>();
+        if (ui != null)
+            ui.Close<BattleWindow>();
+
+        // 返回原场景
+        if (!string.IsNullOrEmpty(_returnSceneName) && _returnSceneName != "Scene_Battle")
+        {
+            var sceneCtrl = ManagerRegistry.Get<SceneController>();
+            if (sceneCtrl != null)
+            {
+                sceneCtrl.LoadScene(_returnSceneName, onLoaded: () => ExitBattle());
+                return;
+            }
+        }
+
+        ExitBattle();
+    }
+
+    public void ExitBattle()
+    {
+        BattleManager = null;
+        _returnSceneName = null;
+
+        if (_stateBeforeBattle is GameplayState)
+            StateMachine.ChangeState(new GameplayState(this));
+        else if (_stateBeforeBattle != null)
+            StateMachine.ChangeState(_stateBeforeBattle);
         else
             StateMachine.ChangeState(new GameplayState(this));
     }

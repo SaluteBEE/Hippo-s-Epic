@@ -340,12 +340,14 @@ public class ConditionSystem
 
     protected virtual bool CheckPerk(int perkId)
     {
-        return false;
+        var stats = CharacterStatsManager.Instance.PlayerStats;
+        if (stats == null) return false;
+        return stats.UnlockedSkills.Contains(perkId);
     }
 
     protected virtual bool CheckBattleResult(int battleId, int result)
     {
-        return false;
+        return SaveManager.Instance.IsBattleCompleted(battleId, (BattleResult)result);
     }
 
     protected virtual bool CheckDialogFinished(int dialogId)
