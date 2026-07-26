@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -33,6 +33,9 @@ public class BattleManager
     public event Action<BattleUnit> OnUnitDeath;
     public event Action<BattleUnit> OnUnitDefend;
     public event Action OnPlayerFlee;
+    public event Action<List<BattleUnit>> OnNewUnitsReady;
+
+    public BattleEventQueue EventQueue { get; private set; }
 
     private cfg.cfg.battle.Battle _battleConfig;
     private int _unitIdCounter;
@@ -54,6 +57,8 @@ public class BattleManager
         CurrentUnit = null;
         IsWaitingForPlayerAction = false;
 
+        EventQueue = new BattleEventQueue(this);
+
         var tables = GetTables();
         if (tables == null)
         {
@@ -69,13 +74,66 @@ public class BattleManager
         }
 
         CreateUnits(_battleConfig, tables);
+        BattleLogger.Log($" 战斗初始化完成: {_battleConfig.Name}, 友方{PlayerUnits.Count}人, 敌方{EnemyUnits.Count}人");
+    }
+
+    /// <summary>
+    /// 开始战斗：触发BattleStart事件 + 触发Buff + 开始第一轮
+    /// 在视觉角色生成完成后调用
+    /// </summary>
+    public void StartBattle()
+    {
+        if (Phase != BattlePhase.Init)
+        {
+            BattleLogger.LogWarning("战斗未初始化，无法开始");
+            return;
+        }
+
         TriggerGlobalBuffs(BuffTrigger.BattleStart);
-
-        Phase = BattlePhase.RoundStart;
         OnBattleStart?.Invoke();
+        BattleLogger.Log(" 战斗开始！");
 
-        Debug.Log($"[BattleManager] 战斗初始化完成: {_battleConfig.Name}, 友方{PlayerUnits.Count}人, 敌方{EnemyUnits.Count}人");
         StartRound();
+    }
+
+    /// <summary>
+    /// 添加待入场单位（下一轮开始时才出现，通过事件队列机制）
+    /// </summary>
+    public void AddPendingUnit(int personId, bool isPlayerSide, int slotIndex)
+    {
+        EventQueue.Enqueue(BattleEvent.Summon(personId, isPlayerSide, slotIndex, BattleEventPhase.RoundStart));
+    }
+
+    /// <summary>
+    /// 从事件创建 BattleUnit（供 EventQueue 调用）
+    /// </summary>
+    public BattleUnit CreateUnitFromEvent(BattleEvent evt)
+    {
+        var tables = GetTables();
+        if (tables == null) return null;
+
+        if (evt.BoolParam && evt.Param1 == 1)
+            return CreatePlayerBattleUnit(evt.Param2, tables);
+        else
+            return CreateBattleUnit(evt.Param1, evt.BoolParam, evt.Param2, tables);
+    }
+
+    /// <summary>
+    /// 触发技能（供 EventQueue 调用）
+    /// </summary>
+    public void TriggerSkill(BattleUnit actor, int skillId, List<BattleUnit> targets)
+    {
+        ExecuteSkill(actor, skillId, targets);
+    }
+
+    public void NotifyBuffApplied(BattleUnit unit, int buffId, int param)
+    {
+        OnBuffApplied?.Invoke(unit, buffId, param);
+    }
+
+    public void NotifyBuffRemoved(BattleUnit unit, int buffId)
+    {
+        OnBuffRemoved?.Invoke(unit, buffId);
     }
 
     private void CreateUnits(cfg.cfg.battle.Battle config, cfg.Tables tables)
@@ -206,9 +264,32 @@ public class BattleManager
     {
         RoundCount++;
         Phase = BattlePhase.RoundStart;
+        BattleLogger.Log($" ══════════ 第{RoundCount}轮开始 ══════════");
 
+        // ① 事件队列 — 提取 RoundStart 召唤事件
+        var newUnits = EventQueue.ProcessPendingSummons();
+
+        // ② 增援入列（在排序前加入，确保参与本轮排序）
+        if (newUnits.Count > 0)
+        {
+            BattleLogger.Log($" 增援入场: {newUnits.Count}人");
+            foreach (var unit in newUnits)
+            {
+                AllUnits.Add(unit);
+                if (unit.IsPlayerSide)
+                    PlayerUnits.Add(unit);
+                else
+                    EnemyUnits.Add(unit);
+            }
+        }
+
+        // ③ 事件队列 — 处理 RoundStart 其他延迟事件
+        EventQueue.ProcessPhase(BattleEventPhase.RoundStart);
+
+        // ④ Buff系统 — 全局TurnStart Buff
         TriggerGlobalBuffs(BuffTrigger.TurnStart);
 
+        // ⑤ 排序
         var sortedUnits = AllUnits
             .Where(u => u.IsAlive)
             .OrderByDescending(u => u.Stats.FinalSpeed)
@@ -218,8 +299,13 @@ public class BattleManager
 
         TurnQueue = new Queue<BattleUnit>(sortedUnits);
 
+        // ⑥ 通知外部（增援视觉 + 回合开始）
+        if (newUnits.Count > 0)
+            OnNewUnitsReady?.Invoke(newUnits);
+
         OnRoundStart?.Invoke(RoundCount);
-        Debug.Log($"[BattleManager] 第{RoundCount}轮开始, 行动顺序: {string.Join(",", sortedUnits.Select(u => $"P{u.PersonId}(S{u.Stats.FinalSpeed})"))}");
+        foreach (var u in sortedUnits)
+            BattleLogger.Log($"   行动顺序: P{u.PersonId} Speed={u.Stats.FinalSpeed} Slot={u.SlotIndex} {(u.IsPlayerSide ? "友方" : "敌方")}");
 
         Phase = BattlePhase.TurnQueue;
         ProcessTurnQueue();
@@ -248,25 +334,31 @@ public class BattleManager
     {
         CurrentUnit = unit;
         unit.ResetTurnState();
+        BattleLogger.Log($" >>> P{unit.PersonId} 开始行动 (Slot={unit.SlotIndex}, HP={unit.Stats.Hp}/{unit.Stats.FinalHpMax})");
 
+        // ① 事件队列 — 该单位TurnStart阶段的延迟事件
+        EventQueue.ProcessUnitPhase(BattleEventPhase.TurnStart, unit);
+
+        // ② Buff系统 — TurnStart触发的Buff效果
+        TriggerBuffs(unit, BuffTrigger.TurnStart);
+
+        // ③ 状态通知
         unit.CurrentPhase = UnitTurnPhase.TurnStart;
         OnUnitPhaseChange?.Invoke(unit, UnitTurnPhase.TurnStart);
         OnUnitTurnStart?.Invoke(unit);
-
-        TriggerBuffs(unit, BuffTrigger.TurnStart);
 
         ProcessStatusCheck(unit);
     }
 
     private void ProcessStatusCheck(BattleUnit unit)
     {
-        unit.CurrentPhase = UnitTurnPhase.StatusCheck;
-        OnUnitPhaseChange?.Invoke(unit, UnitTurnPhase.StatusCheck);
+        // ① 事件队列 — 该单位StatusCheck阶段的延迟事件
+        EventQueue.ProcessUnitPhase(BattleEventPhase.StatusCheck, unit);
 
         if (unit.UnitBuffs.HasStatus(BuffFuncType.Stun) || unit.UnitBuffs.HasStatus(BuffFuncType.Freeze))
         {
             unit.SkipAction = true;
-            Debug.Log($"[BattleManager] {unit.PersonId} 被眩晕/冻结，跳过行动");
+            BattleLogger.Log($"   P{unit.PersonId} 被眩晕/冻结，跳过行动");
         }
 
         var turnStartBuffs = unit.UnitBuffs.GetBuffsByTrigger(BuffTrigger.TurnStart);
@@ -280,12 +372,18 @@ public class BattleManager
             var funcType = (BuffFuncType)cfg.Func;
             if (funcType == BuffFuncType.Heal)
             {
+                BattleLogger.Log($"   P{unit.PersonId} TurnStart Buff恢复HP+{cfg.Param1}");
                 ApplyHeal(unit, cfg.Param1);
             }
         }
 
+        // ② 状态通知
+        unit.CurrentPhase = UnitTurnPhase.StatusCheck;
+        OnUnitPhaseChange?.Invoke(unit, UnitTurnPhase.StatusCheck);
+
         if (unit.SkipAction)
         {
+            BattleLogger.Log($" <<< P{unit.PersonId} 跳过回合");
             EndUnitTurn(unit);
             return;
         }
@@ -295,17 +393,24 @@ public class BattleManager
 
     private void EnterActionPhase(BattleUnit unit)
     {
+        // ① 事件队列 — 该单位Action阶段的延迟事件
+        EventQueue.ProcessUnitPhase(BattleEventPhase.Action, unit);
+
+        // ② Buff系统 — Action前的Buff效果
+        TriggerBuffs(unit, BuffTrigger.BeforeAction);
+
+        // ③ 状态通知
         unit.CurrentPhase = UnitTurnPhase.Action;
         OnUnitPhaseChange?.Invoke(unit, UnitTurnPhase.Action);
 
-        TriggerBuffs(unit, BuffTrigger.BeforeAction);
-
         if (unit.IsPlayerControlled)
         {
+            BattleLogger.Log($"   P{unit.PersonId} 等待玩家操作...");
             IsWaitingForPlayerAction = true;
         }
         else
         {
+            BattleLogger.Log($"   P{unit.PersonId} AI决策中...");
             var action = BattleAI.Decide(unit, this);
             ExecuteAction(action);
         }
@@ -313,8 +418,11 @@ public class BattleManager
 
     public void ExecuteAction(BattleAction action)
     {
+        BattleLogger.Log($"   P{action.Actor?.PersonId} 执行 {action.Type} (id={action.ActionId})");
+
         if (action == null || action.Actor == null || !action.Actor.IsAlive)
         {
+            BattleLogger.Log($"   行动无效(Actor死亡或为空)，跳过");
             AdvanceTurnQueue();
             return;
         }
@@ -350,8 +458,8 @@ public class BattleManager
                 break;
         }
 
+        // ② Buff系统 — AfterAction Buff
         OnUnitActionExecute?.Invoke(action.Actor, action);
-
         TriggerBuffs(action.Actor, BuffTrigger.AfterAction);
 
         CheckDeaths();
@@ -363,13 +471,17 @@ public class BattleManager
 
     private void EndUnitTurn(BattleUnit unit)
     {
-        unit.CurrentPhase = UnitTurnPhase.TurnEnd;
-        OnUnitPhaseChange?.Invoke(unit, UnitTurnPhase.TurnEnd);
+        // ① 事件队列 — 该单位TurnEnd阶段的延迟事件
+        EventQueue.ProcessUnitPhase(BattleEventPhase.TurnEnd, unit);
 
+        // ② Buff系统 — TurnEnd触发的Buff效果
         TriggerBuffs(unit, BuffTrigger.TurnEnd);
-
         unit.UnitBuffs.OnTurnEnd();
 
+        // ③ 状态通知
+        BattleLogger.Log($" <<< P{unit.PersonId} 回合结束");
+        unit.CurrentPhase = UnitTurnPhase.TurnEnd;
+        OnUnitPhaseChange?.Invoke(unit, UnitTurnPhase.TurnEnd);
         OnUnitTurnEnd?.Invoke(unit);
 
         AdvanceTurnQueue();
@@ -389,16 +501,24 @@ public class BattleManager
     {
         Phase = BattlePhase.RoundEnd;
 
+        // ① 事件队列 — RoundEnd 延迟事件
+        EventQueue.ProcessPhase(BattleEventPhase.RoundEnd);
+
+        // ② 日志
+        BattleLogger.Log($" ══════════ 第{RoundCount}轮结束 ══════════");
+
+        // ③ 冷却递减
         foreach (var unit in AllUnits)
         {
             if (unit.IsAlive)
                 unit.DecrementCooldowns();
         }
 
+        // ④ Buff系统 — 全局TurnEnd Buff
         TriggerGlobalBuffs(BuffTrigger.TurnEnd);
 
+        // ⑤ 通知外部
         OnRoundEnd?.Invoke(RoundCount);
-        Debug.Log($"[BattleManager] 第{RoundCount}轮结束");
 
         if (CheckBattleEnd()) return;
 
@@ -430,7 +550,7 @@ public class BattleManager
 
         if (CurrentUnit.IsSkillOnCooldown(skillId))
         {
-            Debug.LogWarning($"[BattleManager] 技能{skillId}冷却中");
+            BattleLogger.LogWarning($" 技能{skillId}冷却中");
             return;
         }
 
@@ -469,7 +589,7 @@ public class BattleManager
 
         if (_battleConfig != null && !_battleConfig.Canflee)
         {
-            Debug.LogWarning("[BattleManager] 此战斗不可逃跑");
+            BattleLogger.LogWarning("此战斗不可逃跑");
             return;
         }
 
@@ -487,19 +607,22 @@ public class BattleManager
 
         if (skillId <= 0)
         {
+            BattleLogger.Log($"    P{actor.PersonId} 普通攻击: {targets.Count}目标");
             foreach (var target in targets)
             {
                 if (!target.IsAlive) continue;
 
                 int damage = CalcDamage(actor, target);
                 if (target.IsDefending)
+                {
                     damage = damage / 2;
+                    BattleLogger.Log($"    P{target.PersonId} 防御，伤害减半");
+                }
 
                 ApplyDamage(target, damage);
                 TriggerBuffs(target, BuffTrigger.OnHit);
             }
 
-            Debug.Log($"[BattleManager] {actor.PersonId} 普通攻击");
             return;
         }
 
@@ -530,7 +653,7 @@ public class BattleManager
             TriggerBuffs(target, BuffTrigger.OnHit);
         }
 
-        Debug.Log($"[BattleManager] {actor.PersonId} 使用技能{skillCfg.Name}({skillId})");
+        BattleLogger.Log($"    P{actor.PersonId} 使用技能 {skillCfg.Name}({skillId})");
     }
 
     private void ExecuteItem(BattleUnit actor, int itemId, List<BattleUnit> targets)
@@ -555,21 +678,21 @@ public class BattleManager
         }
 
         BagManager.Instance.RemoveItem(itemId, 1);
-        Debug.Log($"[BattleManager] {actor.PersonId} 使用物品{itemCfg.Name}({itemId})");
+        BattleLogger.Log($" {actor.PersonId} 使用物品{itemCfg.Name}({itemId})");
     }
 
     private void ExecuteDefend(BattleUnit unit)
     {
         unit.IsDefending = true;
         OnUnitDefend?.Invoke(unit);
-        Debug.Log($"[BattleManager] {unit.PersonId} 防御");
+        BattleLogger.Log($"    P{unit.PersonId} 防御 (下回合伤害减半)");
     }
 
     private void ExecuteFlee(BattleUnit unit)
     {
         OnPlayerFlee?.Invoke();
         EndBattle(BattleResult.Flee);
-        Debug.Log($"[BattleManager] 玩家逃跑");
+        BattleLogger.Log($" 玩家逃跑");
     }
 
     #endregion
@@ -677,7 +800,9 @@ public class BattleManager
         }
 
         OnDamageTaken?.Invoke(unit, damage);
-        Debug.Log($"[BattleManager] {unit.PersonId} 受到伤害{damage}(护盾吸收{shieldAbsorbed}), HP={unit.Stats.Hp}/{unit.Stats.FinalHpMax}");
+        var absorbMsg = shieldAbsorbed > 0 ? string.Format(" [护盾吸收{0}]", shieldAbsorbed) : "";
+        var beforeHp = unit.Stats.Hp + remaining + shieldAbsorbed;
+        BattleLogger.Log(string.Format("    P{0} HP: {1} -> {2} (-{3}){4}", unit.PersonId, beforeHp, unit.Stats.Hp, damage, absorbMsg));
     }
 
     public void ApplyHeal(BattleUnit unit, int amount)
@@ -688,7 +813,7 @@ public class BattleManager
         unit.Stats.ClampHp();
 
         OnHealed?.Invoke(unit, amount);
-        Debug.Log($"[BattleManager] {unit.PersonId} 治疗{amount}, HP={unit.Stats.Hp}/{unit.Stats.FinalHpMax}");
+        BattleLogger.Log($"    P{unit.PersonId} 治疗+{amount}, HP={unit.Stats.Hp}/{unit.Stats.FinalHpMax}");
     }
 
     #endregion
@@ -772,7 +897,7 @@ public class BattleManager
         foreach (var unit in AllUnits.Where(u => !u.IsAlive && u.Stats.Hp <= 0))
         {
             OnUnitDeath?.Invoke(unit);
-            Debug.Log($"[BattleManager] {unit.PersonId} 阵亡");
+            BattleLogger.Log($"    P{unit.PersonId} 阵亡！");
         }
 
         CheckBattleEnd();
@@ -795,7 +920,7 @@ public class BattleManager
         }
 
         OnBattleEnd?.Invoke(result);
-        Debug.Log($"[BattleManager] 战斗结束: {result}");
+        BattleLogger.Log($" ══════════ 战斗结束: {result} ══════════");
     }
 
     private void ApplyBattleRewards()
@@ -809,7 +934,7 @@ public class BattleManager
 
         if (_battleConfig.Currencyreward > 0)
         {
-            Debug.Log($"[BattleManager] 获得货币: {_battleConfig.Currencyreward}");
+            BattleLogger.Log($" 获得货币: {_battleConfig.Currencyreward}");
         }
 
         if (_battleConfig.Lootitems != null)
@@ -817,7 +942,7 @@ public class BattleManager
             foreach (int itemId in _battleConfig.Lootitems)
             {
                 BagManager.Instance.AddItem(itemId, 1);
-                Debug.Log($"[BattleManager] 获得物品: {itemId}");
+                BattleLogger.Log($" 获得物品: {itemId}");
             }
         }
     }

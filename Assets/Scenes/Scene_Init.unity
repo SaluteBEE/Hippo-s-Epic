@@ -171,10 +171,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72aefb6116696b145bf7035053090574, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enableAnimationTest: 0
-  testPersonId: 1
-  testPrefabType: 1
-  enableBagTest: 0
+  debugEnableAnimationTest: 1
+  debugAnimationPersonId: 1
+  debugAnimationPrefabType: 1
+  debugEnableBagTest: 1
   ui: {fileID: 2048630439}
   audio: {fileID: 2104528045}
   scene: {fileID: 1182991098}
@@ -183,11 +183,13 @@ MonoBehaviour:
   mainMenuSceneName: Scene_Init
   startMap: 6
   launchConfig: {fileID: 11400000, guid: 5a9f518bd038b594ca0c8b5617edea5b, type: 2}
-  enableDialogTest: 0
-  testDialogId: 9000001
+  debugEnableDialogTest: 1
+  debugDialogId: 1001001
   autoStartTest: 0
-  enableBattleTest: 1
-  testBattleId: 1
+  debugEnableHub: 1
+  debugHubHotkey: 1
+  debugEnableBattleTest: 1
+  debugBattleId: 1
 --- !u!1 &506944131
 GameObject:
   m_ObjectHideFlags: 0
