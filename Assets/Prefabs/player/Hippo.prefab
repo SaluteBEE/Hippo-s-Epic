@@ -337,6 +337,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rigidbody2D: {fileID: 5169911673293718804}
-  MoveSpeed: 4
+  MoveSpeed: 6
   faceRightByDefault: 1
   animationController: {fileID: 5078597329802929950}
