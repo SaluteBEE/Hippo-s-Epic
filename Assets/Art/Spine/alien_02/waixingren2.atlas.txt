@@ -1,0 +1,90 @@
+
+waixingren2.png
+size: 659,268
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+wxr2_bozi
+  rotate: true
+  xy: 431, 162
+  size: 104, 163
+  orig: 104, 163
+  offset: 0, 0
+  index: -1
+wxr2_shou1
+  rotate: true
+  xy: 596, 174
+  size: 92, 61
+  orig: 92, 61
+  offset: 0, 0
+  index: -1
+wxr2_shou2
+  rotate: false
+  xy: 93, 7
+  size: 92, 61
+  orig: 92, 61
+  offset: 0, 0
+  index: -1
+wxr2_shou3
+  rotate: false
+  xy: 2, 2
+  size: 89, 66
+  orig: 89, 66
+  offset: 0, 0
+  index: -1
+wxr2_st
+  rotate: true
+  xy: 196, 120
+  size: 146, 233
+  orig: 146, 233
+  offset: 0, 0
+  index: -1
+wxr2_tou
+  rotate: false
+  xy: 2, 70
+  size: 192, 196
+  orig: 192, 196
+  offset: 0, 0
+  index: -1
+wxr2_tui1
+  rotate: true
+  xy: 196, 2
+  size: 95, 149
+  orig: 95, 149
+  offset: 0, 0
+  index: -1
+wxr2_tui2
+  rotate: true
+  xy: 347, 2
+  size: 95, 149
+  orig: 95, 149
+  offset: 0, 0
+  index: -1
+wxr2_yan1
+  rotate: false
+  xy: 498, 6
+  size: 89, 91
+  orig: 89, 91
+  offset: 0, 0
+  index: -1
+wxr2_yan2
+  rotate: true
+  xy: 517, 105
+  size: 55, 79
+  orig: 55, 79
+  offset: 0, 0
+  index: -1
+wxr2_ying
+  rotate: false
+  xy: 196, 99
+  size: 319, 19
+  orig: 319, 19
+  offset: 0, 0
+  index: -1
+wxr2_zui
+  rotate: true
+  xy: 598, 108
+  size: 64, 41
+  orig: 64, 41
+  offset: 0, 0
+  index: -1

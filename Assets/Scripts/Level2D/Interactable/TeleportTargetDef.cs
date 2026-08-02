@@ -1,6 +1,6 @@
 ﻿// ============================================================
 // 自动生成文件 - 勿手动修改
-// 生成时间: 2026-08-02 20:27:54
+// 生成时间: 2026-08-02 22:53:13
 // 通过 Tools/Map/收集所有场景数据 重新生成
 // ============================================================
 
@@ -25,7 +25,11 @@ public static class TeleportTargetDef
         {
             sceneName = "Scene_Outer_City",
             mapNames = new string[] { "Behind_Moon", "Outer_City_Ground" },
-            interactables = System.Array.Empty<InteractableEntry>()
+            interactables = new InteractableEntry[]
+            {
+                new InteractableEntry { entityId = "alien_02_alienB", mapName = "Behind_Moon" },
+                new InteractableEntry { entityId = "alien_01_alienA", mapName = "Behind_Moon" }
+            }
         }
     };
 

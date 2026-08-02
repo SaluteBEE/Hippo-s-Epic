@@ -20,4 +20,5 @@
     Vertigo,
     Die2,
     Dead2,
+    Talk2,
 }
