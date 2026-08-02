@@ -12,4 +12,5 @@ public enum MapNodeId
     PunkCityGround = 7,
     BodyHouse = 8,
     InnerHospital = 9,
+    BehindMoon = 10,
 }
