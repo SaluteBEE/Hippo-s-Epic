@@ -15,7 +15,7 @@
     "creatorwilling_per": 0,
     "animstate": 1,
     "prefab1": "prefabs/player/homo_talk",
-    "prefab2": "Assets\\Prefabs\\player\\Hippo",
+    "prefab2": "prefabs/player/Hippo",
     "buffIds": [
       1
     ],
@@ -24,7 +24,15 @@
       "homo_move"
     ],
     "avatar": "avatar_hippo",
-    "speed": 5
+    "speed": 5,
+    "skills": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ]
   },
   {
     "id": 2,
@@ -42,7 +50,7 @@
     "creatorwilling_per": 40000,
     "animstate": 1,
     "prefab1": "prefabs/npc/coach",
-    "prefab2": "Assets\\Prefabs\\npc\\coach",
+    "prefab2": "prefabs/npc/coach_fight",
     "buffIds": [
       2
     ],
@@ -50,7 +58,12 @@
       "coach"
     ],
     "avatar": "avatar_coach",
-    "speed": 5
+    "speed": 5,
+    "skills": [
+      4,
+      5,
+      6
+    ]
   },
   {
     "id": 3,
@@ -68,13 +81,18 @@
     "creatorwilling_per": 0,
     "animstate": 1,
     "prefab1": "prefabs/npc/quanwang_bk",
-    "prefab2": "Assets\\Prefabs\\npc\\quanwang_bk",
+    "prefab2": "prefabs/npc/quanwang_bk",
     "buffIds": [],
     "animconfigs": [
       "quanwang_bk"
     ],
     "avatar": "avatar_quanwang",
-    "speed": 5
+    "speed": 5,
+    "skills": [
+      4,
+      5,
+      6
+    ]
   },
   {
     "id": 4,
@@ -92,13 +110,14 @@
     "creatorwilling_per": 0,
     "animstate": 1,
     "prefab1": "prefabs/npc/npc_01",
-    "prefab2": "Assets\\Prefabs\\npc\\npc_01",
+    "prefab2": "prefabs/npc/npc_01",
     "buffIds": [],
     "animconfigs": [
       "npc_01"
     ],
     "avatar": "avatar_mob1",
-    "speed": 5
+    "speed": 5,
+    "skills": []
   },
   {
     "id": 5,
@@ -116,12 +135,13 @@
     "creatorwilling_per": 0,
     "animstate": 1,
     "prefab1": "prefabs/npc/npc_02",
-    "prefab2": "Assets\\Prefabs\\npc\\npc_02",
+    "prefab2": "prefabs/npc/npc_02",
     "buffIds": [],
     "animconfigs": [
       "npc_02"
     ],
     "avatar": "avatar_mob2",
-    "speed": 5
+    "speed": 5,
+    "skills": []
   }
 ]

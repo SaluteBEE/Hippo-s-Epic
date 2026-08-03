@@ -34,18 +34,23 @@ public class SceneController : MonoBehaviour
         var handle = Addressables.LoadSceneAsync(addressableKey, activateOnLoad: false);
         yield return handle;
 
-        if (handle.Status == AsyncOperationStatus.Succeeded)
+        if (handle.IsValid() && handle.Status == AsyncOperationStatus.Succeeded)
         {
             onProgress?.Invoke(1f);
             yield return handle.Result.ActivateAsync();
         }
         else
         {
-            Addressables.Release(handle);
+            if (handle.IsValid())
+                Addressables.Release(handle);
             yield return LoadBuildSettingsScene(sceneName, onProgress);
         }
 
         RemoveDuplicateEventSystems();
+
+        if (_preservedEventSystem != null)
+            _preservedEventSystem.enabled = true;
+
         onLoaded?.Invoke();
     }
 
@@ -79,11 +84,8 @@ public class SceneController : MonoBehaviour
         var systems = FindObjectsOfType<EventSystem>();
         foreach (var sys in systems)
         {
-            if (sys == _preservedEventSystem) continue;
-            Destroy(sys.gameObject);
+            if (sys != _preservedEventSystem)
+                Destroy(sys.gameObject);
         }
-
-        if (_preservedEventSystem != null)
-            _preservedEventSystem.enabled = true;
     }
 }

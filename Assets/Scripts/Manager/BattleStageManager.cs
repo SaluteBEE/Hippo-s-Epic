@@ -33,6 +33,14 @@ public class BattleStageManager : MonoBehaviour
     [Tooltip("血条在角色头顶的偏移")]
     [SerializeField] private Vector3 healthBarOffset = new Vector3(0, 2.2f, 0);
 
+    [Header("目标选中标签")]
+    [Tooltip("角色下方的选中标签节点（不拖则自动查找子节点 TargetSelectionIndicator）")]
+    [SerializeField] private GameObject targetIndicator;
+
+    [Header("点击检测")]
+    [Tooltip("角色点击检测预制体（含 Collider2D），不拖则运行时动态创建 HitArea 子节点")]
+    [SerializeField] private GameObject hitAreaPrefab;
+
     #endregion
 
     #region 运行时数据
@@ -47,6 +55,9 @@ public class BattleStageManager : MonoBehaviour
 
     /// <summary> 当前行动单位指示箭头 </summary>
     private GameObject _currentIndicator;
+
+    /// <summary> 目标选中标签（场景预置节点，运行时移动/显示/隐藏） </summary>
+    private GameObject _targetIndicator;
 
     /// <summary> 资源加载句柄 </summary>
     private readonly List<AsyncOperationHandle> _loadHandles = new List<AsyncOperationHandle>();
@@ -240,13 +251,25 @@ public class BattleStageManager : MonoBehaviour
             go.transform.localScale = scale;
         }
 
-        // 添加2D碰撞体用于点击选择目标
-        if (go.GetComponent<Collider2D>() == null)
+        // 添加点击检测子节点（HitArea），方便单独调整点击区域
+        if (hitAreaPrefab != null)
         {
-            var collider = go.AddComponent<BoxCollider2D>();
-            collider.size = new Vector2(1f, 2f);
-            collider.offset = new Vector2(0, 1f);
+            var hitArea = Instantiate(hitAreaPrefab, go.transform);
+            hitArea.name = "HitArea";
         }
+        else
+        {
+            var hitArea = new GameObject("HitArea");
+            hitArea.transform.SetParent(go.transform, false);
+            var col = hitArea.AddComponent<BoxCollider2D>();
+            col.size = new Vector2(1f, 2f);
+            col.offset = new Vector2(0, 1f);
+        }
+
+        // 移除角色根节点上旧的整体碰撞体，统一交给 HitArea 子节点
+        var oldCollider = go.GetComponent<Collider2D>();
+        if (oldCollider != null)
+            Destroy(oldCollider);
 
         // 记录
         var dict = unit.IsPlayerSide ? _playerUnits : _enemyUnits;
@@ -393,6 +416,60 @@ public class BattleStageManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 显示目标选中标签（角色下方绿色标记），用于目标选择反馈
+    /// </summary>
+    public void ShowTargetSelected(BattleUnit unit)
+    {
+        ClearTargetSelection();
+        if (unit == null) return;
+
+        var dict = unit.IsPlayerSide ? _playerUnits : _enemyUnits;
+        if (!dict.TryGetValue(unit.SlotIndex, out var go)) return;
+
+        EnsureTargetIndicator();
+        if (_targetIndicator == null) return;
+
+        _targetIndicator.transform.position = go.transform.position + new Vector3(0, -2.4f, 0);
+
+        var sr = _targetIndicator.GetComponent<SpriteRenderer>();
+        if (sr != null)
+        {
+            if (sr.sprite == null)
+                sr.sprite = CreateTriangleSprite();
+            sr.color = Color.green;
+        }
+
+        _targetIndicator.SetActive(true);
+    }
+
+    /// <summary>
+    /// 清除目标选中标签（仅隐藏，保留场景节点）
+    /// </summary>
+    public void ClearTargetSelection()
+    {
+        if (_targetIndicator != null)
+            _targetIndicator.SetActive(false);
+    }
+
+    /// <summary>
+    /// 获取目标选中标签节点：优先序列化字段，其次场景子节点 TargetSelectionIndicator
+    /// </summary>
+    private void EnsureTargetIndicator()
+    {
+        if (_targetIndicator != null) return;
+
+        if (targetIndicator != null)
+        {
+            _targetIndicator = targetIndicator;
+            return;
+        }
+
+        var found = transform.Find("TargetSelectionIndicator");
+        if (found != null)
+            _targetIndicator = found.gameObject;
+    }
+
     private Sprite CreateTriangleSprite()
     {
         // 创建简单的三角形纹理
@@ -453,6 +530,7 @@ public class BattleStageManager : MonoBehaviour
         _playerHealthBars.Clear();
         _enemyHealthBars.Clear();
         ClearHighlight();
+        ClearTargetSelection();
     }
 
     private void ReleaseAll()

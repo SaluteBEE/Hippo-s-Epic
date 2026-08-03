@@ -15,7 +15,6 @@ public class UIManager : MonoBehaviour
     private readonly HashSet<string> createdSet = new HashSet<string>();
     private readonly Dictionary<string, AsyncOperationHandle<GameObject>> loadHandles = new Dictionary<string, AsyncOperationHandle<GameObject>>();
     private readonly HashSet<string> pendingClose = new HashSet<string>();
-
     public static void RegisterAddress(Type windowType, string address)
     {
         addressMap[windowType.FullName] = address;
@@ -78,11 +77,13 @@ public class UIManager : MonoBehaviour
         if (loadHandles[key].Status != AsyncOperationStatus.Succeeded)
         {
             Debug.LogError($"[UIManager] 加载失败: {address}");
-            loadHandles.Remove(key);
+            ReleaseHandle(key);
             yield break;
         }
 
         var prefab = loadHandles[key].Result;
+        ReleaseHandle(key);
+
         var instance = Instantiate(prefab, rootCanvas.transform, false);
         var window = instance.GetComponent<T>();
 
@@ -126,7 +127,10 @@ public class UIManager : MonoBehaviour
         }
 
         window.OnClose();
-        window.gameObject.SetActive(false);
+        Destroy(window.gameObject);
+        windowMap.Remove(key);
+        createdSet.Remove(key);
+        ReleaseHandle(key);
     }
 
     public bool IsOpen<T>() where T : UIWindow
@@ -164,7 +168,16 @@ public class UIManager : MonoBehaviour
         if (topmost != null)
         {
             topmost.OnClose();
-            topmost.gameObject.SetActive(false);
+            Destroy(topmost.gameObject);
+            foreach (var kvp in new List<KeyValuePair<string, UIWindow>>(windowMap))
+            {
+                if (kvp.Value == topmost)
+                {
+                    windowMap.Remove(kvp.Key);
+                    createdSet.Remove(kvp.Key);
+                    ReleaseHandle(kvp.Key);
+                }
+            }
         }
     }
 
@@ -175,6 +188,19 @@ public class UIManager : MonoBehaviour
         if (windowMap.TryGetValue(key, out var window))
             return (T)window;
         return null;
+    }
+
+    /// <summary>
+    /// 释放指定 key 的 prefab 加载 handle，避免缓存旧资源
+    /// </summary>
+    private void ReleaseHandle(string key)
+    {
+        if (!loadHandles.TryGetValue(key, out var handle))
+            return;
+
+        if (handle.IsValid())
+            Addressables.Release(handle);
+        loadHandles.Remove(key);
     }
 
     private void OnDestroy()

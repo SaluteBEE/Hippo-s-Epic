@@ -36,7 +36,6 @@ public static class AddressableAutoSetup
 
     static readonly HashSet<string> _excludeSceneNames = new HashSet<string>
     {
-        "Scene_Init",
         "Scene_Dialogue",
     };
 

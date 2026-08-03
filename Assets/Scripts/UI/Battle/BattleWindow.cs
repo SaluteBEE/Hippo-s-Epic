@@ -111,6 +111,7 @@ public class BattleWindow : UIWindow
         _battleManager.OnUnitTurnEnd += OnUnitTurnEnd;
         _battleManager.OnRoundEnd += OnRoundEnd;
         _battleManager.OnBattleEnd += OnBattleEnd;
+        _battleManager.OnBuffApplied += OnBuffApplied;
     }
 
     private void UnsubscribeEvents()
@@ -127,6 +128,7 @@ public class BattleWindow : UIWindow
         _battleManager.OnUnitTurnEnd -= OnUnitTurnEnd;
         _battleManager.OnRoundEnd -= OnRoundEnd;
         _battleManager.OnBattleEnd -= OnBattleEnd;
+        _battleManager.OnBuffApplied -= OnBuffApplied;
     }
 
     #endregion
@@ -146,7 +148,11 @@ public class BattleWindow : UIWindow
     private void OnUnitTurnStart(BattleUnit unit)
     {
         if (_stageManager != null)
+        {
+            // 清除上一位被选中的目标标签
+            _stageManager.ClearTargetSelection();
             _stageManager.HighlightCurrentUnit(unit);
+        }
     }
 
     private void OnUnitPhaseChange(BattleUnit unit, UnitTurnPhase phase)
@@ -162,12 +168,22 @@ public class BattleWindow : UIWindow
         // 更新场景血条
         if (_stageManager != null)
             _stageManager.UpdateHealthBar(unit);
+        if (logPanel != null)
+            logPanel.AddLog($"{GetUnitName(unit)} 受到 {damage} 点伤害");
     }
 
     private void OnHealed(BattleUnit unit, int amount)
     {
         if (_stageManager != null)
             _stageManager.UpdateHealthBar(unit);
+        if (logPanel != null)
+            logPanel.AddLog($"{GetUnitName(unit)} 恢复 {amount} 点生命");
+    }
+
+    private void OnBuffApplied(BattleUnit unit, int buffId, int param)
+    {
+        if (logPanel != null)
+            logPanel.AddLog($"{GetUnitName(unit)} 获得Buff({buffId})");
     }
 
     private void OnUnitDeath(BattleUnit unit)
@@ -201,6 +217,8 @@ public class BattleWindow : UIWindow
 
         if (_stageManager != null)
             _stageManager.ClearHighlight();
+        if (_stageManager != null)
+            _stageManager.ClearTargetSelection();
 
         if (logPanel != null)
         {
@@ -273,11 +291,11 @@ public class BattleWindow : UIWindow
         }
     }
 
-    /// <summary> 正在发呆 → 跳过回合（防御） </summary>
+    /// <summary> 正在发呆 → 后移回合（排到队尾，下一位先行） </summary>
     private void OnIdleClicked()
     {
         if (!CanOperate()) return;
-        _battleManager.PlayerDefend();
+        _battleManager.PlayerDeferTurn();
     }
 
     private bool CanOperate()
@@ -293,6 +311,19 @@ public class BattleWindow : UIWindow
     {
         CloseAllSubPanels();
         _selectedSkillId = skillId;
+
+        // targettype=Self 无需选目标，直接对自身释放
+        if (skillId > 0 && _battleManager != null)
+        {
+            var skillCfg = _battleManager.GetTables()?.TbSkill.GetOrDefault(skillId);
+            if (skillCfg != null && (TargetType)skillCfg.Targettype == TargetType.Self
+                && _battleManager.CurrentUnit != null)
+            {
+                _battleManager.PlayerUseSkill(skillId, _battleManager.CurrentUnit.SlotIndex);
+                return;
+            }
+        }
+
         StartTargetSelection();
     }
 
@@ -319,6 +350,38 @@ public class BattleWindow : UIWindow
     private void StartTargetSelection()
     {
         _isSelectingTarget = true;
+        if (logPanel != null)
+            logPanel.AddLog("请点击战场上的目标角色（默认选中敌人）");
+
+        // 默认选中一个目标并显示选中标签
+        var defaultTarget = FindDefaultTarget();
+        if (defaultTarget != null && _stageManager != null)
+            _stageManager.ShowTargetSelected(defaultTarget);
+    }
+
+    /// <summary>
+    /// 目标选择模式的默认目标：按技能 targettype 决定阵营，取第一个存活单位
+    /// </summary>
+    private BattleUnit FindDefaultTarget()
+    {
+        if (_battleManager == null || _battleManager.CurrentUnit == null) return null;
+
+        if (_selectedSkillId > 0)
+        {
+            var skillCfg = _battleManager.GetTables()?.TbSkill.GetOrDefault(_selectedSkillId);
+            if (skillCfg != null)
+            {
+                var tt = (TargetType)skillCfg.Targettype;
+                if (tt == TargetType.Ally)
+                    return _battleManager.PlayerUnits.Find(u => u.IsAlive && u.SlotIndex != _battleManager.CurrentUnit.SlotIndex)
+                           ?? _battleManager.CurrentUnit;
+                if (tt == TargetType.Enemy)
+                    return _battleManager.EnemyUnits.Find(u => u.IsAlive);
+            }
+        }
+
+        // 普通攻击/未知类型 → 默认第一个存活敌人
+        return _battleManager.EnemyUnits.Find(u => u.IsAlive);
     }
 
     private void CancelTargetSelection()
@@ -344,6 +407,10 @@ public class BattleWindow : UIWindow
 
         // 执行技能
         _battleManager.PlayerUseSkill(_selectedSkillId, unit.SlotIndex);
+
+        // 显示目标选中标签
+        if (_stageManager != null)
+            _stageManager.ShowTargetSelected(unit);
 
         // 记录日志
         if (logPanel != null && _battleManager.CurrentUnit != null)

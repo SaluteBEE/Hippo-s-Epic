@@ -222,10 +222,10 @@ public class BuffManager
         {
             var skillCfg = tables.TbSkill.GetOrDefault(skillId);
             if (skillCfg == null) continue;
+            if ((SkillType)skillCfg.Skilltype != SkillType.BuffOnly) continue;
+            if (skillCfg.Buffid <= 0) continue;
 
-            int level = stats.SkillLevels.TryGetValue(skillId, out int lv) ? lv : 1;
-            int buffId = skillCfg.Buffid + (level - 1);
-            ApplyBuff(buffId, fromSkill: true);
+            ApplyBuff(skillCfg.Buffid, fromSkill: true);
         }
     }
 

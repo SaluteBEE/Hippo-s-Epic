@@ -10,23 +10,31 @@ public static class BattleAI
 
         if (ShouldHeal(unit, battle))
         {
-            var healTarget = FindLowestHpAlly(unit, battle);
-            if (healTarget != null)
+            var healSkill = FindBestHealSkill(unit, battle);
+            if (healSkill != null)
             {
-                return new BattleAction(unit, ActionType.Defend, 0, new List<int>(), TargetType.Self);
+                var healTargets = battle.GetAvailableTargetsForSkill(unit, healSkill.Id);
+                if (healTargets.Count > 0)
+                {
+                    var healTarget = FindLowestHpAlly(unit, battle) ?? healTargets[0];
+                    if (!healTargets.Contains(healTarget))
+                        healTarget = healTargets[0];
+
+                    return new BattleAction(unit, ActionType.Skill, healSkill.Id,
+                        new List<int> { healTarget.SlotIndex }, (TargetType)healSkill.Targettype);
+                }
             }
         }
 
         var availableSkill = FindBestAttackSkill(unit, battle);
         if (availableSkill != null)
         {
-            var targetType = (TargetType)availableSkill.Targettype;
             var targets = battle.GetAvailableTargetsForSkill(unit, availableSkill.Id);
             if (targets.Count > 0)
             {
                 var primaryTarget = FindBestTarget(targets);
                 return new BattleAction(unit, ActionType.Skill, availableSkill.Id,
-                    new List<int> { primaryTarget.SlotIndex }, targetType);
+                    new List<int> { primaryTarget.SlotIndex }, (TargetType)availableSkill.Targettype);
             }
         }
 
@@ -34,7 +42,7 @@ public static class BattleAI
         {
             var target = FindBestTarget(enemyUnits);
             return new BattleAction(unit, ActionType.Skill, 0,
-                new List<int> { target.SlotIndex }, TargetType.EnemySingle);
+                new List<int> { target.SlotIndex }, TargetType.Enemy);
         }
 
         return new BattleAction(unit, ActionType.Defend, 0, new List<int>(), TargetType.Self);
@@ -65,6 +73,33 @@ public static class BattleAI
         return lowest;
     }
 
+    private static cfg.cfg.skill.Skill FindBestHealSkill(BattleUnit unit, BattleManager battle)
+    {
+        var tables = battle.GetTables();
+        if (tables == null) return null;
+
+        cfg.cfg.skill.Skill best = null;
+        int bestValue = 0;
+
+        foreach (int skillId in unit.AvailableSkills)
+        {
+            if (unit.IsSkillOnCooldown(skillId)) continue;
+
+            var skillCfg = tables.TbSkill.GetOrDefault(skillId);
+            if (skillCfg == null) continue;
+            if ((SkillType)skillCfg.Skilltype != SkillType.Heal) continue;
+
+            int value = SkillCombatUtil.CalcSkillValue(unit.Stats, skillCfg.Dmgfunc, skillCfg.Effectparam);
+            if (value >= bestValue)
+            {
+                bestValue = value;
+                best = skillCfg;
+            }
+        }
+
+        return best;
+    }
+
     private static cfg.cfg.skill.Skill FindBestAttackSkill(BattleUnit unit, BattleManager battle)
     {
         var tables = battle.GetTables();
@@ -80,18 +115,14 @@ public static class BattleAI
             var skillCfg = tables.TbSkill.GetOrDefault(skillId);
             if (skillCfg == null) continue;
 
-            var targetType = (TargetType)skillCfg.Targettype;
-            if (targetType == TargetType.Self || targetType == TargetType.AllySingle || targetType == TargetType.AllyAll)
+            var skillType = (SkillType)skillCfg.Skilltype;
+            if (skillType != SkillType.PhysicalDamage && skillType != SkillType.MagicDamage)
                 continue;
 
-            int level = unit.Stats.SkillLevels.TryGetValue(skillId, out int lv) ? lv : 1;
-            int buffId = skillCfg.Buffid + (level - 1);
+            if ((TargetType)skillCfg.Targettype != TargetType.Enemy)
+                continue;
 
-            var buffCfg = tables.TbBuff.GetOrDefault(buffId);
-            int damage = buffCfg != null && (BuffFuncType)buffCfg.Func == BuffFuncType.DamageUp
-                ? unit.Stats.FinalDestroy + buffCfg.Param1
-                : unit.Stats.FinalDestroy;
-
+            int damage = SkillCombatUtil.CalcSkillValue(unit.Stats, skillCfg.Dmgfunc, skillCfg.Effectparam);
             if (damage > bestDamage)
             {
                 bestDamage = damage;

@@ -441,6 +441,7 @@ public partial class GameApp : MonoBehaviour
 
         // 初始化战斗数据（不依赖场景）
         BattleManager = new BattleManager();
+        BattleManager.UnlockAllSkillsForTest = IsBattleTestEnabled;
         BattleManager.OnBattleEnd += result => OnBattleFinished(battleId, result);
         BattleManager.InitBattle(battleId);
 

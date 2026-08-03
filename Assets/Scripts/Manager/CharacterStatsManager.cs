@@ -43,6 +43,26 @@ public class CharacterStatsManager
         _playerStats.CreatorwillingPer = person.CreatorwillingPer;
         _playerStats.SpeedBase = person.Speed;
 
+        // 从 person 表读取默认技能
+        _playerStats.UnlockedSkills.Clear();
+        _playerStats.SkillLevels.Clear();
+        if (person.Skills != null)
+        {
+            foreach (int skillId in person.Skills)
+            {
+                if (skillId > 0 && !_playerStats.UnlockedSkills.Contains(skillId))
+                {
+                    _playerStats.UnlockedSkills.Add(skillId);
+                    _playerStats.SkillLevels[skillId] = 1;
+
+                    // 仅 BuffOnly 技能在初始化时挂永久 buff
+                    var skillCfg = tables.TbSkill.GetOrDefault(skillId);
+                    if (skillCfg != null && (SkillType)skillCfg.Skilltype == SkillType.BuffOnly && skillCfg.Buffid > 0)
+                        BuffManager.Instance.ApplyBuff(skillCfg.Buffid, fromSkill: true);
+                }
+            }
+        }
+
         InitBuildValues(tables);
 
         _playerStats.Hp = _playerStats.FinalHpMax;
@@ -148,20 +168,10 @@ public class CharacterStatsManager
         }
 
         int currentLevel = _playerStats.SkillLevels.TryGetValue(skillId, out int lv) ? lv : 0;
-
-        if (currentLevel >= skillCfg.Maxlevel)
+        if (currentLevel > 0 || _playerStats.UnlockedSkills.Contains(skillId))
         {
-            Debug.LogWarning($"[CharacterStatsManager] 技能 {skillId} 已达最大等级");
+            Debug.LogWarning($"[CharacterStatsManager] 技能 {skillId} 已解锁");
             return false;
-        }
-
-        if (currentLevel == 0 && skillCfg.Prerequisite > 0)
-        {
-            if (!_playerStats.UnlockedSkills.Contains(skillCfg.Prerequisite))
-            {
-                Debug.LogWarning($"[CharacterStatsManager] 前置技能 {skillCfg.Prerequisite} 未解锁");
-                return false;
-            }
         }
 
         if (_playerStats.SkillPoint < skillCfg.Cost)
@@ -171,26 +181,19 @@ public class CharacterStatsManager
         }
 
         _playerStats.SkillPoint -= skillCfg.Cost;
-
-        if (currentLevel > 0)
-        {
-            int oldBuffId = skillCfg.Buffid + (currentLevel - 1);
-            BuffManager.Instance.RemoveBuff(oldBuffId);
-        }
-
-        int newLevel = currentLevel + 1;
-        _playerStats.SkillLevels[skillId] = newLevel;
+        _playerStats.SkillLevels[skillId] = 1;
 
         if (!_playerStats.UnlockedSkills.Contains(skillId))
             _playerStats.UnlockedSkills.Add(skillId);
 
-        int newBuffId = skillCfg.Buffid + (newLevel - 1);
-        BuffManager.Instance.ApplyBuff(newBuffId, fromSkill: true);
+        // 仅永久 Buff 类技能在解锁时挂到角色；战斗即时技能不在此施加
+        if ((SkillType)skillCfg.Skilltype == SkillType.BuffOnly && skillCfg.Buffid > 0)
+            BuffManager.Instance.ApplyBuff(skillCfg.Buffid, fromSkill: true);
 
         _playerStats.NotifyChanged();
         OnStatsChanged?.Invoke();
 
-        Debug.Log($"[CharacterStatsManager] 解锁/升级技能: {skillCfg.Name}(id={skillId}) Lv{newLevel}, 消耗技能点{skillCfg.Cost}");
+        Debug.Log($"[CharacterStatsManager] 解锁技能: {skillCfg.Name}(id={skillId}), 消耗技能点{skillCfg.Cost}");
 
         ConditionSystem.Instance.Notify(ConditionChangeType.Perk);
         return true;

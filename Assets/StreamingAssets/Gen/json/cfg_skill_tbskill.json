@@ -5,12 +5,18 @@
     "icon": 1,
     "cost": 1,
     "buffid": 20,
-    "prerequisite": 0,
-    "maxlevel": 3,
+    "skilltype": 0,
+    "dmgfunc": 0,
+    "effectparam": [
+      0
+    ],
     "comment": "增加毁灭值",
     "targettype": 1,
-    "cooldown": 0,
-    "battlecost": 0
+    "range": [
+      5
+    ],
+    "selectable": [],
+    "cooldown": 0
   },
   {
     "id": 2,
@@ -18,12 +24,18 @@
     "icon": 2,
     "cost": 1,
     "buffid": 21,
-    "prerequisite": 0,
-    "maxlevel": 3,
+    "skilltype": 0,
+    "dmgfunc": 0,
+    "effectparam": [
+      0
+    ],
     "comment": "增加自我值",
-    "targettype": 1,
-    "cooldown": 0,
-    "battlecost": 0
+    "targettype": 2,
+    "range": [
+      5
+    ],
+    "selectable": [],
+    "cooldown": 0
   },
   {
     "id": 3,
@@ -31,11 +43,81 @@
     "icon": 3,
     "cost": 2,
     "buffid": 22,
-    "prerequisite": 0,
-    "maxlevel": 3,
+    "skilltype": 0,
+    "dmgfunc": 0,
+    "effectparam": [
+      0
+    ],
     "comment": "增加创作者意志值",
     "targettype": 1,
-    "cooldown": 0,
-    "battlecost": 0
+    "range": [
+      5
+    ],
+    "selectable": [],
+    "cooldown": 0
+  },
+  {
+    "id": 4,
+    "name": "铁拳头",
+    "icon": 3,
+    "cost": 2,
+    "buffid": 0,
+    "skilltype": 2,
+    "dmgfunc": 1,
+    "effectparam": [
+      3
+    ],
+    "comment": "增加创作者意志值",
+    "targettype": 3,
+    "range": [
+      5
+    ],
+    "selectable": [],
+    "cooldown": 0
+  },
+  {
+    "id": 5,
+    "name": "踢睾丸",
+    "icon": 4,
+    "cost": 2,
+    "buffid": 0,
+    "skilltype": 2,
+    "dmgfunc": 2,
+    "effectparam": [
+      4
+    ],
+    "comment": "增加创作者意志值",
+    "targettype": 3,
+    "range": [
+      5
+    ],
+    "selectable": [],
+    "cooldown": 0
+  },
+  {
+    "id": 6,
+    "name": "升龙拳",
+    "icon": 5,
+    "cost": 2,
+    "buffid": 0,
+    "skilltype": 2,
+    "dmgfunc": 4,
+    "effectparam": [
+      10
+    ],
+    "comment": "击晕扇形敌人并造成大量伤害",
+    "targettype": 3,
+    "range": [
+      5,
+      3,
+      6,
+      9
+    ],
+    "selectable": [
+      1,
+      4,
+      7
+    ],
+    "cooldown": 0
   }
 ]

@@ -36,6 +36,7 @@ public sealed partial class Person : Luban.BeanBase
         {int n0 = _buf.ReadSize(); Animconfigs = new System.Collections.Generic.List<string>(n0);for(var i0 = 0 ; i0 < n0 ; i0++) { string _e0;  _e0 = _buf.ReadString(); Animconfigs.Add(_e0);}}
         Avatar = _buf.ReadString();
         Speed = _buf.ReadInt();
+        {int n0 = _buf.ReadSize(); Skills = new System.Collections.Generic.List<int>(n0);for(var i0 = 0 ; i0 < n0 ; i0++) { int _e0;  _e0 = _buf.ReadInt(); Skills.Add(_e0);}}
     }
 
     public static Person DeserializePerson(ByteBuf _buf)
@@ -121,6 +122,11 @@ public sealed partial class Person : Luban.BeanBase
     /// 0
     /// </summary>
     public readonly int Speed;
+    /// <summary>
+    /// 默认技能ID列表(按|分隔)
+    /// </summary>
+    public readonly System.Collections.Generic.List<int> Skills;
+    public System.Collections.Generic.List<cfg.skill.Skill> Skills_Ref;
    
     public const int __ID__ = 944002084;
     public override int GetTypeId() => __ID__;
@@ -129,6 +135,9 @@ public sealed partial class Person : Luban.BeanBase
     {
         BuffIds_Ref = new System.Collections.Generic.List<cfg.buff.Buff>();
         foreach (var _v in BuffIds) { BuffIds_Ref.Add(tables.TbBuff.GetOrDefault(_v)); }
+
+        Skills_Ref = new System.Collections.Generic.List<cfg.skill.Skill>();
+        foreach (var _v in Skills) { Skills_Ref.Add(tables.TbSkill.GetOrDefault(_v)); }
 
     }
 
@@ -155,6 +164,7 @@ public sealed partial class Person : Luban.BeanBase
         + "animconfigs:" + Luban.StringUtil.CollectionToString(Animconfigs) + ","
         + "avatar:" + Avatar + ","
         + "speed:" + Speed + ","
+        + "skills:" + Luban.StringUtil.CollectionToString(Skills) + ","
         + "}";
     }
 }

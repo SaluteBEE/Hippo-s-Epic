@@ -40,6 +40,11 @@ public class BattleManager
     private cfg.cfg.battle.Battle _battleConfig;
     private int _unitIdCounter;
 
+    /// <summary>
+    /// 测试模式：为玩家单位解锁技能表中所有技能
+    /// </summary>
+    public bool UnlockAllSkillsForTest;
+
     #region 初始化
 
     public void InitBattle(int battleId)
@@ -202,6 +207,16 @@ public class BattleManager
             }
         }
 
+        // 从 person 表读默认技能
+        if (person != null && person.Skills != null)
+        {
+            foreach (int skillId in person.Skills)
+            {
+                if (skillId > 0 && !unit.AvailableSkills.Contains(skillId))
+                    unit.AvailableSkills.Add(skillId);
+            }
+        }
+
         return unit;
     }
 
@@ -249,6 +264,16 @@ public class BattleManager
         foreach (int skillId in stats.UnlockedSkills)
         {
             unit.AvailableSkills.Add(skillId);
+        }
+
+        // 测试模式：解锁全部技能
+        if (UnlockAllSkillsForTest && tables != null)
+        {
+            foreach (var skill in tables.TbSkill.DataList)
+            {
+                if (skill.Id > 0 && !unit.AvailableSkills.Contains(skill.Id))
+                    unit.AvailableSkills.Add(skill.Id);
+            }
         }
 
         stats.Hp = stats.FinalHpMax;
@@ -535,9 +560,8 @@ public class BattleManager
 
         if (skillId == 0)
         {
-            var normalTargets = GetTargets(TargetType.EnemySingle, CurrentUnit, targetSlotIndex);
             var normalAction = new BattleAction(CurrentUnit, ActionType.Skill, 0,
-                normalTargets.Select(t => t.SlotIndex).ToList(), TargetType.EnemySingle);
+                new List<int> { targetSlotIndex }, TargetType.Enemy);
             ExecuteAction(normalAction);
             return;
         }
@@ -554,14 +578,27 @@ public class BattleManager
             return;
         }
 
+        if (!CanSelectSkillSlot(skillCfg, targetSlotIndex))
+        {
+            BattleLogger.LogWarning($" 技能{skillId}不可从槽位{targetSlotIndex}释放");
+            return;
+        }
+
         var targetType = (TargetType)skillCfg.Targettype;
-        var targets = GetTargets(targetType, CurrentUnit, targetSlotIndex);
+        var preview = GetSkillTargets(CurrentUnit, skillCfg, targetSlotIndex);
+        if (preview.Count == 0)
+        {
+            BattleLogger.LogWarning($" 技能{skillId}无有效目标");
+            return;
+        }
 
         if (skillCfg.Cooldown > 0)
             CurrentUnit.SetCooldown(skillId, skillCfg.Cooldown);
 
+        // TargetSlotIndices 只存落点中心，range 在 ResolveTargets 时展开
+        int centerSlot = targetType == TargetType.Self ? CurrentUnit.SlotIndex : targetSlotIndex;
         var action = new BattleAction(CurrentUnit, ActionType.Skill, skillId,
-            targets.Select(t => t.SlotIndex).ToList(), targetType);
+            new List<int> { centerSlot }, targetType);
         ExecuteAction(action);
     }
 
@@ -569,9 +606,9 @@ public class BattleManager
     {
         if (!IsWaitingForPlayerAction || CurrentUnit == null) return;
 
-        var targets = GetTargets(TargetType.AllySingle, CurrentUnit, targetSlotIndex);
+        var targets = GetTargetsBySide(TargetType.Ally, CurrentUnit, new List<int> { targetSlotIndex });
         var action = new BattleAction(CurrentUnit, ActionType.Item, itemId,
-            targets.Select(t => t.SlotIndex).ToList(), TargetType.AllySingle);
+            targets.Select(t => t.SlotIndex).ToList(), TargetType.Ally);
         ExecuteAction(action);
     }
 
@@ -581,6 +618,23 @@ public class BattleManager
 
         var action = new BattleAction(CurrentUnit, ActionType.Defend, 0, new List<int>(), TargetType.Self);
         ExecuteAction(action);
+    }
+
+    /// <summary>
+    /// 后移回合：当前角色排到队尾，让后一位角色先行
+    /// </summary>
+    public void PlayerDeferTurn()
+    {
+        if (!IsWaitingForPlayerAction || CurrentUnit == null) return;
+        IsWaitingForPlayerAction = false;
+
+        TurnQueue.Dequeue();           // 移除当前单位
+        TurnQueue.Enqueue(CurrentUnit); // 放到队尾
+
+        BattleLogger.Log($"   P{CurrentUnit.PersonId} 后移回合，排到队尾");
+        OnUnitTurnEnd?.Invoke(CurrentUnit);
+
+        ProcessTurnQueue();
     }
 
     public void PlayerFlee()
@@ -631,29 +685,50 @@ public class BattleManager
         var skillCfg = tables.TbSkill.GetOrDefault(skillId);
         if (skillCfg == null) return;
 
-        int level = actor.Stats.SkillLevels.TryGetValue(skillId, out int lv) ? lv : 1;
-        int buffId = skillCfg.Buffid + (level - 1);
+        var skillType = (SkillType)skillCfg.Skilltype;
+        int effectValue = SkillCombatUtil.CalcSkillValue(actor.Stats, skillCfg.Dmgfunc, skillCfg.Effectparam);
+        int buffId = skillCfg.Buffid;
+
+        BattleLogger.Log($"    P{actor.PersonId} 使用技能 {skillCfg.Name}({skillId}) type={skillType} value={effectValue} targets={targets.Count}");
 
         foreach (var target in targets)
         {
             if (!target.IsAlive) continue;
 
-            int damage = CalcDamage(actor, target);
-            if (target.IsDefending)
-                damage = damage / 2;
+            switch (skillType)
+            {
+                case SkillType.Heal:
+                    ApplyHeal(target, effectValue);
+                    break;
 
-            ApplyDamage(target, damage);
+                case SkillType.PhysicalDamage:
+                case SkillType.MagicDamage:
+                {
+                    int damage = effectValue;
+                    if (target.IsDefending)
+                    {
+                        damage = damage / 2;
+                        BattleLogger.Log($"    P{target.PersonId} 防御，伤害减半");
+                    }
+
+                    ApplyDamage(target, damage);
+                    TriggerBuffs(target, BuffTrigger.OnHit);
+                    break;
+                }
+
+                case SkillType.BuffOnly:
+                    BattleLogger.Log($"    P{actor.PersonId} 使用 {skillCfg.Name}: 附加Buff id={buffId} → P{target.PersonId}");
+                    break;
+                default:
+                    break;
+            }
 
             if (buffId > 0)
             {
                 target.UnitBuffs.ApplyBuff(buffId);
                 OnBuffApplied?.Invoke(target, buffId, 0);
             }
-
-            TriggerBuffs(target, BuffTrigger.OnHit);
         }
-
-        BattleLogger.Log($"    P{actor.PersonId} 使用技能 {skillCfg.Name}({skillId})");
     }
 
     private void ExecuteItem(BattleUnit actor, int itemId, List<BattleUnit> targets)
@@ -699,40 +774,79 @@ public class BattleManager
 
     #region 目标选择
 
-    public List<BattleUnit> GetTargets(TargetType type, BattleUnit actor, int selectedSlot)
+    /// <summary>
+    /// 按技能配置解析命中单位（selectedSlot 为落点中心，对应 range 中的键5）
+    /// </summary>
+    public List<BattleUnit> GetSkillTargets(BattleUnit actor, cfg.cfg.skill.Skill skillCfg, int selectedSlot)
     {
-        bool actorIsPlayer = actor.IsPlayerSide;
+        if (actor == null || skillCfg == null)
+            return new List<BattleUnit>();
+
+        var targetType = (TargetType)skillCfg.Targettype;
+
+        if (targetType == TargetType.Self)
+            return actor.IsAlive ? new List<BattleUnit> { actor } : new List<BattleUnit>();
+
+        if (!CanSelectSkillSlot(skillCfg, selectedSlot))
+            return new List<BattleUnit>();
+
+        var hitSlots = SkillCombatUtil.ExpandRangeSlots(selectedSlot, skillCfg.Range);
+        return GetTargetsBySide(targetType, actor, hitSlots);
+    }
+
+    public bool CanSelectSkillSlot(cfg.cfg.skill.Skill skillCfg, int selectedSlot)
+    {
+        if (skillCfg == null) return false;
+        if ((TargetType)skillCfg.Targettype == TargetType.Self)
+            return true;
+        return SkillCombatUtil.IsSlotSelectable(selectedSlot, skillCfg.Selectable);
+    }
+
+    public List<BattleUnit> GetTargetsBySide(TargetType type, BattleUnit actor, IList<int> slotIndices)
+    {
+        var result = new List<BattleUnit>();
+        if (actor == null || slotIndices == null) return result;
 
         switch (type)
         {
             case TargetType.Self:
-                return new List<BattleUnit> { actor };
+                if (actor.IsAlive)
+                    result.Add(actor);
+                return result;
 
-            case TargetType.EnemySingle:
-                return GetAllAliveUnits(!actorIsPlayer)
-                    .Where(u => u.SlotIndex == selectedSlot)
-                    .ToList();
+            case TargetType.Ally:
+            {
+                foreach (int slot in slotIndices)
+                {
+                    var unit = GetUnitAtSlot(actor.IsPlayerSide, slot);
+                    if (unit != null && unit.IsAlive)
+                        result.Add(unit);
+                }
+                return result;
+            }
 
-            case TargetType.EnemyRow:
-                return GetRowUnits(!actorIsPlayer, selectedSlot / 3);
-
-            case TargetType.EnemyColumn:
-                return GetColumnUnits(!actorIsPlayer, selectedSlot % 3);
-
-            case TargetType.EnemyAll:
-                return GetAllAliveUnits(!actorIsPlayer);
-
-            case TargetType.AllySingle:
-                return GetAllyAliveUnits(actorIsPlayer)
-                    .Where(u => u.SlotIndex == selectedSlot)
-                    .ToList();
-
-            case TargetType.AllyAll:
-                return GetAllyAliveUnits(actor.IsPlayerSide);
+            case TargetType.Enemy:
+            {
+                foreach (int slot in slotIndices)
+                {
+                    var unit = GetUnitAtSlot(!actor.IsPlayerSide, slot);
+                    if (unit != null && unit.IsAlive)
+                        result.Add(unit);
+                }
+                return result;
+            }
 
             default:
-                return new List<BattleUnit>();
+                return result;
         }
+    }
+
+    /// <summary>兼容旧调用：单槽目标</summary>
+    public List<BattleUnit> GetTargets(TargetType type, BattleUnit actor, int selectedSlot)
+    {
+        if (type == TargetType.Self)
+            return actor != null && actor.IsAlive ? new List<BattleUnit> { actor } : new List<BattleUnit>();
+        return GetTargetsBySide(type, actor, new List<int> { selectedSlot });
     }
 
     private List<BattleUnit> ResolveTargets(BattleAction action)
@@ -740,8 +854,32 @@ public class BattleManager
         if (action.Type == ActionType.Defend || action.Type == ActionType.Flee)
             return new List<BattleUnit> { action.Actor };
 
-        return GetTargets(action.TargetType, action.Actor,
-            action.TargetSlotIndices.Count > 0 ? action.TargetSlotIndices[0] : 0);
+        // 技能：TargetSlotIndices[0] 为落点中心；配置技能按 range 展开，普通攻击打单格
+        if (action.Type == ActionType.Skill)
+        {
+            int center = action.TargetSlotIndices != null && action.TargetSlotIndices.Count > 0
+                ? action.TargetSlotIndices[0]
+                : action.Actor.SlotIndex;
+
+            if (action.ActionId > 0)
+            {
+                var tables = GetTables();
+                var skillCfg = tables?.TbSkill.GetOrDefault(action.ActionId);
+                if (skillCfg != null)
+                    return GetSkillTargets(action.Actor, skillCfg, center);
+            }
+
+            return GetTargetsBySide(action.TargetType, action.Actor, new List<int> { center });
+        }
+
+        if (action.TargetSlotIndices == null || action.TargetSlotIndices.Count == 0)
+        {
+            if (action.TargetType == TargetType.Self && action.Actor != null)
+                return new List<BattleUnit> { action.Actor };
+            return new List<BattleUnit>();
+        }
+
+        return GetTargetsBySide(action.TargetType, action.Actor, action.TargetSlotIndices);
     }
 
     public List<BattleUnit> GetRowUnits(bool playerSide, int row)
@@ -957,6 +1095,9 @@ public class BattleManager
         return units.FirstOrDefault(u => u.SlotIndex == slotIndex && u.IsAlive);
     }
 
+    /// <summary>
+    /// 返回可作为技能落点中心的存活单位（受 selectable 与 targettype 约束）
+    /// </summary>
     public List<BattleUnit> GetAvailableTargetsForSkill(BattleUnit actor, int skillId)
     {
         var tables = GetTables();
@@ -966,22 +1107,24 @@ public class BattleManager
         if (skillCfg == null) return new List<BattleUnit>();
 
         var targetType = (TargetType)skillCfg.Targettype;
+        if (targetType == TargetType.Self)
+            return actor != null && actor.IsAlive ? new List<BattleUnit> { actor } : new List<BattleUnit>();
 
-        switch (targetType)
+        bool playerSide = targetType == TargetType.Ally ? actor.IsPlayerSide : !actor.IsPlayerSide;
+        var candidates = GetAllAliveUnits(playerSide);
+        var result = new List<BattleUnit>();
+
+        foreach (var unit in candidates)
         {
-            case TargetType.Self:
-                return new List<BattleUnit> { actor };
-            case TargetType.EnemySingle:
-            case TargetType.EnemyRow:
-            case TargetType.EnemyColumn:
-            case TargetType.EnemyAll:
-                return GetAllAliveUnits(!actor.IsPlayerSide);
-            case TargetType.AllySingle:
-            case TargetType.AllyAll:
-                return GetAllyAliveUnits(actor.IsPlayerSide);
-            default:
-                return new List<BattleUnit>();
+            if (!CanSelectSkillSlot(skillCfg, unit.SlotIndex))
+                continue;
+
+            // 落点必须至少能打到一个存活单位
+            if (GetSkillTargets(actor, skillCfg, unit.SlotIndex).Count > 0)
+                result.Add(unit);
         }
+
+        return result;
     }
 
     public cfg.Tables GetTables()

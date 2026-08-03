@@ -54,6 +54,12 @@ public class BattleSkillPanel : BattleSubPanel
 
     private void RefreshSkillList()
     {
+        bool prefabIsAsset = skillItemPrefab != null && !skillItemPrefab.gameObject.scene.IsValid();
+        Debug.Log($"[BattleSkillPanel] RefreshSkillList: " +
+                  $"container={skillContainer} " +
+                  $"prefab={skillItemPrefab} " +
+                  $"prefabIsAsset={prefabIsAsset} (false=引用的是场景实例) " +
+                  $"manager={_battleManager} unit={_battleManager?.CurrentUnit}");
         if (skillContainer == null || skillItemPrefab == null) return;
         if (_battleManager == null || _battleManager.CurrentUnit == null) return;
 
@@ -86,18 +92,80 @@ public class BattleSkillPanel : BattleSubPanel
 
     private void AddSkillItem(int skillId, string name, bool disabled)
     {
+        var srcBtn = skillItemPrefab;
+        bool srcIsScene = srcBtn != null && srcBtn.gameObject.scene.IsValid();
+        Debug.Log($"[BattleSkillPanel][{name}] 源模板: " +
+                  $"skillItemPrefab={(srcBtn ? "非空" : "NULL")} " +
+                  $"srcIsSceneInstance={srcIsScene} " +
+                  $"btnEnabled={srcBtn?.enabled} btnInteractable={srcBtn?.interactable} " +
+                  $"goActive={srcBtn != null && srcBtn.gameObject.activeSelf}");
+
         var go = Instantiate(skillItemPrefab.gameObject, skillContainer);
         go.SetActive(true);
 
+        // skillItemPrefab 作为模板时组件可能是 disabled，克隆后需显式启用，
+        // 否则 SetActive 只会激活 GameObject，disable 的组件仍不工作
+        var imgMore = go.GetComponentInChildren<Image>();
+        if (imgMore != null) imgMore.enabled = true;
+
+        var btnMore = go.GetComponent<Button>();
+        if (btnMore != null) btnMore.enabled = true;
+
         var tmp = go.GetComponentInChildren<TextMeshProUGUI>();
+        if (tmp != null) tmp.enabled = true;
         if (tmp != null) tmp.text = name;
 
         var btn = go.GetComponent<Button>();
+        var grid = go.GetComponentInParent<GridLayoutGroup>();
+        var contentFitter = go.GetComponentInParent<ContentSizeFitter>();
+
+        Debug.Log($"[BattleSkillPanel][{name}] 实例化即时: " +
+                  $"goActiveSelf={go.activeSelf} goActiveInHierarchy={go.activeInHierarchy} " +
+                  $"btn={btn} btnEnabled={btn?.enabled} btnInteractable={btn?.interactable} " +
+                  $"tmp={tmp} tmpEnabled={tmp?.enabled} tmpActiveInHierarchy={(tmp != null ? tmp.gameObject.activeInHierarchy : false)} " +
+                  $"iconImage={go.GetComponentInChildren<Image>()?.gameObject.name} " +
+                  $"grid={grid} gridEnabled={grid?.enabled} gridActive={(grid != null && grid.gameObject.activeInHierarchy)} " +
+                  $"fitter={contentFitter} fitterEnabled={contentFitter?.enabled}");
+
+        if (isActiveAndEnabled)
+            StartCoroutine(LogFinalState(skillId, name, go));
+        else
+            LogItemState(skillId, name, go, "自检(宿主未激活,无下一帧)");
+
         if (btn != null)
         {
             btn.interactable = !disabled;
             int capturedId = skillId;
             btn.onClick.AddListener(() => _onSkillSelected?.Invoke(capturedId));
         }
+    }
+
+    /// <summary>
+    /// 等一帧再打印一次终态，暴露是否有组件在实例化后的帧里被禁用
+    /// </summary>
+    private System.Collections.IEnumerator LogFinalState(int skillId, string name, GameObject go)
+    {
+        yield return null;
+        if (go == null) yield break;
+        LogItemState(skillId, name, go, "下一帧终态");
+    }
+
+    /// <summary>
+    /// 打印技能项的当前组件/激活状态
+    /// </summary>
+    private void LogItemState(int skillId, string name, GameObject go, string stage)
+    {
+        if (go == null) return;
+
+        var btn = go.GetComponent<Button>();
+        var tmp = go.GetComponentInChildren<TextMeshProUGUI>();
+        var image = go.GetComponentInChildren<Image>();
+        var grid = go.GetComponentInParent<GridLayoutGroup>();
+        Debug.Log($"[BattleSkillPanel][{name}] {stage}: " +
+                  $"goActiveInHierarchy={go.activeInHierarchy} " +
+                  $"btnEnabled={btn?.enabled} btnInteractable={btn?.interactable} " +
+                  $"tmpEnabled={tmp?.enabled} tmpActive={(tmp != null && tmp.gameObject.activeInHierarchy)} " +
+                  $"imageEnabled={image?.enabled} imageActive={(image != null && image.gameObject.activeInHierarchy)} " +
+                  $"gridEnabled={grid?.enabled} gridActive={(grid != null && grid.gameObject.activeInHierarchy)}");
     }
 }

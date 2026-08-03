@@ -21,12 +21,14 @@ public sealed partial class Skill : Luban.BeanBase
         Icon = _buf.ReadInt();
         Cost = _buf.ReadInt();
         Buffid = _buf.ReadInt();
-        Prerequisite = _buf.ReadInt();
-        Maxlevel = _buf.ReadInt();
+        Skilltype = _buf.ReadInt();
+        Dmgfunc = _buf.ReadInt();
+        {int n0 = _buf.ReadSize(); Effectparam = new System.Collections.Generic.List<int>(n0);for(var i0 = 0 ; i0 < n0 ; i0++) { int _e0;  _e0 = _buf.ReadInt(); Effectparam.Add(_e0);}}
         Comment = _buf.ReadString();
         Targettype = _buf.ReadInt();
+        {int n0 = _buf.ReadSize(); Range = new System.Collections.Generic.List<int>(n0);for(var i0 = 0 ; i0 < n0 ; i0++) { int _e0;  _e0 = _buf.ReadInt(); Range.Add(_e0);}}
+        {int n0 = _buf.ReadSize(); Selectable = new System.Collections.Generic.List<int>(n0);for(var i0 = 0 ; i0 < n0 ; i0++) { int _e0;  _e0 = _buf.ReadInt(); Selectable.Add(_e0);}}
         Cooldown = _buf.ReadInt();
-        Battlecost = _buf.ReadInt();
     }
 
     public static Skill DeserializeSkill(ByteBuf _buf)
@@ -51,33 +53,41 @@ public sealed partial class Skill : Luban.BeanBase
     /// </summary>
     public readonly int Cost;
     /// <summary>
-    /// 施加的Buff ID
+    /// 施加的Buff ID<br/>注意：BUFF id并不限制对谁生效！配置的时候注意！
     /// </summary>
     public readonly int Buffid;
     /// <summary>
-    /// 前置技能ID(0=无)
+    /// 技能类型<br/>0.除了加buff没别的效果<br/>1.回血<br/>2.物理伤害<br/>3.魔法伤害
     /// </summary>
-    public readonly int Prerequisite;
+    public readonly int Skilltype;
     /// <summary>
-    /// 最大等级
+    /// 1.(力量+参数）<br/>2.（理智+参数）<br/>3.（体质+参数）<br/>4.力量*参数<br/>5.理智*参数<br/>6.体质*参数
     /// </summary>
-    public readonly int Maxlevel;
+    public readonly int Dmgfunc;
+    /// <summary>
+    /// 伤害公式的参数
+    /// </summary>
+    public readonly System.Collections.Generic.List<int> Effectparam;
     /// <summary>
     /// 注释
     /// </summary>
     public readonly string Comment;
     /// <summary>
-    /// 1
+    /// <br/>1对自己生效<br/>2对友方角色生效<br/>3对敌方角色生效
     /// </summary>
     public readonly int Targettype;
+    /// <summary>
+    /// 看小键盘的九宫格<br/>5为最中间鼠标选定的位置<br/>所有技能位置都以在左边为基准设计，敌方使用会镜像！
+    /// </summary>
+    public readonly System.Collections.Generic.List<int> Range;
+    /// <summary>
+    /// 可以选择角色的位置<br/>不写则默认全都可以选<br/>可以选择哪个位置的角色<br/>仍然参考小键盘的九宫格<br/>147为最后一列<br/>258被中间列<br/>369为第一列
+    /// </summary>
+    public readonly System.Collections.Generic.List<int> Selectable;
     /// <summary>
     /// 0
     /// </summary>
     public readonly int Cooldown;
-    /// <summary>
-    /// 0
-    /// </summary>
-    public readonly int Battlecost;
    
     public const int __ID__ = 1539215818;
     public override int GetTypeId() => __ID__;
@@ -94,12 +104,14 @@ public sealed partial class Skill : Luban.BeanBase
         + "icon:" + Icon + ","
         + "cost:" + Cost + ","
         + "buffid:" + Buffid + ","
-        + "prerequisite:" + Prerequisite + ","
-        + "maxlevel:" + Maxlevel + ","
+        + "skilltype:" + Skilltype + ","
+        + "dmgfunc:" + Dmgfunc + ","
+        + "effectparam:" + Luban.StringUtil.CollectionToString(Effectparam) + ","
         + "comment:" + Comment + ","
         + "targettype:" + Targettype + ","
+        + "range:" + Luban.StringUtil.CollectionToString(Range) + ","
+        + "selectable:" + Luban.StringUtil.CollectionToString(Selectable) + ","
         + "cooldown:" + Cooldown + ","
-        + "battlecost:" + Battlecost + ","
         + "}";
     }
 }
