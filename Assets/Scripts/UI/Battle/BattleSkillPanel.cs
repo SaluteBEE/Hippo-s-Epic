@@ -44,11 +44,14 @@ public class BattleSkillPanel : BattleSubPanel
     [SerializeField] private Button skillItemPrefab;
 
     private Action<int> _onSkillSelected;
+    private Func<int, bool> _canUseOnTarget;
 
-    public void Open(BattleManager battleManager, Action<int> onSkillSelected)
+    public void Open(BattleManager battleManager, Action<int> onSkillSelected,
+                     Func<int, bool> canUseOnTarget = null)
     {
         base.Open(battleManager);
         _onSkillSelected = onSkillSelected;
+        _canUseOnTarget = canUseOnTarget;
         RefreshSkillList();
     }
 
@@ -71,7 +74,7 @@ public class BattleSkillPanel : BattleSubPanel
         var tables = _battleManager.GetTables();
 
         // 添加普通攻击
-        AddSkillItem(0, "普通攻击", false);
+        AddSkillItem(0, "普通攻击", false, IsInvalidForTarget(0));
 
         // 添加技能
         foreach (int skillId in unit.AvailableSkills)
@@ -86,11 +89,17 @@ public class BattleSkillPanel : BattleSubPanel
                 name += $" (冷却{cd})";
             }
 
-            AddSkillItem(skillId, name, onCooldown);
+            AddSkillItem(skillId, name, onCooldown, IsInvalidForTarget(skillId));
         }
     }
 
-    private void AddSkillItem(int skillId, string name, bool disabled)
+    /// <summary> 当前选中目标对该技能是否无效（用于置灰提示，点击时由上层给出提示） </summary>
+    private bool IsInvalidForTarget(int skillId)
+    {
+        return _canUseOnTarget != null && !_canUseOnTarget(skillId);
+    }
+
+    private void AddSkillItem(int skillId, string name, bool disabled, bool invalidForTarget = false)
     {
         var srcBtn = skillItemPrefab;
         bool srcIsScene = srcBtn != null && srcBtn.gameObject.scene.IsValid();
@@ -137,6 +146,21 @@ public class BattleSkillPanel : BattleSubPanel
             btn.interactable = !disabled;
             int capturedId = skillId;
             btn.onClick.AddListener(() => _onSkillSelected?.Invoke(capturedId));
+        }
+
+        // 目标有效性 → 显式设置颜色（有效恢复全色，无效置灰；不依赖模板原色）
+        // 注意: 模板根 Image 可能本身 alpha=0.45, 因此有效时必须显式设回 1.00
+        var baseImg = go.GetComponent<Image>();
+        var baseTmp = go.GetComponentInChildren<TextMeshProUGUI>();
+        if (!disabled && baseImg != null)
+        {
+            float a = invalidForTarget ? 0.45f : 1.00f;
+            baseImg.color = new Color(baseImg.color.r, baseImg.color.g, baseImg.color.b, a);
+        }
+        if (!disabled && baseTmp != null)
+        {
+            float a = invalidForTarget ? 0.45f : 1.00f;
+            baseTmp.color = new Color(baseTmp.color.r, baseTmp.color.g, baseTmp.color.b, a);
         }
     }
 
