@@ -31,9 +31,10 @@ public static class DamageFx
         var canvas = canvasGo.AddComponent<Canvas>();
         canvas.renderMode = RenderMode.WorldSpace;
         canvas.sortingOrder = 40;
+        canvas.worldCamera = Camera.main; // WorldSpace Canvas 必须指定渲染相机, 否则文字不参与渲染
 
         var rt = canvasGo.GetComponent<RectTransform>();
-        rt.sizeDelta = new Vector2(200f, 60f);
+        rt.sizeDelta = new Vector2(320f, 110f); // 容纳 80pt/110pt 字号, 太小文字会被裁剪
         rt.localScale = Vector3.one * 0.01f;
 
         var textGo = new GameObject("Text");
@@ -46,7 +47,7 @@ public static class DamageFx
 
         var tmp = textGo.AddComponent<TextMeshProUGUI>();
         tmp.text = text;
-        tmp.fontSize = type == FloatTextType.Crit ? 44f : 32f;
+        tmp.fontSize = type == FloatTextType.Crit ? 110f : 80f; // 0.01 scale 下实际≈世界0.8/1.1单位, 才够醒目
         tmp.alignment = TextAlignmentOptions.Center;
         tmp.color = GetColor(type);
         tmp.outlineWidth = 0.25f;
@@ -78,7 +79,7 @@ public class FloatTextItem : MonoBehaviour
     private TextMeshProUGUI _tmp;
     private Vector3 _startPos;
 
-    private const float RiseWorld = 1.6f; // 世界空间上升高度
+    private const float RiseWorld = 1.0f; // 世界空间上升高度(正交相机 orthoSize≈5, 头顶 y≈3.8 起跳, 1.0 保证全程屏内)
     private const float Duration = 0.9f;
 
     private void Awake()
@@ -96,14 +97,26 @@ public class FloatTextItem : MonoBehaviour
     {
         float t = 0f;
         var baseColor = _tmp != null ? _tmp.color : Color.white;
-        // localScale 0.01 → local 位移 = 世界位移 / scale
-        float riseLocal = RiseWorld / Mathf.Max(transform.localScale.y, 0.0001f);
+        // 世界上升 RiseWorld 单位。local 位移 = 世界位移 / 父级 lossyScale.y。
+        // 注意: 不能用自身 localScale.y(那是 canvas 的 0.01 渲染缩放, 与位移无关),
+        // 否则 riseLocal=160 会把飘字瞬间抬出屏幕(vp.y>1)
+        var parent = transform.parent;
+        float parentScale = parent != null ? Mathf.Max(Mathf.Abs(parent.lossyScale.y), 0.0001f) : 1f;
+        float riseLocal = RiseWorld / parentScale;
 
         while (t < Duration)
         {
             t += Time.deltaTime;
             float k = t / Duration;
             transform.localPosition = _startPos + Vector3.up * (riseLocal * k);
+            // Billboard: 每帧面向相机。主相机 rot=(90,0,0) 俯视, 默认法线朝 +Z 会被压扁成线不可见
+            var cam = Camera.main;
+            if (cam != null)
+            {
+                var fwd = transform.position - cam.transform.position;
+                if (fwd.sqrMagnitude > 0.0001f)
+                    transform.rotation = Quaternion.LookRotation(fwd, cam.transform.up);
+            }
             if (_tmp != null)
             {
                 var c = baseColor;

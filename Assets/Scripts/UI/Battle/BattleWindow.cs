@@ -290,7 +290,26 @@ public class BattleWindow : UIWindow
             }
         }
 
-        // 战斗结束自动返回
+        // 战斗结束：等演出全部结束（技能序列+死亡倒地）再返回原场景，避免截断死亡演出
+        StartCoroutine(WaitPerformancesThenReturn());
+    }
+
+    /// <summary>
+    /// 等待演出收尾：技能序列结束 → 死亡倒地播完 → 飘字淡出，再返回原场景
+    /// </summary>
+    private System.Collections.IEnumerator WaitPerformancesThenReturn()
+    {
+        var presenter = BattlePresenter.Instance;
+        if (presenter != null)
+        {
+            while (presenter.IsPlaying)
+                yield return null;
+            while (presenter.IsDeathPlaying)
+                yield return null;
+        }
+        // 再等半拍让飘字自然淡出
+        yield return new WaitForSeconds(0.5f);
+
         var gameApp = GameApp.Instance;
         if (gameApp != null)
             gameApp.OnBattleResultConfirmed();

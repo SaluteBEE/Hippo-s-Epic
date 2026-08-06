@@ -20,6 +20,10 @@ public class BattlePresenter : MonoBehaviour
     /// <summary> 演出播放中（输入抑制用） </summary>
     public bool IsPlaying { get; private set; }
 
+    /// <summary> 死亡演出是否进行中（结算返回场景前需等待） </summary>
+    public bool IsDeathPlaying { get; private set; }
+    private int _deathCount;
+
     /// <summary> 序列开始/结束（UI 订阅做输入抑制） </summary>
     public event Action OnSequenceBegin;
     public event Action OnSequenceEnd;
@@ -244,24 +248,42 @@ public class BattlePresenter : MonoBehaviour
         var go = GetUnitGo(unit);
         if (go == null) yield break;
 
-        // 等飘字先亮出来（受击反馈 + 喜剧延迟）
-        yield return new WaitForSeconds(0.2f);
-
-        float dur = 0.45f;
-        float t = 0f;
-        var startRot = go.transform.rotation;
-        var startPos = go.transform.position;
-        float dir = unit.IsPlayerSide ? -1f : 1f;
-
-        while (t < dur)
+        _deathCount++;
+        IsDeathPlaying = true;
+        try
         {
-            t += Time.deltaTime;
-            float k = t / dur;
-            go.transform.rotation = startRot * Quaternion.Euler(0f, 0f, dir * 85f * k);
-            go.transform.position = startPos + Vector3.down * (0.25f * k);
-            yield return null;
+            // 等当前演出序列结束（攻击方飘字/归位完成）再倒地，避免死亡演出抢跑
+            while (IsPlaying)
+                yield return null;
+
+            // 再等一小拍让飘字亮稳
+            yield return new WaitForSeconds(0.2f);
+
+            float dur = 0.45f;
+            float t = 0f;
+            var startRot = go.transform.rotation;
+            var startPos = go.transform.position;
+            float dir = unit.IsPlayerSide ? -1f : 1f;
+
+            while (t < dur)
+            {
+                t += Time.deltaTime;
+                float k = t / dur;
+                go.transform.rotation = startRot * Quaternion.Euler(0f, 0f, dir * 85f * k);
+                go.transform.position = startPos + Vector3.down * (0.25f * k);
+                yield return null;
+            }
+            go.SetActive(false);
         }
-        go.SetActive(false);
+        finally
+        {
+            _deathCount--;
+            if (_deathCount <= 0)
+            {
+                _deathCount = 0;
+                IsDeathPlaying = false;
+            }
+        }
     }
 
     #endregion

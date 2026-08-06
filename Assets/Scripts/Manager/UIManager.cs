@@ -22,10 +22,18 @@ public class UIManager : MonoBehaviour
 
     private void Awake()
     {
-        ManagerRegistry.Register(this);
-
         if (rootCanvas == null)
             rootCanvas = GetComponentInChildren<Canvas>(true);
+    }
+
+    private void OnEnable()
+    {
+        // 注册放 OnEnable: domain reload 后 DontDestroyOnLoad 对象 Awake 不重跑,
+        // 但 OnEnable 会重跑 —— 保证战斗重入时 Get<UIManager>() 不失效。
+        // 条件注册: 场景副本(Scene_Battle 等)不得顶掉 DDO 实例的注册
+        var cur = ManagerRegistry.Get<UIManager>();
+        if (cur == null || cur == this)
+            ManagerRegistry.Register(this);
     }
 
     public T Open<T>(object args = null, Action<T> onReady = null) where T : UIWindow
@@ -223,7 +231,10 @@ public class UIManager : MonoBehaviour
         }
         loadHandles.Clear();
         pendingClose.Clear();
-        ManagerRegistry.Unregister<UIManager>();
+
+        // 条件注销: 只有注册的是自己才删键（场景副本销毁不得删 DDO 实例的注册）
+        if (ManagerRegistry.Get<UIManager>() == this)
+            ManagerRegistry.Unregister<UIManager>();
     }
 
     private void PlaceWindow(UIWindow window)
