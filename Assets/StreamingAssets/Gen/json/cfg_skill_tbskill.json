@@ -23,7 +23,7 @@
     "name": "厚脸皮",
     "icon": 2,
     "cost": 1,
-    "buffid": 21,
+    "buffid": 23,
     "skilltype": 0,
     "dmgfunc": 0,
     "effectparam": [
@@ -42,7 +42,7 @@
     "name": "意志之力",
     "icon": 3,
     "cost": 2,
-    "buffid": 22,
+    "buffid": 26,
     "skilltype": 0,
     "dmgfunc": 0,
     "effectparam": [
@@ -65,7 +65,7 @@
     "skilltype": 2,
     "dmgfunc": 1,
     "effectparam": [
-      3
+      2
     ],
     "comment": "增加创作者意志值",
     "targettype": 3,
@@ -103,7 +103,7 @@
     "skilltype": 2,
     "dmgfunc": 4,
     "effectparam": [
-      10
+      2
     ],
     "comment": "击晕扇形敌人并造成大量伤害",
     "targettype": 3,
