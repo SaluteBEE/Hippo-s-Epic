@@ -434,7 +434,13 @@ public class BattleStageManager : MonoBehaviour
         EnsureTargetIndicator();
         if (_targetIndicator == null) return;
 
-        _targetIndicator.transform.position = go.transform.position + new Vector3(0, -2.4f, 0);
+        // 选中点显示在角色位置（角色根节点即 slot 位置）
+        // 注意: 不能用 go.transform.position + 固定偏移(如 -2.4), 那会偏离 slot
+        _targetIndicator.transform.position = go.transform.position;
+
+        // 显式重置缩放: 场景文件里该节点 localScale=1, 但内存场景可能被放大(如10倍),
+        // 每次显示前重置, 保证选中点大小稳定
+        _targetIndicator.transform.localScale = Vector3.one;
 
         var sr = _targetIndicator.GetComponent<SpriteRenderer>();
         if (sr != null)
