@@ -500,8 +500,8 @@ public class BattleWindow : UIWindow
             {
                 var tt = (TargetType)skillCfg.Targettype;
                 if (tt == TargetType.Ally)
-                    return _battleManager.PlayerUnits.Find(u => u.IsAlive && u.SlotIndex != _battleManager.CurrentUnit.SlotIndex)
-                           ?? _battleManager.CurrentUnit;
+                    // 治疗/增益默认选中自己（自身必然存活在场，点技能直接对自己生效）
+                    return _battleManager.CurrentUnit;
                 if (tt == TargetType.Enemy)
                     return _battleManager.EnemyUnits.Find(u => u.IsAlive);
             }
@@ -591,6 +591,21 @@ public class BattleWindow : UIWindow
     }
 
     /// <summary>
+    /// 所有存活单位（玩家+敌人合并），供键盘游标全场循环切换——游标可移动到任意单位（含自己），
+    /// 技能的可用性由 IsTargetValidForSkill 置灰表达
+    /// </summary>
+    private List<BattleUnit> GetAllAliveUnits()
+    {
+        var result = new List<BattleUnit>();
+        if (_battleManager == null) return result;
+        foreach (var u in _battleManager.PlayerUnits)
+            if (u.IsAlive) result.Add(u);
+        foreach (var u in _battleManager.EnemyUnits)
+            if (u.IsAlive) result.Add(u);
+        return result;
+    }
+
+    /// <summary>
     /// 指定技能的可选目标列表（skillId=0 普通攻击→敌人；按 targettype 分阵营；Self→自身）
     /// </summary>
     private List<BattleUnit> GetValidTargetsForSkill(int skillId)
@@ -612,13 +627,10 @@ public class BattleWindow : UIWindow
                 var pool = tt == TargetType.Ally ? _battleManager.PlayerUnits : _battleManager.EnemyUnits;
                 foreach (var u in pool)
                 {
-                    // 仅 Ally 池排除自己（引用比较，敌我 SlotIndex 可能相同不能按索引排除）
+                    // 治疗/增益类(Ally)目标池包含自己——可对自己释放（引用比较，敌我 SlotIndex 可能相同不能按索引排除）
                     if (!u.IsAlive) continue;
-                    if (tt == TargetType.Ally && u == _battleManager.CurrentUnit) continue;
                     result.Add(u);
                 }
-                if (result.Count == 0 && tt == TargetType.Ally)
-                    result.Add(_battleManager.CurrentUnit);
                 result.Sort((a, b) => a.SlotIndex.CompareTo(b.SlotIndex));
                 return result;
             }
@@ -641,7 +653,7 @@ public class BattleWindow : UIWindow
     /// <summary> 键盘游标在当前目标基础上按行列偏移切换（左右循环，上下换行） </summary>
     private void CycleTarget(int colDelta, int rowDelta)
     {
-        var targets = GetValidTargets();
+        var targets = GetAllAliveUnits();
         if (targets.Count == 0) return;
 
         var current = _currentCursorTarget;
