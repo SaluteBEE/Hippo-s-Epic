@@ -27,6 +27,9 @@ public static class DamageFx
         var canvasGo = new GameObject("FloatText");
         canvasGo.transform.SetParent(anchor, false);
         canvasGo.transform.localPosition = new Vector3(0f, 2.3f, 0f);
+        // 不设 Billboard: 战斗相机是正面正交 (0,0,-10) rot=(0,0,0), 角色 sprite 已面向相机,
+        // canvas 继承角色旋转(identity localRotation) 法线自然朝相机, 文字正立可见。
+        // 任何 Billboard 都会破坏朝向(俯视/正面相机下都 edge-on 不可见)
 
         var canvas = canvasGo.AddComponent<Canvas>();
         canvas.renderMode = RenderMode.WorldSpace;
@@ -109,14 +112,7 @@ public class FloatTextItem : MonoBehaviour
             t += Time.deltaTime;
             float k = t / Duration;
             transform.localPosition = _startPos + Vector3.up * (riseLocal * k);
-            // Billboard: 每帧面向相机。主相机 rot=(90,0,0) 俯视, 默认法线朝 +Z 会被压扁成线不可见
-            var cam = Camera.main;
-            if (cam != null)
-            {
-                var fwd = transform.position - cam.transform.position;
-                if (fwd.sqrMagnitude > 0.0001f)
-                    transform.rotation = Quaternion.LookRotation(fwd, cam.transform.up);
-            }
+            // 无 Billboard: 战斗相机正面正交, canvas 继承角色朝向即面向相机
             if (_tmp != null)
             {
                 var c = baseColor;
