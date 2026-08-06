@@ -1,7 +1,7 @@
 {
     "name": "Manager",
     "rootNamespace": "",
-    "references": ["Core", "LubanData.Gen", "Luban.Runtime", "HippoInput", "Unity.InputSystem", "Unity.Addressables", "Unity.ResourceManager"],
+    "references": ["Core", "LubanData.Gen", "Luban.Runtime", "HippoInput", "Unity.InputSystem", "Unity.Addressables", "Unity.ResourceManager", "Unity.TextMeshPro", "spine-unity"],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,

@@ -30,6 +30,7 @@ public class BattleManager
     public event Action<BattleUnit, int> OnHealed;
     public event Action<BattleUnit, int, int> OnBuffApplied;
     public event Action<BattleUnit, int> OnBuffRemoved;
+    public event Action<BattleUnit, int, List<BattleUnit>> OnSkillExecuted;
     public event Action<BattleUnit> OnUnitDeath;
     public event Action<BattleUnit> OnUnitDefend;
     public event Action OnPlayerFlee;
@@ -467,6 +468,11 @@ public class BattleManager
             return;
         }
 
+        // 行动前 HP 快照（供表现层血条延迟动画使用）
+        var beforeHpSnapshot = new Dictionary<BattleUnit, int>();
+        foreach (var t in targets)
+            beforeHpSnapshot[t] = t.Stats.Hp;
+
         switch (action.Type)
         {
             case ActionType.Skill:
@@ -486,6 +492,19 @@ public class BattleManager
         // ② Buff系统 — AfterAction Buff
         OnUnitActionExecute?.Invoke(action.Actor, action);
         TriggerBuffs(action.Actor, BuffTrigger.AfterAction);
+
+        // ③ 表现层 — 技能释放演出（演出结束后再推进回合）
+        var presenter = BattlePresenter.Instance;
+        if (action.Type == ActionType.Skill && presenter != null)
+        {
+            presenter.PlaySkillSequence(action.Actor, action.ActionId, targets, beforeHpSnapshot, () =>
+            {
+                CheckDeaths();
+                if (Phase == BattlePhase.BattleEnd) return;
+                EndUnitTurn(action.Actor);
+            });
+            return;
+        }
 
         CheckDeaths();
 
@@ -677,6 +696,7 @@ public class BattleManager
                 TriggerBuffs(target, BuffTrigger.OnHit);
             }
 
+            OnSkillExecuted?.Invoke(actor, skillId, targets);
             return;
         }
 
@@ -729,6 +749,8 @@ public class BattleManager
                 OnBuffApplied?.Invoke(target, buffId, 0);
             }
         }
+
+        OnSkillExecuted?.Invoke(actor, skillId, targets);
     }
 
     private void ExecuteItem(BattleUnit actor, int itemId, List<BattleUnit> targets)

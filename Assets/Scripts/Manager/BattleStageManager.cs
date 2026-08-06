@@ -70,6 +70,10 @@ public class BattleStageManager : MonoBehaviour
     {
         _instance = this;
         AutoFindSlots();
+
+        // 表现层总控（技能释放演出序列）
+        if (GetComponent<BattlePresenter>() == null)
+            gameObject.AddComponent<BattlePresenter>();
     }
 
     private void OnDestroy()

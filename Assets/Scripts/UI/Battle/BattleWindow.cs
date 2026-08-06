@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -38,6 +39,7 @@ public class BattleWindow : UIWindow
     private bool _isSelectingTarget;
     private int _selectedSkillId;
     private Camera _mainCamera;
+    private BattleUnit _currentCursorTarget;
 
     #endregion
 
@@ -87,9 +89,42 @@ public class BattleWindow : UIWindow
     private void Update()
     {
         // 目标选择模式：检测点击场景中的角色
-        if (_isSelectingTarget && Input.GetMouseButtonDown(0))
+        if (_isSelectingTarget)
         {
-            TrySelectTargetByClick();
+            // 鼠标点击选择（保留）
+            if (Input.GetMouseButtonDown(0))
+            {
+                TrySelectTargetByClick();
+            }
+            // 键盘游标切换目标（方向键/WASD：左右循环切换，上下切换行）
+            else if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
+            {
+                CycleTarget(1, 0);
+            }
+            else if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A))
+            {
+                CycleTarget(-1, 0);
+            }
+            else if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
+            {
+                CycleTarget(0, -1);
+            }
+            else if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S))
+            {
+                CycleTarget(0, 1);
+            }
+            // 回车/空格：确认当前选中目标
+            else if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.Space))
+            {
+                ConfirmCurrentTarget();
+            }
+            // Esc/右键：取消，返回技能面板
+            else if (Input.GetKeyDown(KeyCode.Escape) || Input.GetMouseButtonDown(1))
+            {
+                CancelTargetSelection();
+                if (logPanel != null)
+                    logPanel.AddLog("已取消目标选择");
+            }
         }
     }
 
@@ -112,6 +147,13 @@ public class BattleWindow : UIWindow
         _battleManager.OnRoundEnd += OnRoundEnd;
         _battleManager.OnBattleEnd += OnBattleEnd;
         _battleManager.OnBuffApplied += OnBuffApplied;
+
+        var presenter = BattlePresenter.Instance;
+        if (presenter != null)
+        {
+            presenter.OnSequenceBegin += OnSequenceBegin;
+            presenter.OnSequenceEnd += OnSequenceEnd;
+        }
     }
 
     private void UnsubscribeEvents()
@@ -129,6 +171,13 @@ public class BattleWindow : UIWindow
         _battleManager.OnRoundEnd -= OnRoundEnd;
         _battleManager.OnBattleEnd -= OnBattleEnd;
         _battleManager.OnBuffApplied -= OnBuffApplied;
+
+        var presenter = BattlePresenter.Instance;
+        if (presenter != null)
+        {
+            presenter.OnSequenceBegin -= OnSequenceBegin;
+            presenter.OnSequenceEnd -= OnSequenceEnd;
+        }
     }
 
     #endregion
@@ -208,6 +257,17 @@ public class BattleWindow : UIWindow
     }
 
     private void OnRoundEnd(int round) { }
+
+    /// <summary> 演出序列开始：抑制输入（隐藏操作按钮/关闭子面板/取消目标选择） </summary>
+    private void OnSequenceBegin()
+    {
+        SetActionButtonsVisible(false);
+        CloseAllSubPanels();
+        CancelTargetSelection();
+    }
+
+    /// <summary> 演出序列结束（回合推进由 BattleManager 负责） </summary>
+    private void OnSequenceEnd() { }
 
     private void OnBattleEnd(BattleResult result)
     {
@@ -300,7 +360,9 @@ public class BattleWindow : UIWindow
 
     private bool CanOperate()
     {
-        return _battleManager != null && _battleManager.IsWaitingForPlayerAction;
+        if (_battleManager == null || !_battleManager.IsWaitingForPlayerAction) return false;
+        var presenter = BattlePresenter.Instance;
+        return presenter == null || !presenter.IsPlaying;
     }
 
     #endregion
@@ -351,10 +413,11 @@ public class BattleWindow : UIWindow
     {
         _isSelectingTarget = true;
         if (logPanel != null)
-            logPanel.AddLog("请点击战场上的目标角色（默认选中敌人）");
+            logPanel.AddLog("请选择目标：点击 / 方向键切换 / 回车确认（默认选中敌人）");
 
         // 默认选中一个目标并显示选中标签
         var defaultTarget = FindDefaultTarget();
+        _currentCursorTarget = defaultTarget;
         if (defaultTarget != null && _stageManager != null)
             _stageManager.ShowTargetSelected(defaultTarget);
     }
@@ -387,6 +450,7 @@ public class BattleWindow : UIWindow
     private void CancelTargetSelection()
     {
         _isSelectingTarget = false;
+        _currentCursorTarget = null;
     }
 
     /// <summary>
@@ -451,6 +515,97 @@ public class BattleWindow : UIWindow
         }
         return null;
     }
+
+    #region 键盘游标切换目标（3.2 动态选择轻量版）
+
+    /// <summary>
+    /// 获取当前技能可选目标的存活单位列表（按槽位排序）
+    /// </summary>
+    private List<BattleUnit> GetValidTargets()
+    {
+        var result = new List<BattleUnit>();
+        if (_battleManager == null || _battleManager.CurrentUnit == null) return result;
+
+        if (_selectedSkillId > 0)
+        {
+            var skillCfg = _battleManager.GetTables()?.TbSkill.GetOrDefault(_selectedSkillId);
+            if (skillCfg != null)
+            {
+                var tt = (TargetType)skillCfg.Targettype;
+                var pool = tt == TargetType.Ally ? _battleManager.PlayerUnits : _battleManager.EnemyUnits;
+                foreach (var u in pool)
+                {
+                    if (u.IsAlive && u.SlotIndex != _battleManager.CurrentUnit.SlotIndex)
+                        result.Add(u);
+                }
+                if (result.Count == 0 && tt == TargetType.Ally)
+                    result.Add(_battleManager.CurrentUnit);
+                result.Sort((a, b) => a.SlotIndex.CompareTo(b.SlotIndex));
+                return result;
+            }
+        }
+
+        // 普通攻击：默认敌人
+        foreach (var u in _battleManager.EnemyUnits)
+            if (u.IsAlive) result.Add(u);
+        result.Sort((a, b) => a.SlotIndex.CompareTo(b.SlotIndex));
+        return result;
+    }
+
+    /// <summary> 键盘游标在当前目标基础上按行列偏移切换（左右循环，上下换行） </summary>
+    private void CycleTarget(int colDelta, int rowDelta)
+    {
+        var targets = GetValidTargets();
+        if (targets.Count == 0) return;
+
+        var current = _currentCursorTarget;
+        if (current == null || !current.IsAlive)
+        {
+            current = targets[0];
+        }
+        else
+        {
+            int idx = targets.IndexOf(current);
+            if (idx < 0)
+            {
+                current = targets[0];
+            }
+            else
+            {
+                int next = idx + colDelta + rowDelta * 3;
+                // 循环（含上下换行越界回绕）
+                next = (next % targets.Count + targets.Count) % targets.Count;
+                current = targets[next];
+            }
+        }
+
+        _currentCursorTarget = current;
+        if (_stageManager != null)
+            _stageManager.ShowTargetSelected(current);
+    }
+
+    /// <summary> 回车/空格：确认当前游标目标并释放技能 </summary>
+    private void ConfirmCurrentTarget()
+    {
+        if (_currentCursorTarget == null) return;
+        var unit = _currentCursorTarget;
+        if (!unit.IsAlive) return;
+
+        _battleManager.PlayerUseSkill(_selectedSkillId, unit.SlotIndex);
+
+        if (_stageManager != null)
+            _stageManager.ShowTargetSelected(unit);
+
+        if (logPanel != null && _battleManager.CurrentUnit != null)
+        {
+            string skillName = _selectedSkillId == 0 ? "普通攻击" : $"技能{_selectedSkillId}";
+            logPanel.AddDamageLog(GetUnitName(_battleManager.CurrentUnit), GetUnitName(unit), 0, skillName);
+        }
+
+        CancelTargetSelection();
+    }
+
+    #endregion
 
     #endregion
 
