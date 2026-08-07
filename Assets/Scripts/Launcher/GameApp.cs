@@ -9,11 +9,17 @@ public partial class GameApp : MonoBehaviour
 
     private static string _pendingMapName;
 
+    /// <summary>
+    /// 设置待加载的地图名（场景切换前由入口设置，加载后由 ConsumePendingMap 取走）
+    /// </summary>
     public static void SetPendingMap(string mapName)
     {
         _pendingMapName = mapName;
     }
 
+    /// <summary>
+    /// 取走并清空待加载地图名（一次性消费，场景加载完成后调用）
+    /// </summary>
     public static string ConsumePendingMap()
     {
         string name = _pendingMapName;

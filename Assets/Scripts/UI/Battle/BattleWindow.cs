@@ -45,6 +45,9 @@ public class BattleWindow : UIWindow
 
     #region 生命周期
 
+    /// <summary>
+    /// 窗口创建：绑定四个操作按钮点击事件（暴力/咄咄逼人/翻找/发呆）
+    /// </summary>
     public override void OnCreate(object args)
     {
         if (btnViolence != null) btnViolence.onClick.AddListener(OnViolenceClicked);
@@ -57,6 +60,9 @@ public class BattleWindow : UIWindow
         _mainCamera = Camera.main;
     }
 
+    /// <summary>
+    /// 窗口打开：获取 BattleManager/StageManager、订阅事件、刷新UI；若已在等待玩家操作则立即设置默认选中目标
+    /// </summary>
     public override void OnOpen(object args)
     {
         _battleManager = GameApp.Instance.BattleManager;
@@ -86,6 +92,9 @@ public class BattleWindow : UIWindow
         }
     }
 
+    /// <summary>
+    /// 窗口关闭：退订事件、清空管理器引用
+    /// </summary>
     public override void OnClose()
     {
         UnsubscribeEvents();

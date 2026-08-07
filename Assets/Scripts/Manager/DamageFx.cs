@@ -20,6 +20,9 @@ public enum FloatTextType
 /// </summary>
 public static class DamageFx
 {
+    /// <summary>
+    /// 生成伤害/治疗飘字：World Space Canvas + TMP，锚定目标头顶，上升+淡出后自毁
+    /// </summary>
     public static void SpawnFloatText(Transform anchor, string text, FloatTextType type)
     {
         if (anchor == null) return;
@@ -61,6 +64,9 @@ public static class DamageFx
         item.Play();
     }
 
+    /// <summary>
+    /// 按飘字类型返回颜色：伤害白/暴击黄/治疗绿/未命中灰/格挡蓝
+    /// </summary>
     private static Color GetColor(FloatTextType type)
     {
         switch (type)

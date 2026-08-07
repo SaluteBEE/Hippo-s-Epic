@@ -50,6 +50,9 @@ public class BattleEvent
         TriggerPhase = phase;
     }
 
+    /// <summary>
+    /// 构造召唤事件：指定 PersonId / 阵营 / 槽位 / 触发时机
+    /// </summary>
     public static BattleEvent Summon(int personId, bool isPlayerSide, int slotIndex, BattleEventPhase phase)
     {
         return new BattleEvent(BattleEventType.SummonUnit, phase)
@@ -60,6 +63,9 @@ public class BattleEvent
         };
     }
 
+    /// <summary>
+    /// 构造伤害事件：目标 + 伤害值 + 触发时机
+    /// </summary>
     public static BattleEvent Damage(BattleUnit target, int damage, BattleEventPhase phase)
     {
         return new BattleEvent(BattleEventType.ApplyDamage, phase)
@@ -69,6 +75,9 @@ public class BattleEvent
         };
     }
 
+    /// <summary>
+    /// 构造治疗事件：目标 + 治疗量 + 触发时机
+    /// </summary>
     public static BattleEvent Heal(BattleUnit target, int amount, BattleEventPhase phase)
     {
         return new BattleEvent(BattleEventType.ApplyHeal, phase)
@@ -78,6 +87,9 @@ public class BattleEvent
         };
     }
 
+    /// <summary>
+    /// 构造附加Buff事件：目标 + BuffId + 触发时机
+    /// </summary>
     public static BattleEvent Buff(BattleUnit target, int buffId, BattleEventPhase phase)
     {
         return new BattleEvent(BattleEventType.ApplyBuff, phase)
@@ -87,6 +99,9 @@ public class BattleEvent
         };
     }
 
+    /// <summary>
+    /// 构造移除Buff事件：目标 + BuffId + 触发时机
+    /// </summary>
     public static BattleEvent RemoveBuff(BattleUnit target, int buffId, BattleEventPhase phase)
     {
         return new BattleEvent(BattleEventType.RemoveBuff, phase)
@@ -96,6 +111,9 @@ public class BattleEvent
         };
     }
 
+    /// <summary>
+    /// 事件调试用描述字符串（类型/时机/目标/参数）
+    /// </summary>
     public override string ToString()
     {
         return $"{EventType}(phase={TriggerPhase}, target=P{TargetUnit?.PersonId}, p1={Param1})";

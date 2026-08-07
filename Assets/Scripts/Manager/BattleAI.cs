@@ -4,6 +4,9 @@ using UnityEngine;
 
 public static class BattleAI
 {
+    /// <summary>
+    /// 敌方AI决策主入口：按优先级生成行动——HP 低于 30%且有治疗技能→治疗最低血友军；否则最强伤害技能打最优目标；再否则普攻；无目标则防御
+    /// </summary>
     public static BattleAction Decide(BattleUnit unit, BattleManager battle)
     {
         var enemyUnits = battle.GetAllAliveUnits(!unit.IsPlayerSide);
@@ -48,6 +51,9 @@ public static class BattleAI
         return new BattleAction(unit, ActionType.Defend, 0, new List<int>(), TargetType.Self);
     }
 
+    /// <summary>
+    /// 判断单位是否需要治疗（当前HP比例低于 30%）
+    /// </summary>
     private static bool ShouldHeal(BattleUnit unit, BattleManager battle)
     {
         if (unit.Stats.FinalHpMax <= 0) return false;
@@ -55,6 +61,9 @@ public static class BattleAI
         return hpRatio < 0.3f;
     }
 
+    /// <summary>
+    /// 在友军存活单位中寻找HP最低者（治疗优先目标）
+    /// </summary>
     private static BattleUnit FindLowestHpAlly(BattleUnit unit, BattleManager battle)
     {
         var allies = battle.GetAllAliveUnits(unit.IsPlayerSide);
@@ -73,6 +82,9 @@ public static class BattleAI
         return lowest;
     }
 
+    /// <summary>
+    /// 遍历可用技能，挑选治疗量最大的非冷却治疗技能；无则返回null
+    /// </summary>
     private static cfg.cfg.skill.Skill FindBestHealSkill(BattleUnit unit, BattleManager battle)
     {
         var tables = battle.GetTables();
@@ -100,6 +112,9 @@ public static class BattleAI
         return best;
     }
 
+    /// <summary>
+    /// 遍历可用技能，挑选伤害最高的非冷却伤害技能（限敌方目标类型）；无则返回null
+    /// </summary>
     private static cfg.cfg.skill.Skill FindBestAttackSkill(BattleUnit unit, BattleManager battle)
     {
         var tables = battle.GetTables();
@@ -133,6 +148,9 @@ public static class BattleAI
         return bestSkill;
     }
 
+    /// <summary>
+    /// 目标择优：优先前排（row=2）中HP最低的单位，无前排则取目标列表第一个
+    /// </summary>
     private static BattleUnit FindBestTarget(List<BattleUnit> targets)
     {
         BattleUnit best = null;

@@ -14,6 +14,9 @@ public abstract class BattleSubPanel : MonoBehaviour
 
     protected BattleManager _battleManager;
 
+    /// <summary>
+    /// 子面板初始化：绑定关闭按钮；panelRoot 为空时回退到自身
+    /// </summary>
     protected virtual void Awake()
     {
         if (btnClose != null)
@@ -21,12 +24,18 @@ public abstract class BattleSubPanel : MonoBehaviour
         if (panelRoot == null) panelRoot = gameObject;
     }
 
+    /// <summary>
+    /// 打开面板：记录 BattleManager 引用并显示面板根节点
+    /// </summary>
     public virtual void Open(BattleManager battleManager)
     {
         _battleManager = battleManager;
         if (panelRoot != null) panelRoot.SetActive(true);
     }
 
+    /// <summary>
+    /// 关闭面板：隐藏面板根节点
+    /// </summary>
     public virtual void Close()
     {
         if (panelRoot != null) panelRoot.SetActive(false);

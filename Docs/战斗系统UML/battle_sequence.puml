@@ -1,0 +1,97 @@
+@startuml battle_sequence
+' 战斗系统时序图 - 完整战斗流程（含前端表现）
+skinparam sequenceMessageAlign center
+skinparam maxMessageSize 200
+skinparam defaultFontName "Noto Sans CJK SC"
+skinparam sequenceFontSize 12
+skinparam participantFontSize 12
+
+title 完整战斗流程时序（逻辑 + 表现 + UI）
+
+actor 玩家
+participant "GameApp" as APP
+participant "BattleManager" as BM
+participant "BattleEventQueue" as BEQ
+participant "BattleStageManager" as STAGE
+participant "BattlePresenter" as PRES
+participant "BattleWindow" as WIN
+participant "DamageFx" as FX
+
+== 进入战斗 ==
+APP -> APP : EnterBattle(battleId)\n记录返回场景
+APP -> BM : new + ManagerRegistry.Register
+APP -> BM : InitBattle(battleId)
+activate BM
+BM -> BEQ : new BattleEventQueue(this)
+BM --> APP : 单位就绪(PlayerUnits/EnemyUnits)
+APP -> APP : LoadScene("Scene_Battle")
+APP -> APP : OnBattleSceneLoaded()
+APP -> STAGE : SpawnUnits(全单位, onComplete)
+activate STAGE
+STAGE -> STAGE : Addressables加载Spine角色\n+ 创建血条 + HitArea
+STAGE --> APP : onComplete
+APP -> BM : StartBattle()
+BM -> BM : TriggerGlobalBuffs(BattleStart)
+BM --> WIN : OnBattleStart
+APP -> WIN : UIManager.Open<BattleWindow>()
+activate WIN
+WIN -> BM : SubscribeEvents(12事件)
+WIN -> PRES : Subscribe OnSequence
+
+== 回合循环 ==
+BM -> BM : StartRound()\n排序(TurnQueue)
+loop 每回合
+  BM -> BEQ : ProcessPendingSummons()\n(召唤增援)
+  BM -> BM : 处理RoundStart事件/全局Buff
+  BM -> BM : StartUnitTurn(unit)
+  BM -> BM : ProcessStatusCheck(unit)\n(眩晕→跳过)
+  alt 玩家单位
+    BM --> WIN : OnUnitTurnStart / OnUnitPhaseChange(Action)
+    WIN -> STAGE : HighlightCurrentUnit(unit)
+    WIN -> WIN : 显示操作按钮 + 默认选中目标
+    WIN -> WIN : FindDefaultTarget + ShowTargetSelected
+    玩家 -> WIN : 点击"暴力行为"→选技能\n或方向键切换目标
+    WIN -> BM : PlayerUseSkill(skillId, targetSlot)
+  else AI单位
+    BM -> BM : BattleAI.Decide(unit) → action
+  end
+  BM -> BM : ExecuteAction(action)
+  activate BM
+  BM -> BM : ResolveTargets → ExecuteSkill\n(CalcDamage/ApplyDamage/ApplyHeal/Buff)
+  BM --> WIN : OnDamageTaken / OnHealed / OnBuffApplied
+  WIN -> STAGE : UpdateHealthBar(unit)
+  BM -> PRES : PlaySkillSequence(actor, skill, targets,\nbeforeHp, onComplete)
+  activate PRES
+  PRES -> PRES : 演出序列(0.1s停顿→转身→走向→蓄力→\n冲刺→命中停顿→受击闪白/后仰→\n喜剧延迟→飘字+白条残影→归位)
+  PRES -> FX : SpawnFloatText(target, "-5", Damage)
+  FX -> FX : 上升1.0 + 淡出0.9s (worldCamera+父级scale)
+  PRES -> STAGE : GetHealthBar.PlayGhostAnimation(白条)
+  PRES --> BM : onComplete
+  deactivate PRES
+  BM -> BM : CheckDeaths()
+  alt 有单位死亡
+    BM --> PRES : OnUnitDeath(unit)
+    activate PRES
+    PRES -> PRES : DeathRoutine\n(等IsPlaying→0.2s→0.45s倒地→隐藏)
+    deactivate PRES
+    BM --> WIN : OnUnitDeath → 日志
+  end
+  BM -> BM : EndUnitTurn(unit)
+  BM --> WIN : OnUnitTurnEnd → 清高亮/按钮
+  BM -> BM : AdvanceTurnQueue()
+end
+
+== 战斗结束 ==
+BM -> BM : EndRound → CheckBattleEnd()
+BM -> BM : EndBattle(Win/Lose/Flee)
+activate BM
+BM -> BM : ApplyBattleRewards(Win)
+BM --> WIN : OnBattleEnd(result)
+WIN -> WIN : WaitPerformancesThenReturn()\n(等 IsPlaying + IsDeathPlaying)
+WIN -> PRES : 轮询 IsPlaying/IsDeathPlaying
+WIN -> APP : OnBattleResultConfirmed()
+APP -> WIN : UIManager.Close<BattleWindow>()
+APP -> APP : LoadScene(返回场景) → ExitBattle()
+deactivate BM
+
+@enduml

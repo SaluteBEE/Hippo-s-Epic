@@ -187,6 +187,9 @@ public class BattleHealthBar : MonoBehaviour
         return ghost;
     }
 
+    /// <summary>
+    /// 设置残影条比例：Filled类型用fillAmount，Simple类型用localScale.x
+    /// </summary>
     private static void SetGhostValue(Image ghost, float ratio)
     {
         if (ghost == null) return;

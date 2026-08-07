@@ -1,0 +1,286 @@
+@startuml battle_class
+' 战斗系统类图 - 逻辑层 + 表现层 + UI层
+skinparam classAttributeIconSize 0
+skinparam classFontSize 13
+skinparam classAttributeFontSize 11
+skinparam classFontColor #111111
+skinparam shadowing false
+skinparam linetype ortho
+skinparam defaultFontName "Noto Sans CJK SC"
+
+title 战斗系统类图（逻辑层 / 表现层 / UI层）
+
+package "战斗逻辑层（纯数据，无 Mono）" #F0F8FF {
+
+class BattleManager {
+  + Phase : BattlePhase
+  + RoundCount : int
+  + AllUnits / PlayerUnits / EnemyUnits : List<BattleUnit>
+  + TurnQueue : Queue<BattleUnit>
+  + CurrentUnit : BattleUnit
+  + IsWaitingForPlayerAction : bool
+  + EventQueue : BattleEventQueue
+  + InitBattle(battleId)
+  + StartBattle()
+  + StartRound()
+  + ProcessTurnQueue()
+  + ExecuteAction(action)
+  + PlayerUseSkill(skillId, targetSlot)
+  + PlayerUseItem / PlayerDefend / PlayerDeferTurn / PlayerFlee
+  + ExecuteSkill / ExecuteItem / ExecuteDefend / ExecuteFlee
+  + GetSkillTargets / ResolveTargets / GetTargetsBySide
+  + CalcDamage / ApplyDamage / ApplyHeal
+  + TriggerBuffs / TriggerGlobalBuffs
+  + CheckBattleEnd / EndBattle / ApplyBattleRewards
+  + CheckDeaths / GetUnitAtSlot
+  + GetAvailableTargetsForSkill / GetTables
+  {field} + event OnBattleStart / OnRoundStart / OnUnitTurnStart
+  {field} + event OnUnitPhaseChange / OnUnitActionExecute / OnUnitTurnEnd
+  {field} + event OnRoundEnd / OnBattleEnd / OnDamageTaken / OnHealed
+  {field} + event OnBuffApplied / OnBuffRemoved / OnSkillExecuted
+  {field} + event OnUnitDeath / OnUnitDefend / OnPlayerFlee / OnNewUnitsReady
+}
+
+class BattleUnit {
+  + UnitId / PersonId / SlotIndex : int
+  + IsPlayerSide / IsAlive / IsPlayerControlled : bool
+  + Stats : CharacterStats
+  + UnitBuffs : BuffManager
+  + AvailableSkills : List<int>
+  + SkillCooldowns : Dictionary<int,int>
+  + CurrentPhase : UnitTurnPhase
+  + GetRow() : int
+  + GetColumn() : int
+  + ResetTurnState()
+  + DecrementCooldowns()
+  + IsSkillOnCooldown(skillId) : bool
+  + SetCooldown(skillId, turns)
+}
+
+class BattleAction {
+  + Actor : BattleUnit
+  + Type : ActionType
+  + ActionId : int
+  + TargetSlotIndices : List<int>
+  + TargetType : TargetType
+}
+
+class BattleAI {
+  {static} + Decide(unit, battle) : BattleAction
+  {static} - ShouldHeal / FindLowestHpAlly : ...
+  {static} - FindBestHealSkill / FindBestAttackSkill : ...
+  {static} - FindBestTarget : BattleUnit
+}
+
+class BattleEventQueue {
+  - _queues : Dictionary<BattleEventPhase, Queue<BattleEvent>>
+  + Enqueue(evt)
+  + ProcessPhase(phase)
+  + ProcessUnitPhase(phase, unit)
+  + ProcessPendingSummons() : List<BattleUnit>
+  + ExecuteEvent(evt)
+  + Clear() / GetQueueCount(phase)
+}
+
+class BattleEvent {
+  + EventType : BattleEventType
+  + TriggerPhase : BattleEventPhase
+  + TargetUnit / SourceUnit : BattleUnit
+  + Param1 / Param2 : int
+  + BoolParam : bool
+  {static} + Summon / Damage / Heal / Buff / RemoveBuff
+}
+
+enum BattlePhase {
+  None / Init / RoundStart
+  TurnQueue / RoundEnd / BattleEnd
+}
+
+enum UnitTurnPhase {
+  None / TurnStart / StatusCheck
+  Action / TurnEnd
+}
+
+enum ActionType {
+  Skill / Item / Defend / Flee
+}
+
+enum TargetType {
+  None / Self / Ally / Enemy
+}
+
+enum SkillType {
+  BuffOnly / Heal / PhysicalDamage / MagicDamage
+}
+
+enum BattleResult {
+  None / Win / Lose / Flee
+}
+
+BattleManager o-- BattleUnit : 管理
+BattleManager o-- BattleEventQueue
+BattleManager ..> BattleAction : 执行
+BattleManager ..> BattleAI : AI决策
+BattleEventQueue ..> BattleEvent : 队列元素
+BattleUnit "1" o-- "1" BattleAction : Actor
+BattleManager ..> BattlePhase : 状态
+BattleUnit ..> UnitTurnPhase
+BattleAction ..> ActionType
+BattleAction ..> TargetType
+BattleManager ..> BattleResult
+}
+
+package "前端表现层（MonoBehaviour）" #FFF8F0 {
+
+class BattlePresenter {
+  {static} + Instance : BattlePresenter
+  + IsPlaying : bool
+  + IsDeathPlaying : bool
+  + event OnSequenceBegin / OnSequenceEnd
+  + PlaySkillSequence(actor, skillId, targets, beforeHp, onComplete)
+  + OnUnitDeath(unit)
+  - DeathRoutine(unit)
+  - W(seconds) : WaitForSeconds
+  - GetUnitGo(unit) : GameObject
+  - FaceTarget(go, targetPos)
+  - WindUpRoutine(go, back, dur)
+  - MoveRoutine(go, target, dur)
+  - FlashWhiteRoutine(go, dur)
+  - KnockbackRoutine(go, attackerGo, dist, dur)
+}
+
+class BattleStageManager {
+  {static} + Instance : BattleStageManager
+  + SpawnUnits(units, onComplete)
+  + SpawnNewUnits(units, onComplete)
+  + UpdateHealthBar(unit) / UpdateAllHealthBars()
+  + HighlightCurrentUnit(unit) / ClearHighlight()
+  + ShowTargetSelected(unit) / ClearTargetSelection()
+  + GetSlot / GetUnitObject / GetHealthBar
+  + ClearAllUnits()
+  - SpawnUnitCoroutine(unit, onComplete)
+  - CreateHealthBar / CreateSimpleHealthBar
+  - CreateTriangleSprite()
+}
+
+class BattleHealthBar {
+  + Setup(unit, followTarget, offset)
+  + SetupSimple(unit, fillImage, followTarget, offset)
+  + UpdateHealth()
+  + PlayGhostAnimation(beforeHp, afterHp)
+  - GhostRoutine(from, to)
+  - EnsureGhostImage()
+}
+
+class DamageFx {
+  {static} + SpawnFloatText(anchor, text, type)
+  - GetColor(type) : Color
+}
+
+class FloatTextItem {
+  - _tmp : TextMeshProUGUI
+  + Play()
+  - Routine()
+}
+
+class BattleIndicatorFloat {
+  - Update() : 上下浮动
+}
+
+BattlePresenter ..> BattleStageManager : 取单位/血条
+BattlePresenter ..> DamageFx : 飘字
+BattleStageManager o-- BattleHealthBar : 管理
+BattleStageManager o-- BattleIndicatorFloat
+BattleStageManager ..> BattlePresenter : Awake 挂载
+}
+
+package "UI层（战斗窗口）" #F0FFF0 {
+
+class BattleWindow {
+  - _battleManager : BattleManager
+  - _stageManager : BattleStageManager
+  - _isSelectingTarget : bool
+  - _selectedSkillId : int
+  - _currentCursorTarget : BattleUnit
+  + OnCreate / OnOpen / OnClose
+  - Update() : 输入处理
+  - SubscribeEvents / UnsubscribeEvents
+  - OnBattleStart / OnRoundStart / OnUnitTurnStart
+  - OnUnitPhaseChange / OnDamageTaken / OnHealed
+  - OnBuffApplied / OnUnitDeath / OnUnitDefend
+  - OnUnitTurnEnd / OnRoundEnd / OnBattleEnd
+  - OnSequenceBegin / OnSequenceEnd
+  - WaitPerformancesThenReturn()
+  - OnViolenceClicked / OnTalkClicked / OnItemClicked / OnIdleClicked
+  - OnSkillSelected / OnTalkSelected / OnItemSelected
+  - StartTargetSelection / FindDefaultTarget
+  - CancelTargetSelection / TrySelectTargetByClick
+  - FindUnitByGameObject / GetValidTargets
+  - GetAllAliveUnits / GetValidTargetsForSkill
+  - IsTargetValidForSkill / CycleTarget / ConfirmCurrentTarget
+  - SetActionButtonsVisible / CloseAllSubPanels
+}
+
+class BattleSkillPanel {
+  + Open(battleManager, onSkillSelected, canUseOnTarget)
+  - RefreshSkillList()
+  - AddSkillItem(skillId, name, disabled, invalid)
+  - IsInvalidForTarget(skillId) : bool
+}
+
+class BattleItemPanel {
+  + Open(battleManager, onItemSelected)
+  - RefreshItemList() / AddItem()
+}
+
+class BattleTalkPanel {
+  + Open(battleManager, onTalkSelected)
+  - RefreshOptions() / GetOption(index)
+}
+
+class BattleLogPanel {
+  + AddLog / AddDamageLog / AddHealLog
+  + AddDefendLog / AddDeathLog / AddRoundLog
+  + ClearLogs()
+}
+
+BattleWindow o-- BattleSkillPanel
+BattleWindow o-- BattleItemPanel
+BattleWindow o-- BattleTalkPanel
+BattleWindow o-- BattleLogPanel
+BattleWindow ..> BattleManager : 订阅12事件/调玩家操作
+BattleWindow ..> BattlePresenter : 订阅OnSequence
+BattleWindow ..> BattleStageManager : 刷血条/指示器
+BattleSkillPanel ..> BattleManager : 读技能/冷却
+}
+
+package "入口与状态" #F5F0FF {
+class GameApp {
+  + BattleManager : BattleManager
+  + EnterBattle(battleId)
+  - OnBattleSceneLoaded()
+  - OnBattleFinished(battleId, result)
+  + OnBattleResultConfirmed()
+  + ExitBattle()
+}
+
+class BattleGameState {
+  + Enter() : 冻结玩家/切UI输入
+  + Exit() : 恢复
+  + Update()
+}
+
+class GameStateMachine {
+  + Current : IGameState
+  + ChangeState(state)
+  + Update()
+}
+
+GameApp o-- BattleManager : 创建注册
+GameApp ..> GameStateMachine : 切换状态
+GameApp ..> BattleStageManager : SpawnUnits
+GameApp ..> UIManager : Open<BattleWindow>
+BattleGameState ..|> IGameState
+}
+
+@enduml
