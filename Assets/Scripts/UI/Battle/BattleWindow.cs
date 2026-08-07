@@ -41,6 +41,12 @@ public class BattleWindow : UIWindow
     private Camera _mainCamera;
     private BattleUnit _currentCursorTarget;
 
+    // ---- 事件推送缓存（严格 MVC：只由事件更新，不主动读取战斗状态）----
+    private BattleUnit _currentUnit;
+    private bool _isWaitingForPlayerAction;
+    private List<BattleUnit> _playerUnits = new List<BattleUnit>();
+    private List<BattleUnit> _enemyUnits = new List<BattleUnit>();
+
     #endregion
 
     #region 生命周期
@@ -80,16 +86,9 @@ public class BattleWindow : UIWindow
 
         if (logPanel != null) logPanel.ClearLogs();
 
-        // 如果已经在等待玩家操作
-        if (_battleManager.IsWaitingForPlayerAction && _battleManager.CurrentUnit != null)
-        {
-            SetActionButtonsVisible(true);
-            // 全局选中中心点兜底：窗口打开时若已进入玩家回合，立即设默认选中目标
-            _selectedSkillId = 0;
-            _currentCursorTarget = FindDefaultTarget();
-            if (_currentCursorTarget != null && _stageManager != null)
-                _stageManager.ShowTargetSelected(_currentCursorTarget);
-        }
+        // 严格 MVC：请求管理器推送当前状态快照（由事件回调更新缓存，不主动读取）
+        // 若战斗已处于玩家等待，OnPlayerActionWaitChanged(true) 回调会自动显示按钮并选中目标
+        _battleManager.PushStateToUI();
     }
 
     /// <summary>
@@ -145,8 +144,8 @@ public class BattleWindow : UIWindow
         }
 
         // 全局选中中心点：玩家回合等待行动时，方向键随时切换选中目标（无需先进目标选择）
-        if (_battleManager != null && _battleManager.IsWaitingForPlayerAction
-            && _battleManager.CurrentUnit != null && _battleManager.CurrentUnit.IsPlayerControlled)
+        if (_battleManager != null && _isWaitingForPlayerAction
+            && _currentUnit != null && _currentUnit.IsPlayerControlled)
         {
             if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
                 CycleTarget(1, 0);
@@ -178,6 +177,9 @@ public class BattleWindow : UIWindow
         _battleManager.OnRoundEnd += OnRoundEnd;
         _battleManager.OnBattleEnd += OnBattleEnd;
         _battleManager.OnBuffApplied += OnBuffApplied;
+        _battleManager.OnCurrentUnitChanged += OnCurrentUnitChanged;
+        _battleManager.OnPlayerActionWaitChanged += OnPlayerActionWaitChanged;
+        _battleManager.OnUnitListsChanged += OnUnitListsChanged;
 
         var presenter = BattlePresenter.Instance;
         if (presenter != null)
@@ -202,6 +204,9 @@ public class BattleWindow : UIWindow
         _battleManager.OnRoundEnd -= OnRoundEnd;
         _battleManager.OnBattleEnd -= OnBattleEnd;
         _battleManager.OnBuffApplied -= OnBuffApplied;
+        _battleManager.OnCurrentUnitChanged -= OnCurrentUnitChanged;
+        _battleManager.OnPlayerActionWaitChanged -= OnPlayerActionWaitChanged;
+        _battleManager.OnUnitListsChanged -= OnUnitListsChanged;
 
         var presenter = BattlePresenter.Instance;
         if (presenter != null)
@@ -214,6 +219,45 @@ public class BattleWindow : UIWindow
     #endregion
 
     #region 事件回调
+
+    /// <summary> 当前行动单位变化：仅缓存（由管理器推送，UI 不主动读取） </summary>
+    private void OnCurrentUnitChanged(BattleUnit unit)
+    {
+        _currentUnit = unit;
+    }
+
+    /// <summary>
+    /// 玩家操作等待状态变化：进入等待 → 显示操作按钮并默认选中目标；结束 → 隐藏按钮并清理
+    /// </summary>
+    private void OnPlayerActionWaitChanged(bool waiting)
+    {
+        if (waiting)
+        {
+            if (_currentUnit == null) return;
+            SetActionButtonsVisible(true);
+            // 全局选中中心点：进入玩家回合即默认选中（普攻→第一个存活敌人）
+            if (_currentCursorTarget == null)
+            {
+                _selectedSkillId = 0;
+                _currentCursorTarget = FindDefaultTarget();
+                if (_currentCursorTarget != null && _stageManager != null)
+                    _stageManager.ShowTargetSelected(_currentCursorTarget);
+            }
+        }
+        else
+        {
+            SetActionButtonsVisible(false);
+            CloseAllSubPanels();
+            CancelTargetSelection();
+        }
+    }
+
+    /// <summary> 单位列表变化（增援/死亡）：缓存快照 </summary>
+    private void OnUnitListsChanged(List<BattleUnit> players, List<BattleUnit> enemies)
+    {
+        _playerUnits = new List<BattleUnit>(players);
+        _enemyUnits = new List<BattleUnit>(enemies);
+    }
 
     private void OnBattleStart()
     {
@@ -377,7 +421,7 @@ public class BattleWindow : UIWindow
         CloseAllSubPanels();
         if (skillPanel != null)
         {
-            skillPanel.Open(_battleManager, OnSkillSelected,
+            skillPanel.Open(_battleManager, _currentUnit, OnSkillSelected,
                 canUseOnTarget: skillId => IsTargetValidForSkill(_currentCursorTarget, skillId));
             if (subPanelContainer != null) subPanelContainer.SetActive(true);
         }
@@ -416,7 +460,7 @@ public class BattleWindow : UIWindow
 
     private bool CanOperate()
     {
-        if (_battleManager == null || !_battleManager.IsWaitingForPlayerAction) return false;
+        if (_battleManager == null || !_isWaitingForPlayerAction) return false;
         var presenter = BattlePresenter.Instance;
         return presenter == null || !presenter.IsPlaying;
     }
@@ -434,10 +478,10 @@ public class BattleWindow : UIWindow
         {
             var skillCfg = _battleManager.GetTables()?.TbSkill.GetOrDefault(skillId);
             if (skillCfg != null && (TargetType)skillCfg.Targettype == TargetType.Self
-                && _battleManager.CurrentUnit != null)
+                && _currentUnit != null)
             {
                 CloseAllSubPanels();
-                _battleManager.PlayerUseSkill(skillId, _battleManager.CurrentUnit.SlotIndex);
+                _battleManager.PlayerUseSkill(skillId, _currentUnit.SlotIndex);
                 return;
             }
         }
@@ -455,10 +499,10 @@ public class BattleWindow : UIWindow
         _battleManager.PlayerUseSkill(skillId, target.SlotIndex);
         if (_stageManager != null)
             _stageManager.ShowTargetSelected(target);
-        if (logPanel != null && _battleManager.CurrentUnit != null)
+        if (logPanel != null && _currentUnit != null)
         {
             string skillName = skillId == 0 ? "普通攻击" : $"技能{skillId}";
-            logPanel.AddDamageLog(GetUnitName(_battleManager.CurrentUnit), GetUnitName(target), 0, skillName);
+            logPanel.AddDamageLog(GetUnitName(_currentUnit), GetUnitName(target), 0, skillName);
         }
     }
 
@@ -500,7 +544,7 @@ public class BattleWindow : UIWindow
     /// </summary>
     private BattleUnit FindDefaultTarget()
     {
-        if (_battleManager == null || _battleManager.CurrentUnit == null) return null;
+        if (_battleManager == null || _currentUnit == null) return null;
 
         if (_selectedSkillId > 0)
         {
@@ -510,14 +554,14 @@ public class BattleWindow : UIWindow
                 var tt = (TargetType)skillCfg.Targettype;
                 if (tt == TargetType.Ally)
                     // 治疗/增益默认选中自己（自身必然存活在场，点技能直接对自己生效）
-                    return _battleManager.CurrentUnit;
+                    return _currentUnit;
                 if (tt == TargetType.Enemy)
-                    return _battleManager.EnemyUnits.Find(u => u.IsAlive);
+                    return _enemyUnits.Find(u => u.IsAlive);
             }
         }
 
         // 普通攻击/未知类型 → 默认第一个存活敌人
-        return _battleManager.EnemyUnits.Find(u => u.IsAlive);
+        return _enemyUnits.Find(u => u.IsAlive);
     }
 
     private void CancelTargetSelection()
@@ -550,10 +594,10 @@ public class BattleWindow : UIWindow
             _stageManager.ShowTargetSelected(unit);
 
         // 记录日志
-        if (logPanel != null && _battleManager.CurrentUnit != null)
+        if (logPanel != null && _currentUnit != null)
         {
             string skillName = _selectedSkillId == 0 ? "普通攻击" : $"技能{_selectedSkillId}";
-            logPanel.AddDamageLog(GetUnitName(_battleManager.CurrentUnit), GetUnitName(unit), 0, skillName);
+            logPanel.AddDamageLog(GetUnitName(_currentUnit), GetUnitName(unit), 0, skillName);
         }
 
         CancelTargetSelection();
@@ -574,11 +618,11 @@ public class BattleWindow : UIWindow
                 string[] parts = name.Split('_');
                 if (parts.Length >= 2 && int.TryParse(parts[1], out int personId))
                 {
-                    foreach (var unit in _battleManager.PlayerUnits)
+                    foreach (var unit in _playerUnits)
                     {
                         if (unit.PersonId == personId && unit.IsAlive) return unit;
                     }
-                    foreach (var unit in _battleManager.EnemyUnits)
+                    foreach (var unit in _enemyUnits)
                     {
                         if (unit.PersonId == personId && unit.IsAlive) return unit;
                     }
@@ -607,9 +651,9 @@ public class BattleWindow : UIWindow
     {
         var result = new List<BattleUnit>();
         if (_battleManager == null) return result;
-        foreach (var u in _battleManager.PlayerUnits)
+        foreach (var u in _playerUnits)
             if (u.IsAlive) result.Add(u);
-        foreach (var u in _battleManager.EnemyUnits)
+        foreach (var u in _enemyUnits)
             if (u.IsAlive) result.Add(u);
         return result;
     }
@@ -620,7 +664,7 @@ public class BattleWindow : UIWindow
     private List<BattleUnit> GetValidTargetsForSkill(int skillId)
     {
         var result = new List<BattleUnit>();
-        if (_battleManager == null || _battleManager.CurrentUnit == null) return result;
+        if (_battleManager == null || _currentUnit == null) return result;
 
         if (skillId > 0)
         {
@@ -630,10 +674,10 @@ public class BattleWindow : UIWindow
                 var tt = (TargetType)skillCfg.Targettype;
                 if (tt == TargetType.Self)
                 {
-                    result.Add(_battleManager.CurrentUnit);
+                    result.Add(_currentUnit);
                     return result;
                 }
-                var pool = tt == TargetType.Ally ? _battleManager.PlayerUnits : _battleManager.EnemyUnits;
+                var pool = tt == TargetType.Ally ? _playerUnits : _enemyUnits;
                 foreach (var u in pool)
                 {
                     // 治疗/增益类(Ally)目标池包含自己——可对自己释放（引用比较，敌我 SlotIndex 可能相同不能按索引排除）
@@ -646,7 +690,7 @@ public class BattleWindow : UIWindow
         }
 
         // 普通攻击：默认敌人
-        foreach (var u in _battleManager.EnemyUnits)
+        foreach (var u in _enemyUnits)
             if (u.IsAlive) result.Add(u);
         result.Sort((a, b) => a.SlotIndex.CompareTo(b.SlotIndex));
         return result;
@@ -703,10 +747,10 @@ public class BattleWindow : UIWindow
         if (_stageManager != null)
             _stageManager.ShowTargetSelected(unit);
 
-        if (logPanel != null && _battleManager.CurrentUnit != null)
+        if (logPanel != null && _currentUnit != null)
         {
             string skillName = _selectedSkillId == 0 ? "普通攻击" : $"技能{_selectedSkillId}";
-            logPanel.AddDamageLog(GetUnitName(_battleManager.CurrentUnit), GetUnitName(unit), 0, skillName);
+            logPanel.AddDamageLog(GetUnitName(_currentUnit), GetUnitName(unit), 0, skillName);
         }
 
         CancelTargetSelection();

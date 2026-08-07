@@ -54,11 +54,13 @@ public class BattleSkillPanel : BattleSubPanel
 
     private Action<int> _onSkillSelected;
     private Func<int, bool> _canUseOnTarget;
+    private BattleUnit _unit;  // 打开面板时的当前单位（由上层事件缓存传入，不主动读取）
 
-    public void Open(BattleManager battleManager, Action<int> onSkillSelected,
+    public void Open(BattleManager battleManager, BattleUnit unit, Action<int> onSkillSelected,
                      Func<int, bool> canUseOnTarget = null)
     {
         base.Open(battleManager);
+        _unit = unit;
         _onSkillSelected = onSkillSelected;
         _canUseOnTarget = canUseOnTarget;
         RefreshSkillList();
@@ -71,15 +73,15 @@ public class BattleSkillPanel : BattleSubPanel
                   $"container={skillContainer} " +
                   $"prefab={skillItemPrefab} " +
                   $"prefabIsAsset={prefabIsAsset} (false=引用的是场景实例) " +
-                  $"manager={_battleManager} unit={_battleManager?.CurrentUnit}");
+                  $"manager={_battleManager} unit={_unit}");
         if (skillContainer == null || skillItemPrefab == null) return;
-        if (_battleManager == null || _battleManager.CurrentUnit == null) return;
+        if (_battleManager == null || _unit == null) return;
 
         // 清空旧列表
         foreach (Transform child in skillContainer)
             Destroy(child.gameObject);
 
-        var unit = _battleManager.CurrentUnit;
+        var unit = _unit;
         var tables = _battleManager.GetTables();
 
         // 添加普通攻击

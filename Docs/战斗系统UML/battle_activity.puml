@@ -9,9 +9,9 @@ title 战斗回合循环活动图（含前端表现）
 start
 :GameApp.EnterBattle(battleId);
 :InitBattle → LoadScene(Scene_Battle);
+:打开 BattleWindow (onReady 回调, 先开窗+订阅15事件);
 :StageManager.SpawnUnits (Addressables 生成 Spine 角色 + 血条);
-:StartBattle (全局 Buff + OnBattleStart);
-:打开 BattleWindow (订阅事件);
+:StartBattle (全局 Buff + OnBattleStart → 事件必达);
 
 repeat
   :StartRound;

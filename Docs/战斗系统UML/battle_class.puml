@@ -17,8 +17,8 @@ class BattleManager {
   + RoundCount : int
   + AllUnits / PlayerUnits / EnemyUnits : List<BattleUnit>
   + TurnQueue : Queue<BattleUnit>
-  + CurrentUnit : BattleUnit
-  + IsWaitingForPlayerAction : bool
+  + CurrentUnit : BattleUnit  [属性,赋值→OnCurrentUnitChanged]
+  + IsWaitingForPlayerAction : bool  [属性,赋值→OnPlayerActionWaitChanged]
   + EventQueue : BattleEventQueue
   + InitBattle(battleId)
   + StartBattle()
@@ -34,11 +34,13 @@ class BattleManager {
   + CheckBattleEnd / EndBattle / ApplyBattleRewards
   + CheckDeaths / GetUnitAtSlot
   + GetAvailableTargetsForSkill / GetTables
+  + PushStateToUI()  [窗口打开时推送一次状态快照]
   {field} + event OnBattleStart / OnRoundStart / OnUnitTurnStart
   {field} + event OnUnitPhaseChange / OnUnitActionExecute / OnUnitTurnEnd
   {field} + event OnRoundEnd / OnBattleEnd / OnDamageTaken / OnHealed
   {field} + event OnBuffApplied / OnBuffRemoved / OnSkillExecuted
   {field} + event OnUnitDeath / OnUnitDefend / OnPlayerFlee / OnNewUnitsReady
+  {field} + event OnCurrentUnitChanged / OnPlayerActionWaitChanged / OnUnitListsChanged
 }
 
 class BattleUnit {
@@ -202,6 +204,10 @@ class BattleWindow {
   - _isSelectingTarget : bool
   - _selectedSkillId : int
   - _currentCursorTarget : BattleUnit
+  - _currentUnit : BattleUnit  [缓存,事件回调填充]
+  - _isWaitingForPlayerAction : bool  [缓存,事件回调填充]
+  - _playerUnits : List<BattleUnit>  [缓存,事件回调填充]
+  - _enemyUnits : List<BattleUnit>  [缓存,事件回调填充]
   + OnCreate / OnOpen / OnClose
   - Update() : 输入处理
   - SubscribeEvents / UnsubscribeEvents
@@ -209,6 +215,7 @@ class BattleWindow {
   - OnUnitPhaseChange / OnDamageTaken / OnHealed
   - OnBuffApplied / OnUnitDeath / OnUnitDefend
   - OnUnitTurnEnd / OnRoundEnd / OnBattleEnd
+  - OnCurrentUnitChanged / OnPlayerActionWaitChanged / OnUnitListsChanged
   - OnSequenceBegin / OnSequenceEnd
   - WaitPerformancesThenReturn()
   - OnViolenceClicked / OnTalkClicked / OnItemClicked / OnIdleClicked
@@ -222,7 +229,8 @@ class BattleWindow {
 }
 
 class BattleSkillPanel {
-  + Open(battleManager, onSkillSelected, canUseOnTarget)
+  + Open(battleManager, unit, onSkillSelected, canUseOnTarget)
+  [unit 由事件推送的当前行动单位传入]
   - RefreshSkillList()
   - AddSkillItem(skillId, name, disabled, invalid)
   - IsInvalidForTarget(skillId) : bool
@@ -248,7 +256,7 @@ BattleWindow o-- BattleSkillPanel
 BattleWindow o-- BattleItemPanel
 BattleWindow o-- BattleTalkPanel
 BattleWindow o-- BattleLogPanel
-BattleWindow ..> BattleManager : 订阅12事件/调玩家操作
+BattleWindow ..> BattleManager : 订阅15事件(含3个状态推送)/调玩家操作
 BattleWindow ..> BattlePresenter : 订阅OnSequence
 BattleWindow ..> BattleStageManager : 刷血条/指示器
 BattleSkillPanel ..> BattleManager : 读技能/冷却
@@ -258,7 +266,7 @@ package "入口与状态" #F5F0FF {
 class GameApp {
   + BattleManager : BattleManager
   + EnterBattle(battleId)
-  - OnBattleSceneLoaded()
+  - OnBattleSceneLoaded()  [ui.Open<BattleWindow>(null, onReady) 先开窗后战斗]
   - OnBattleFinished(battleId, result)
   + OnBattleResultConfirmed()
   + ExitBattle()

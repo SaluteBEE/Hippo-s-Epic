@@ -473,30 +473,53 @@ public partial class GameApp : MonoBehaviour
         // 切换游戏状态
         StateMachine.ChangeState(new BattleGameState(this));
 
-        // 生成战斗角色，完成后开始战斗
-        var stageManager = FindObjectOfType<BattleStageManager>();
-        if (stageManager != null && BattleManager != null)
+        // 打开战斗UI（先开窗口并完成订阅，再开始战斗 → OnBattleStart 等事件必达）
+        var ui = ManagerRegistry.Get<UIManager>();
+        if (ui != null)
         {
-            var allUnits = new List<BattleUnit>();
-            allUnits.AddRange(BattleManager.PlayerUnits);
-            allUnits.AddRange(BattleManager.EnemyUnits);
-            stageManager.SpawnUnits(allUnits, () =>
+            ui.Open<BattleWindow>(null, _ =>
             {
-                Debug.Log("[GameApp] 角色生成完成，开始战斗流程");
-                BattleManager.StartBattle();
+                // 窗口创建+订阅完成后才开始战斗（onReady 在 OnOpen 之后触发）
+                var stageManager = FindObjectOfType<BattleStageManager>();
+                if (stageManager != null && BattleManager != null)
+                {
+                    var allUnits = new List<BattleUnit>();
+                    allUnits.AddRange(BattleManager.PlayerUnits);
+                    allUnits.AddRange(BattleManager.EnemyUnits);
+                    stageManager.SpawnUnits(allUnits, () =>
+                    {
+                        Debug.Log("[GameApp] 角色生成完成，开始战斗流程");
+                        BattleManager.StartBattle();
+                    });
+                }
+                else
+                {
+                    Debug.LogWarning("[GameApp] 战斗场景中未找到 BattleStageManager");
+                    if (BattleManager != null)
+                        BattleManager.StartBattle();
+                }
             });
         }
         else
         {
-            Debug.LogWarning("[GameApp] 战斗场景中未找到 BattleStageManager");
-            if (BattleManager != null)
+            // 无UI管理器兜底：直接开始战斗
+            var stageManager = FindObjectOfType<BattleStageManager>();
+            if (stageManager != null && BattleManager != null)
+            {
+                var allUnits = new List<BattleUnit>();
+                allUnits.AddRange(BattleManager.PlayerUnits);
+                allUnits.AddRange(BattleManager.EnemyUnits);
+                stageManager.SpawnUnits(allUnits, () =>
+                {
+                    Debug.Log("[GameApp] 角色生成完成，开始战斗流程");
+                    BattleManager.StartBattle();
+                });
+            }
+            else if (BattleManager != null)
+            {
                 BattleManager.StartBattle();
+            }
         }
-
-        // 打开战斗UI
-        var ui = ManagerRegistry.Get<UIManager>();
-        if (ui != null)
-            ui.Open<BattleWindow>();
 
         // 订阅增援入场事件：新单位进入时生成视觉
         if (BattleManager != null)

@@ -14,9 +14,36 @@ public class BattleManager
     public List<BattleUnit> PlayerUnits = new List<BattleUnit>();
     public List<BattleUnit> EnemyUnits = new List<BattleUnit>();
     public Queue<BattleUnit> TurnQueue = new Queue<BattleUnit>();
-    public BattleUnit CurrentUnit;
 
-    public bool IsWaitingForPlayerAction;
+    private BattleUnit _currentUnit;
+    /// <summary>
+    /// 当前行动单位（属性赋值自动推送 OnCurrentUnitChanged）
+    /// </summary>
+    public BattleUnit CurrentUnit
+    {
+        get => _currentUnit;
+        set
+        {
+            if (ReferenceEquals(_currentUnit, value)) return;
+            _currentUnit = value;
+            OnCurrentUnitChanged?.Invoke(value);
+        }
+    }
+
+    private bool _isWaitingForPlayerAction;
+    /// <summary>
+    /// 是否等待玩家操作（属性赋值自动推送 OnPlayerActionWaitChanged）
+    /// </summary>
+    public bool IsWaitingForPlayerAction
+    {
+        get => _isWaitingForPlayerAction;
+        set
+        {
+            if (_isWaitingForPlayerAction == value) return;
+            _isWaitingForPlayerAction = value;
+            OnPlayerActionWaitChanged?.Invoke(value);
+        }
+    }
 
     public event Action OnBattleStart;
     public event Action<int> OnRoundStart;
@@ -35,8 +62,21 @@ public class BattleManager
     public event Action<BattleUnit> OnUnitDefend;
     public event Action OnPlayerFlee;
     public event Action<List<BattleUnit>> OnNewUnitsReady;
+    public event Action<BattleUnit> OnCurrentUnitChanged;
+    public event Action<bool> OnPlayerActionWaitChanged;
+    public event Action<List<BattleUnit>, List<BattleUnit>> OnUnitListsChanged;
 
     public BattleEventQueue EventQueue { get; private set; }
+
+    /// <summary>
+    /// 向订阅者推送当前战斗状态快照（窗口打开时请求初始同步用，UI 不主动拉取）
+    /// </summary>
+    public void PushStateToUI()
+    {
+        OnCurrentUnitChanged?.Invoke(CurrentUnit);
+        OnPlayerActionWaitChanged?.Invoke(IsWaitingForPlayerAction);
+        OnUnitListsChanged?.Invoke(PlayerUnits, EnemyUnits);
+    }
 
     private cfg.cfg.battle.Battle _battleConfig;
     private int _unitIdCounter;
@@ -81,6 +121,8 @@ public class BattleManager
 
         CreateUnits(_battleConfig, tables);
         BattleLogger.Log($" 战斗初始化完成: {_battleConfig.Name}, 友方{PlayerUnits.Count}人, 敌方{EnemyUnits.Count}人");
+
+        OnUnitListsChanged?.Invoke(PlayerUnits, EnemyUnits);
     }
 
     /// <summary>
@@ -307,6 +349,8 @@ public class BattleManager
                 else
                     EnemyUnits.Add(unit);
             }
+
+            OnUnitListsChanged?.Invoke(PlayerUnits, EnemyUnits);
         }
 
         // ③ 事件队列 — 处理 RoundStart 其他延迟事件
@@ -1060,6 +1104,7 @@ public class BattleManager
             BattleLogger.Log($"    P{unit.PersonId} 阵亡！");
         }
 
+        OnUnitListsChanged?.Invoke(PlayerUnits, EnemyUnits);
         CheckBattleEnd();
     }
 

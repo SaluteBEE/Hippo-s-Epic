@@ -26,17 +26,18 @@ BM -> BEQ : new BattleEventQueue(this)
 BM --> APP : 单位就绪(PlayerUnits/EnemyUnits)
 APP -> APP : LoadScene("Scene_Battle")
 APP -> APP : OnBattleSceneLoaded()
+APP -> WIN : UIManager.Open<BattleWindow>(null, onReady)\n先开窗并完成订阅
+activate WIN
+WIN -> BM : SubscribeEvents(15事件)
+WIN -> PRES : Subscribe OnSequence
+WIN --> APP : onReady (窗口+订阅完成)
 APP -> STAGE : SpawnUnits(全单位, onComplete)
 activate STAGE
 STAGE -> STAGE : Addressables加载Spine角色\n+ 创建血条 + HitArea
 STAGE --> APP : onComplete
-APP -> BM : StartBattle()
+APP -> BM : StartBattle()\n(OnBattleStart 事件必达, 无竞态)
 BM -> BM : TriggerGlobalBuffs(BattleStart)
 BM --> WIN : OnBattleStart
-APP -> WIN : UIManager.Open<BattleWindow>()
-activate WIN
-WIN -> BM : SubscribeEvents(12事件)
-WIN -> PRES : Subscribe OnSequence
 
 == 回合循环 ==
 BM -> BM : StartRound()\n排序(TurnQueue)
