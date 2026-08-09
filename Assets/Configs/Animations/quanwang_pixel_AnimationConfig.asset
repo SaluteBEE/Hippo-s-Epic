@@ -1,0 +1,68 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 667ecdb9b442b9f49a7a2aaee87ac430, type: 3}
+  m_Name: quanwang_pixel_AnimationConfig
+  m_EditorClassIdentifier: 
+  skeletonData: {fileID: 11400000, guid: 34c56a6c4cda67e459c8aee34920b31c, type: 2}
+  clips:
+  - name: "\u5F85\u673A"
+    animation: {fileID: 11400000, guid: 0718dab22c47f5b448428c5c2cc6806f, type: 2}
+    animationName: "\u5F85\u673A"
+    speed: 1
+    loop: 1
+    type: 0
+  - name: "\u884C\u8D70"
+    animation: {fileID: 11400000, guid: b1b7f825704043e46bbf81e7ea6b144e, type: 2}
+    animationName: "\u884C\u8D70"
+    speed: 1
+    loop: 1
+    type: 0
+  layers:
+  - name: Base
+    trackIndex: 0
+    defaultWeight: 1
+    additive: 0
+    slotNames: []
+    availableClipNames:
+    - "\u5F85\u673A"
+    - "\u884C\u8D70"
+  - name: UpperBody
+    trackIndex: 1
+    defaultWeight: 1
+    additive: 0
+    slotNames: []
+    availableClipNames: []
+  - name: LowerBody
+    trackIndex: 2
+    defaultWeight: 1
+    additive: 0
+    slotNames: []
+    availableClipNames: []
+  compositions:
+  - name: 0
+    description: "\u63CF\u8FF0"
+    layers:
+    - layerName: Base
+      clipName: "\u5F85\u673A"
+      weight: 1
+      transitionTime: 0.1
+      delay: 0
+  - name: 6
+    description: "\u63CF\u8FF0"
+    layers:
+    - layerName: Base
+      clipName: "\u884C\u8D70"
+      weight: 1
+      transitionTime: 0.1
+      delay: 0
+  defaultComposition: 0
+  defaultTransitionTime: 0.1

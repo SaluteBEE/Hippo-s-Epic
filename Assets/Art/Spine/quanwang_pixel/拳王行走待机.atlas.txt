@@ -1,0 +1,102 @@
+
+拳王行走待机.png
+size: 1952, 1504
+format: RGBA8888
+filter: Linear, Linear
+repeat: none
+右腿
+  rotate: true
+  xy: 1090, 1310
+  size: 192, 242
+  orig: 192, 242
+  offset: 0, 0
+  index: -1
+后臂
+  rotate: false
+  xy: 2, 2
+  size: 952, 752
+  orig: 952, 752
+  offset: 0, 0
+  index: -1
+头大
+  rotate: false
+  xy: 1160, 316
+  size: 662, 942
+  orig: 662, 942
+  offset: 0, 0
+  index: -1
+头小
+  rotate: true
+  xy: 496, 756
+  size: 552, 662
+  orig: 552, 662
+  offset: 0, 0
+  index: -1
+左腿
+  rotate: true
+  xy: 1334, 1310
+  size: 192, 242
+  orig: 192, 242
+  offset: 0, 0
+  index: -1
+脸大
+  rotate: false
+  xy: 2, 1046
+  size: 492, 312
+  orig: 492, 312
+  offset: 0, 0
+  index: -1
+脸小
+  rotate: false
+  xy: 1578, 1260
+  size: 372, 242
+  orig: 372, 242
+  offset: 0, 0
+  index: -1
+腰带
+  rotate: false
+  xy: 2, 1360
+  size: 522, 142
+  orig: 522, 142
+  offset: 0, 0
+  index: -1
+裆部
+  rotate: false
+  xy: 526, 1350
+  size: 562, 152
+  orig: 562, 152
+  offset: 0, 0
+  index: -1
+
+拳王行走待机_2.png
+size: 1196, 1686
+format: RGBA8888
+filter: Linear, Linear
+repeat: none
+左臂
+  rotate: false
+  xy: 2, 2
+  size: 1192, 1682
+  orig: 1192, 1682
+  offset: 0, 0
+  index: -1
+
+拳王行走待机_3.png
+size: 1870, 1736
+format: RGBA8888
+filter: Linear, Linear
+repeat: none
+右臂
+  rotate: false
+  xy: 2, 2
+  size: 902, 1732
+  orig: 902, 1732
+  offset: 0, 0
+  index: -1
+身体
+  rotate: false
+  xy: 906, 502
+  size: 962, 1232
+  orig: 962, 1232
+  offset: 0, 0
+  index: -1
