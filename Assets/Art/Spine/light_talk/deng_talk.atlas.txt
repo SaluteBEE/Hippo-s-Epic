@@ -1,0 +1,41 @@
+
+deng_talk.png
+size: 1492,731
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+deng
+  rotate: true
+  xy: 1013, 233
+  size: 496, 477
+  orig: 498, 479
+  offset: 1, 1
+  index: -1
+dengmie
+  rotate: false
+  xy: 1013, 14
+  size: 87, 27
+  orig: 89, 29
+  offset: 1, 1
+  index: -1
+guangyuan
+  rotate: true
+  xy: 2, 2
+  size: 727, 1009
+  orig: 727, 1009
+  offset: 0, 0
+  index: -1
+zhanglang1
+  rotate: true
+  xy: 1251, 64
+  size: 167, 201
+  orig: 167, 201
+  offset: 0, 0
+  index: -1
+zhanglang2
+  rotate: true
+  xy: 1013, 43
+  size: 188, 236
+  orig: 188, 236
+  offset: 0, 0
+  index: -1

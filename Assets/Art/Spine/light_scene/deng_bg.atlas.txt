@@ -1,0 +1,41 @@
+
+deng_bg.png
+size: 948,465
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+deng
+  rotate: true
+  xy: 644, 149
+  size: 314, 302
+  orig: 316, 304
+  offset: 1, 1
+  index: -1
+dengmie
+  rotate: false
+  xy: 644, 8
+  size: 55, 17
+  orig: 57, 19
+  offset: 1, 1
+  index: -1
+guang
+  rotate: true
+  xy: 2, 2
+  size: 461, 640
+  orig: 461, 640
+  offset: 0, 0
+  index: -1
+zhanglang1
+  rotate: true
+  xy: 796, 41
+  size: 106, 128
+  orig: 106, 128
+  offset: 0, 0
+  index: -1
+zhanglang2
+  rotate: true
+  xy: 644, 27
+  size: 120, 150
+  orig: 120, 150
+  offset: 0, 0
+  index: -1
