@@ -18,19 +18,19 @@ MonoBehaviour:
   m_GUID: e28905b90bbdc054ea52c27a21b6bacf
   m_SerializeEntries:
   - m_GUID: e03d41e28039e724295f06fdb54cf7ac
-    m_Address: prefabs/maps/Outer_City_Ground
+    m_Address: Assets/Prefabs/Maps/Outer_City_Ground
     m_ReadOnly: 0
     m_SerializedLabels:
     - map_prefab
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 01985814fdb7a3549b30aa53c66e87ed
-    m_Address: prefabs/maps/Staff Lounge
+    m_Address: Assets/Prefabs/Maps/Staff Lounge
     m_ReadOnly: 0
     m_SerializedLabels:
     - map_prefab
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 335a63000ac1e0e43935281f53d402c2
-    m_Address: prefabs/maps/Underground Boxing Gym
+    m_Address: Assets/Prefabs/Maps/Underground Boxing Gym
     m_ReadOnly: 0
     m_SerializedLabels:
     - map_prefab

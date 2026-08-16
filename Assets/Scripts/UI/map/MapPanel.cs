@@ -10,7 +10,7 @@ public enum MapRootId
 
 public class MapPanel : UIWindow
 {
-    private const string AddressPrefix = "ui/map/MapRoot_";
+    private const string AddressPrefix = "Assets/Prefabs/UI/map/MapRoot_";
 
     [Header("UI")]
     [SerializeField] private RectTransform mapRootContainer;

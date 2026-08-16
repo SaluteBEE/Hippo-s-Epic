@@ -18,224 +18,236 @@ MonoBehaviour:
   m_GUID: d57eea12ceb511543b6ee4480b7deaaa
   m_SerializeEntries:
   - m_GUID: a74815a8f39778146bdcd01ab2e7d74d
-    m_Address: backgrounds/TestBackground
+    m_Address: Assets/Art/Backgrounds/TestBackground
     m_ReadOnly: 0
     m_SerializedLabels:
     - background
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: ab105f16188c31b4a8edfcd8de2fe12f
-    m_Address: ui/Dialog/BubbleLeft
+    m_Address: Assets/Prefabs/UI/Dialog/BubbleLeft
     m_ReadOnly: 0
     m_SerializedLabels:
     - ui_prefab
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: c73df702408772b42b68a4b0d89e3205
-    m_Address: ui/Dialog/BubbleMiddle
+    m_Address: Assets/Prefabs/UI/Dialog/BubbleMiddle
     m_ReadOnly: 0
     m_SerializedLabels:
     - ui_prefab
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 5e0861a17eabd3a4db06b3cfc207ce42
-    m_Address: ui/Dialog/BubbleOption
+    m_Address: Assets/Prefabs/UI/Dialog/BubbleOption
     m_ReadOnly: 0
     m_SerializedLabels:
     - ui_prefab
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: cbba89dd17a70de4e83ec9117ea420e3
-    m_Address: ui/Dialog/BubbleRight
+    m_Address: Assets/Prefabs/UI/Dialog/BubbleRight
     m_ReadOnly: 0
     m_SerializedLabels:
     - ui_prefab
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: d9f082591a7dd534d8201345555b871d
-    m_Address: ui/Dialog/DialoguePanel
+    m_Address: Assets/Prefabs/UI/Dialog/DialoguePanel
     m_ReadOnly: 0
     m_SerializedLabels:
     - ui_prefab
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 0da5c93151d8d7a4da9da7892a9a4c96
-    m_Address: ui/Global/MainMenuPanel
+    m_Address: Assets/Prefabs/UI/Global/MainMenuPanel
     m_ReadOnly: 0
     m_SerializedLabels:
     - ui_prefab
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 6c87d922910b4e548b72984c8551337b
-    m_Address: backgrounds/catchdog
+    m_Address: Assets/Art/Backgrounds/catchdog
     m_ReadOnly: 0
     m_SerializedLabels:
     - background
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 8f47d42ebe93395418e6d0ac6e620ff9
-    m_Address: ui/Interact/InteractHint
+    m_Address: Assets/Prefabs/UI/Interact/InteractHint
     m_ReadOnly: 0
     m_SerializedLabels:
     - ui_prefab
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: d09353bb4b7642349a2f58092b2fe394
-    m_Address: ui/Dialog/DialogWindow
+    m_Address: Assets/Prefabs/UI/Dialog/DialogWindow
     m_ReadOnly: 0
     m_SerializedLabels:
     - ui_prefab
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: a95b9c147c9db894cb3d953ca8dbdfa4
-    m_Address: ui/Bag/BagPanel
+    m_Address: Assets/Prefabs/UI/Bag/BagPanel
     m_ReadOnly: 0
     m_SerializedLabels:
     - ui_prefab
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 5dc0706b5ace6344b83c4a9701ba9081
-    m_Address: ui/Global/LoadingPanel
+    m_Address: Assets/Prefabs/UI/Global/LoadingPanel
     m_ReadOnly: 0
     m_SerializedLabels:
     - ui_prefab
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: cf158ebc8bb7fe749aea7ddeb745372c
-    m_Address: ui/Bag/UseItemTip
+    m_Address: Assets/Prefabs/UI/Bag/UseItemTip
     m_ReadOnly: 0
     m_SerializedLabels:
     - ui_prefab
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 882963ba44968274ebc1b49f0c7e5bf5
-    m_Address: icon/item/6
+    m_Address: Assets/Art/Sprites/UI/Item/6
     m_ReadOnly: 0
     m_SerializedLabels:
     - icon
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 220b8325cfa4baa47a5d5553e36482e9
-    m_Address: icon/item/7
+    m_Address: Assets/Art/Sprites/UI/Item/7
     m_ReadOnly: 0
     m_SerializedLabels:
     - icon
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: ca5895c26071632469d4b7d61b91bdc2
-    m_Address: icon/item/2
+    m_Address: Assets/Art/Sprites/UI/Item/2
     m_ReadOnly: 0
     m_SerializedLabels:
     - icon
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 331feba6b6cac3c4ab30e0ff55583bfd
-    m_Address: icon/item/3
+    m_Address: Assets/Art/Sprites/UI/Item/3
     m_ReadOnly: 0
     m_SerializedLabels:
     - icon
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 5248289c5cbc880409b37b99835fab31
-    m_Address: icon/item/4
+    m_Address: Assets/Art/Sprites/UI/Item/4
     m_ReadOnly: 0
     m_SerializedLabels:
     - icon
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: ce7a6b22f5f601d4fa2dfadf55a0209f
-    m_Address: icon/item/5
+    m_Address: Assets/Art/Sprites/UI/Item/5
     m_ReadOnly: 0
     m_SerializedLabels:
     - icon
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: a541335c14d0d1d4aa118d81b069ce9b
-    m_Address: ui/task/TaskPanel
+    m_Address: Assets/Prefabs/UI/task/TaskPanel
     m_ReadOnly: 0
     m_SerializedLabels:
     - ui_prefab
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: beed687bb57aeb94199f8c772406529c
-    m_Address: ui/Bag/bagitem
+    m_Address: Assets/Prefabs/UI/Bag/bagitem
     m_ReadOnly: 0
     m_SerializedLabels:
     - ui_prefab
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 355eaf1386fffd44f81111993a376f5d
-    m_Address: ui/Bag/equip
+    m_Address: Assets/Prefabs/UI/Bag/equip
     m_ReadOnly: 0
     m_SerializedLabels:
     - ui_prefab
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: a9be672bad163ea4392e86f7da9338e8
-    m_Address: ui/common/common btn
+    m_Address: Assets/Prefabs/UI/common/common btn
     m_ReadOnly: 0
     m_SerializedLabels:
     - ui_prefab
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: dcd6a6eb771918a42bf9200001c39441
-    m_Address: ui/common/VerScrollbar
+    m_Address: Assets/Prefabs/UI/common/VerScrollbar
     m_ReadOnly: 0
     m_SerializedLabels:
     - ui_prefab
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 50f3289f4bcdb4c48932defb3daf3d23
-    m_Address: ui/Dialog/DialogCameraRoot
+    m_Address: Assets/Prefabs/UI/Dialog/DialogCameraRoot
     m_ReadOnly: 0
     m_SerializedLabels:
     - ui_prefab
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: e7035f386eb1af6448754e2efb8cff21
-    m_Address: ui/task/taskContent
+    m_Address: Assets/Prefabs/UI/task/taskContent
     m_ReadOnly: 0
     m_SerializedLabels:
     - ui_prefab
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 6cb7db52459623c4cab620e9beb4d227
-    m_Address: ui/task/taskItem
+    m_Address: Assets/Prefabs/UI/task/taskItem
     m_ReadOnly: 0
     m_SerializedLabels:
     - ui_prefab
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: bf9322693e035f34da3a5fad76f3c6f0
-    m_Address: ui/map/MapPanel
+    m_Address: Assets/Prefabs/UI/map/MapPanel
     m_ReadOnly: 0
     m_SerializedLabels:
     - ui_prefab
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: e27e3731e6f74dd448abebfa2608da45
-    m_Address: ui/map/MapRoot_PunkCity
+    m_Address: Assets/Prefabs/UI/map/MapRoot_PunkCity
     m_ReadOnly: 0
     m_SerializedLabels:
     - ui_prefab
     - maproot
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 3ad0146421d356f42a2f03c56f03ee4a
-    m_Address: ui/Global/MainPanel
+    m_Address: Assets/Prefabs/UI/Global/MainPanel
     m_ReadOnly: 0
     m_SerializedLabels:
     - ui_prefab
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: e0a6c4a934d3c3a40b9889704624a359
-    m_Address: avatars/avatar_hippo
+    m_Address: Assets/Art/Sprites/Head/avatar_hippo
     m_ReadOnly: 0
     m_SerializedLabels:
     - avatar
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 2050b668e71c2bd4d9fb309ef47172a0
-    m_Address: avatars/avatar_coach
+    m_Address: Assets/Art/Sprites/Head/avatar_coach
     m_ReadOnly: 0
     m_SerializedLabels:
     - avatar
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 287ac86076327c54187efd04a4275315
-    m_Address: avatars/avatar_quanwang
+    m_Address: Assets/Art/Sprites/Head/avatar_quanwang
     m_ReadOnly: 0
     m_SerializedLabels:
     - avatar
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: fdf56e6b25cf1b5408d3cb1f4af3395a
-    m_Address: avatars/avatar_mob1
+    m_Address: Assets/Art/Sprites/Head/avatar_mob1
     m_ReadOnly: 0
     m_SerializedLabels:
     - avatar
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: aac8e5f69ce6de14ca47964699742d79
-    m_Address: avatars/avatar_mob2
+    m_Address: Assets/Art/Sprites/Head/avatar_mob2
     m_ReadOnly: 0
     m_SerializedLabels:
     - avatar
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 478d1a161cc2d7b4b96d375b9f89ceb7
-    m_Address: ui/Battle/BattleWindow
+    m_Address: Assets/Prefabs/UI/Battle/BattleWindow
     m_ReadOnly: 0
     m_SerializedLabels:
     - ui_prefab
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 2e7f1ea8ac19cadd89eb31e1e9cfac77
-    m_Address: ui/Test/TestUIPanel
+    m_Address: Assets/Prefabs/UI/Test/TestUIPanel
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - ui_prefab
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1b5dcb3d5cd60da45b8e1735b3213477
+    m_Address: Assets/Prefabs/UI/Battle/BattleLogContainer
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - ui_prefab
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e26a95a942b26764d86e2d40f4f0790c
+    m_Address: Assets/Prefabs/UI/Battle/BattleLogEntry
     m_ReadOnly: 0
     m_SerializedLabels:
     - ui_prefab

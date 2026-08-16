@@ -87,7 +87,7 @@ public static class IconLoader
             var loading = new List<AsyncOperationHandle<Sprite>>();
             foreach (var id in toLoad)
             {
-                var handle = Addressables.LoadAssetAsync<Sprite>($"icon/item/{id}");
+                var handle = Addressables.LoadAssetAsync<Sprite>($"Assets/Art/Sprites/UI/Item/{id}");
                 _handles[id] = handle;
                 _loading.Add(id);
                 loading.Add(handle);
@@ -143,7 +143,7 @@ public static class IconLoader
 
     static IEnumerator DoLoad(int id)
     {
-        var handle = Addressables.LoadAssetAsync<Sprite>($"icon/item/{id}");
+        var handle = Addressables.LoadAssetAsync<Sprite>($"Assets/Art/Sprites/UI/Item/{id}");
         _handles[id] = handle;
         yield return handle;
         _loading.Remove(id);

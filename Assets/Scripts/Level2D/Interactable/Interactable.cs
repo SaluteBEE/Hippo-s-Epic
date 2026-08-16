@@ -8,7 +8,7 @@ using UnityEngine.ResourceManagement.AsyncOperations;
 [AddComponentMenu("Level 2D/Interactable")]
 public class Interactable : MonoBehaviour
 {
-    private const string HintPrefabAddress = "ui/Interact/InteractHint";
+    private const string HintPrefabAddress = "Assets/Prefabs/UI/Interact/InteractHint";
 
     [Header("Phases")]
     [SerializeField] private List<InteractionPhase> phases = new List<InteractionPhase>();

@@ -23,17 +23,18 @@ public static class AddressableAutoSetup
 
     static readonly DirConfig[] _configs = new[]
     {
-        new DirConfig { dir = "Assets/Art/Backgrounds", addressPrefix = "backgrounds", label = "background", filter = "t:Texture2D", forceSprite = false, groupName = null, excludeSubDir = null },
-        new DirConfig { dir = "Assets/Art/DialogImages", addressPrefix = "dialog_images", label = null, filter = "t:Texture2D", forceSprite = false, groupName = null, excludeSubDir = null },
-        new DirConfig { dir = "Assets/Art/Sprites/UI/Item", addressPrefix = "icon/item", label = "icon", filter = "t:Texture2D", forceSprite = true, groupName = null, excludeSubDir = null },
-        new DirConfig { dir = "Assets/Art/Sprites/Head", addressPrefix = "avatars", label = "avatar", filter = "t:Texture2D", forceSprite = true, groupName = null, excludeSubDir = null },
-        new DirConfig { dir = "Assets/Prefabs/UI", addressPrefix = "ui", label = "ui_prefab", filter = "t:Prefab", forceSprite = false, groupName = null, excludeSubDir = null },
-        new DirConfig { dir = "Assets/Prefabs/Maps", addressPrefix = "prefabs/maps", label = "map_prefab", filter = "t:Prefab", forceSprite = false, groupName = "Maps", excludeSubDir = null },
-        new DirConfig { dir = "Assets/Prefabs/MapObjects", addressPrefix = "prefabs/mapobjects", label = "mapobject_prefab", filter = "t:Prefab", forceSprite = false, groupName = "MapObjects", excludeSubDir = null },
-        new DirConfig { dir = "Assets/Prefabs/player", addressPrefix = "prefabs/player", label = "player_prefab", filter = "t:Prefab", forceSprite = false, groupName = "DialogCharacters", excludeSubDir = null },
-        new DirConfig { dir = "Assets/Prefabs/npc", addressPrefix = "prefabs/npc", label = "npc_prefab", filter = "t:Prefab", forceSprite = false, groupName = "DialogCharacters", excludeSubDir = "talk" },
-        new DirConfig { dir = "Assets/Prefabs/npc/talk", addressPrefix = "prefabs/npc/talk", label = "dialog_character", filter = "t:Prefab", forceSprite = false, groupName = "DialogCharacters", excludeSubDir = null, removeLabel = "npc_prefab" },
-        new DirConfig { dir = "Assets/Scenes", addressPrefix = "scenes", label = "scene", filter = "t:Scene", forceSprite = false, groupName = "Scenes", excludeSubDir = "Test" },
+        new DirConfig { dir = "Assets/Art/Backgrounds", addressPrefix = "Assets/Art/Backgrounds", label = "background", filter = "t:Texture2D", forceSprite = false, groupName = null, excludeSubDir = null },
+        new DirConfig { dir = "Assets/Art/DialogImages", addressPrefix = "Assets/Art/DialogImages", label = null, filter = "t:Texture2D", forceSprite = false, groupName = null, excludeSubDir = null },
+        new DirConfig { dir = "Assets/Art/Sprites/UI/Item", addressPrefix = "Assets/Art/Sprites/UI/Item", label = "icon", filter = "t:Texture2D", forceSprite = true, groupName = null, excludeSubDir = null },
+        new DirConfig { dir = "Assets/Art/Sprites/Head", addressPrefix = "Assets/Art/Sprites/Head", label = "avatar", filter = "t:Texture2D", forceSprite = true, groupName = null, excludeSubDir = null },
+        new DirConfig { dir = "Assets/Prefabs/UI", addressPrefix = "Assets/Prefabs/UI", label = "ui_prefab", filter = "t:Prefab", forceSprite = false, groupName = null, excludeSubDir = null },
+        new DirConfig { dir = "Assets/Prefabs/Maps", addressPrefix = "Assets/Prefabs/Maps", label = "map_prefab", filter = "t:Prefab", forceSprite = false, groupName = "Maps", excludeSubDir = null },
+        new DirConfig { dir = "Assets/Prefabs/MapObjects", addressPrefix = "Assets/Prefabs/MapObjects", label = "mapobject_prefab", filter = "t:Prefab", forceSprite = false, groupName = "MapObjects", excludeSubDir = null },
+        new DirConfig { dir = "Assets/Prefabs/player", addressPrefix = "Assets/Prefabs/player", label = "player_prefab", filter = "t:Prefab", forceSprite = false, groupName = "DialogCharacters", excludeSubDir = null },
+        new DirConfig { dir = "Assets/Prefabs/npc", addressPrefix = "Assets/Prefabs/npc", label = "npc_prefab", filter = "t:Prefab", forceSprite = false, groupName = "DialogCharacters", excludeSubDir = "talk" },
+        new DirConfig { dir = "Assets/Prefabs/npc/talk", addressPrefix = "Assets/Prefabs/npc/talk", label = "dialog_character", filter = "t:Prefab", forceSprite = false, groupName = "DialogCharacters", excludeSubDir = null, removeLabel = "npc_prefab" },
+        new DirConfig { dir = "Assets/Prefabs/Battle", addressPrefix = "Assets/Prefabs/Battle", label = "battle_prefab", filter = "t:Prefab", forceSprite = false, groupName = "DialogCharacters", excludeSubDir = null },
+        new DirConfig { dir = "Assets/Scenes", addressPrefix = "Assets/Scenes", label = "scene", filter = "t:Scene", forceSprite = false, groupName = "Scenes", excludeSubDir = "Test" },
     };
 
     static readonly HashSet<string> _excludeSceneNames = new HashSet<string>
@@ -42,7 +43,7 @@ public static class AddressableAutoSetup
     };
 
     const string MapRootPrefabDir = "Assets/Prefabs/UI/map";
-    const string MapRootAddressPrefix = "ui/map";
+    const string MapRootAddressPrefix = "Assets/Prefabs/UI/map";
 
     [MenuItem("Tools/自动设置 Addressable")]
     public static void Setup()

@@ -14,8 +14,8 @@
     "selfmatain_per": 0,
     "creatorwilling_per": 0,
     "animstate": 1,
-    "prefab1": "prefabs/player/homo_talk",
-    "prefab2": "prefabs/player/Hippo",
+    "prefab1": "Assets/Prefabs/player/homo_talk",
+    "prefab2": "Assets/Prefabs/Battle/homa_battle",
     "buffIds": [
       1
     ],
@@ -49,8 +49,8 @@
     "selfmatain_per": 0,
     "creatorwilling_per": 0,
     "animstate": 1,
-    "prefab1": "prefabs/npc/talk/coach",
-    "prefab2": "prefabs/npc/coach_fight",
+    "prefab1": "Assets/Prefabs/npc/talk/coach",
+    "prefab2": "Assets/Prefabs/Battle/coach_battle",
     "buffIds": [
       2
     ],
@@ -81,7 +81,7 @@
     "creatorwilling_per": 0,
     "animstate": 1,
     "prefab1": "",
-    "prefab2": "prefabs/npc/quanwang_bk",
+    "prefab2": "Assets/Prefabs/Battle/quanwang_battle",
     "buffIds": [],
     "animconfigs": [
       "quanwang_bk"
@@ -109,14 +109,14 @@
     "selfmatain_per": 0,
     "creatorwilling_per": 0,
     "animstate": 1,
-    "prefab1": "prefabs/npc/talk/light_talk",
-    "prefab2": "prefabs/npc/light_scene",
+    "prefab1": "Assets/Prefabs/npc/talk/light_talk",
+    "prefab2": "Assets/Prefabs/npc/light_scene",
     "buffIds": [],
     "animconfigs": [
       "light_talk",
       "light_scene"
     ],
-    "avatar": "avatar_light",
+    "avatar": "avatar_mob1",
     "speed": 5,
     "skills": []
   }

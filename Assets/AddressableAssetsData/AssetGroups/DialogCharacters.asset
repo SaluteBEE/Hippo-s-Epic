@@ -18,87 +18,111 @@ MonoBehaviour:
   m_GUID: d609369cf5d490f47ac46ab3d24ed000
   m_SerializeEntries:
   - m_GUID: d08b0455da5bbe141a2e9e1171c9caac
-    m_Address: prefabs/player/homo_talk
+    m_Address: Assets/Prefabs/player/homo_talk
     m_ReadOnly: 0
     m_SerializedLabels:
     - dialog_character
     - player_prefab
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 7f2b4cc40ac313947a3f43421676553a
-    m_Address: prefabs/player/Hippo
+    m_Address: Assets/Prefabs/player/Hippo
     m_ReadOnly: 0
     m_SerializedLabels:
     - dialog_character
     - player_prefab
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 5553d0deef21410409282b4bbdff67dd
-    m_Address: prefabs/npc/talk/coach
+    m_Address: Assets/Prefabs/npc/talk/coach
     m_ReadOnly: 0
     m_SerializedLabels:
     - dialog_character
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 05234a69a8ffea648af4da48217a29fc
-    m_Address: prefabs/npc/quanwang_bk
+    m_Address: Assets/Prefabs/npc/quanwang_bk
     m_ReadOnly: 0
     m_SerializedLabels:
     - dialog_character
     - npc_prefab
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 7be800446140d564b9f34a7a248473e9
-    m_Address: prefabs/npc/npc_01
+    m_Address: Assets/Prefabs/npc/npc_01
     m_ReadOnly: 0
     m_SerializedLabels:
     - dialog_character
     - npc_prefab
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 5032e2d1138e79a47a46be1469cbe1c0
-    m_Address: prefabs/npc/npc_02
+    m_Address: Assets/Prefabs/npc/npc_02
     m_ReadOnly: 0
     m_SerializedLabels:
     - dialog_character
     - npc_prefab
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: ec4b960c74459814faa555933de1310f
-    m_Address: prefabs/npc/alien_01
+    m_Address: Assets/Prefabs/npc/alien_01
     m_ReadOnly: 0
     m_SerializedLabels:
     - npc_prefab
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 96467598b049bab4ba2a7760ded36be0
-    m_Address: prefabs/npc/coach_fight
+    m_Address: Assets/Prefabs/npc/coach_fight
     m_ReadOnly: 0
     m_SerializedLabels:
     - npc_prefab
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 99b4db89c7d44ef4484fef1714a61656
-    m_Address: prefabs/npc/alien_02
+    m_Address: Assets/Prefabs/npc/alien_02
     m_ReadOnly: 0
     m_SerializedLabels:
     - npc_prefab
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 79262e751dfb84742b2a92a42eba6f24
-    m_Address: prefabs/npc/fog
+    m_Address: Assets/Prefabs/npc/fog
     m_ReadOnly: 0
     m_SerializedLabels:
     - npc_prefab
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 2527df7420b954a458db2dbd97de1635
-    m_Address: prefabs/npc/light_scene
+    m_Address: Assets/Prefabs/npc/light_scene
     m_ReadOnly: 0
     m_SerializedLabels:
     - npc_prefab
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 42ad2385e9c36804eb8a0d9658da7e47
-    m_Address: prefabs/npc/quanwang_pixel
+    m_Address: Assets/Prefabs/npc/quanwang_pixel
     m_ReadOnly: 0
     m_SerializedLabels:
     - npc_prefab
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 7ed535af77982d541b074bfa3e10e3ee
-    m_Address: prefabs/npc/talk/light_talk
+    m_Address: Assets/Prefabs/npc/talk/light_talk
     m_ReadOnly: 0
     m_SerializedLabels:
     - dialog_character
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e2b3d75405171844f814412740731588
+    m_Address: Assets/Prefabs/Battle/coach_battle
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - battle_prefab
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: cee416f96dd202443bc72885fd0112a8
+    m_Address: Assets/Prefabs/Battle/common_battle
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - battle_prefab
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a80f5461b074fb54198df16e46ba08cd
+    m_Address: Assets/Prefabs/Battle/homa_battle
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - battle_prefab
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: df9f556798909744d8579df79b6d26ad
+    m_Address: Assets/Prefabs/Battle/quanwang_battle
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - battle_prefab
     FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: dd90b6ecff8020e40aa537a3ddf43594, type: 2}

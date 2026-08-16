@@ -2786,7 +2786,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxLogs: 3
-  logTemplate: {fileID: 0}
+  logTemplate: {fileID: 7078146810425273790, guid: e26a95a942b26764d86e2d40f4f0790c, type: 3}
   logContainer: {fileID: 0}
   damageColor: {r: 1, g: 0, b: 0, a: 1}
   healColor: {r: 0, g: 1, b: 0, a: 1}

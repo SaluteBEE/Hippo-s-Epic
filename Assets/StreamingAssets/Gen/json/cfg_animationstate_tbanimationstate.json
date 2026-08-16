@@ -42,6 +42,83 @@
     "slotstateid": 0
   },
   {
+    "id": 1006,
+    "personid": 1,
+    "statename": "walk",
+    "prefabtype": 2,
+    "slotstateid": 0
+  },
+  {
+    "id": 1007,
+    "personid": 1,
+    "statename": "attack",
+    "prefabtype": 2,
+    "slotstateid": 0
+  },
+  {
+    "id": 1008,
+    "personid": 1,
+    "statename": "hurt",
+    "prefabtype": 2,
+    "slotstateid": 0
+  },
+  {
+    "id": 1009,
+    "personid": 1,
+    "statename": "idle2",
+    "prefabtype": 2,
+    "slotstateid": 0
+  },
+  {
+    "id": 1010,
+    "personid": 1,
+    "statename": "idle3",
+    "prefabtype": 2,
+    "slotstateid": 0
+  },
+  {
+    "id": 1011,
+    "personid": 1,
+    "statename": "die",
+    "prefabtype": 2,
+    "slotstateid": 0
+  },
+  {
+    "id": 1012,
+    "personid": 1,
+    "statename": "dead",
+    "prefabtype": 2,
+    "slotstateid": 0
+  },
+  {
+    "id": 1013,
+    "personid": 1,
+    "statename": "vertigo",
+    "prefabtype": 2,
+    "slotstateid": 0
+  },
+  {
+    "id": 1014,
+    "personid": 1,
+    "statename": "die2",
+    "prefabtype": 2,
+    "slotstateid": 0
+  },
+  {
+    "id": 1015,
+    "personid": 1,
+    "statename": "dead2",
+    "prefabtype": 2,
+    "slotstateid": 0
+  },
+  {
+    "id": 1016,
+    "personid": 1,
+    "statename": "skill",
+    "prefabtype": 2,
+    "slotstateid": 0
+  },
+  {
     "id": 2000,
     "personid": 2,
     "statename": "idle",
@@ -80,6 +157,27 @@
     "id": 3002,
     "personid": 3,
     "statename": "throw",
+    "prefabtype": 1,
+    "slotstateid": 0
+  },
+  {
+    "id": 4000,
+    "personid": 4,
+    "statename": "idle",
+    "prefabtype": 1,
+    "slotstateid": 0
+  },
+  {
+    "id": 4001,
+    "personid": 4,
+    "statename": "talk",
+    "prefabtype": 1,
+    "slotstateid": 0
+  },
+  {
+    "id": 4002,
+    "personid": 4,
+    "statename": "talk2",
     "prefabtype": 1,
     "slotstateid": 0
   }

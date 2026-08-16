@@ -56,21 +56,13 @@ public partial class GameApp
 
     #region Controller List
 
-    private bool IsDialogPrefab(GameObject go)
-    {
-        if (go.name.StartsWith("Dialog_")) return true;
-        if (go.layer == LayerMask.NameToLayer("DialogCharacter")) return true;
-        return false;
-    }
-
     private void RefreshAnimControllers()
     {
         _animControllers.Clear();
-        var found = FindObjectsOfType<AnimationController>(true);
+        var found = FindObjectsOfType<AnimationController>();
         foreach (var ctrl in found)
         {
             if (ctrl == null || _animControllers.Contains(ctrl)) continue;
-            if (IsDialogPrefab(ctrl.gameObject)) continue;
             _animControllers.Add(ctrl);
         }
         if (_animControllers.Count > 0)

@@ -18,19 +18,19 @@ MonoBehaviour:
   m_GUID: dfbacfa19b130f64e911f17b4a3165c9
   m_SerializeEntries:
   - m_GUID: 0b5aa9fbd5f4a5e4da770a37602b9c3c
-    m_Address: prefabs/mapobjects/General/interacteT
+    m_Address: Assets/Prefabs/MapObjects/General/interacteT
     m_ReadOnly: 0
     m_SerializedLabels:
     - mapobject_prefab
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 6d0c92056d579ca49bff51535d5f53c8
-    m_Address: prefabs/mapobjects/General/template
+    m_Address: Assets/Prefabs/MapObjects/General/template
     m_ReadOnly: 0
     m_SerializedLabels:
     - mapobject_prefab
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: b9c891ff271779b4eafd6ef51a3e6fc8
-    m_Address: prefabs/mapobjects/General/trans
+    m_Address: Assets/Prefabs/MapObjects/General/trans
     m_ReadOnly: 0
     m_SerializedLabels:
     - mapobject_prefab

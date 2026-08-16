@@ -1278,12 +1278,24 @@ public class AnimationConfigEditor : Editor
             return;
         }
 
-        var personByConfig = new Dictionary<string, cfg.cfg.person.Person>();
-        foreach (var person in _cachedPersons)
+        var personByConfig = BuildPersonByConfigMap();
+
+        var missingConfigs = new List<string>();
+        foreach (var guid in configGuids)
         {
-            if (person.Animconfigs == null) continue;
-            foreach (var configName in person.Animconfigs)
-                personByConfig[configName.ToLower()] = person;
+            string path = AssetDatabase.GUIDToAssetPath(guid);
+            string configName = Path.GetFileNameWithoutExtension(path).Replace("_AnimationConfig", "");
+            if (!personByConfig.ContainsKey(configName.ToLower()))
+                missingConfigs.Add(configName);
+        }
+
+        if (missingConfigs.Count > 0 && AddMissingPersons(missingConfigs))
+        {
+            if (RunLubanGenCore())
+            {
+                LoadPersonTable();
+                personByConfig = BuildPersonByConfigMap();
+            }
         }
 
         int totalCount = 0, successCount = 0, failCount = 0;
@@ -1340,7 +1352,72 @@ public class AnimationConfigEditor : Editor
         EditorUtility.DisplayDialog("批量导出完成", msg, "确定");
     }
 
-    private void RunLubanGen()
+    private Dictionary<string, cfg.cfg.person.Person> BuildPersonByConfigMap()
+    {
+        var map = new Dictionary<string, cfg.cfg.person.Person>();
+        if (_cachedPersons == null) return map;
+
+        foreach (var person in _cachedPersons)
+        {
+            if (person.Animconfigs == null) continue;
+            foreach (var configName in person.Animconfigs)
+                map[configName.ToLower()] = person;
+        }
+        return map;
+    }
+
+    private bool AddMissingPersons(List<string> configNames)
+    {
+        if (configNames == null || configNames.Count == 0) return false;
+
+        var sb = new System.Text.StringBuilder();
+        sb.Append("[");
+        for (int i = 0; i < configNames.Count; i++)
+        {
+            if (i > 0) sb.Append(",");
+            sb.Append($"{{\"name\":\"{configNames[i]}\"}}");
+        }
+        sb.Append("]");
+
+        string projectRoot = Directory.GetParent(Application.dataPath).FullName;
+        string pythonScript = Path.Combine(projectRoot, "DataTables", "update_excel.py");
+        string xlsxPath = Path.Combine(projectRoot, "DataTables", "Datas", "person.xlsx");
+        string tempJson = Path.Combine(Path.GetTempPath(), "luban_export_person.json");
+
+        File.WriteAllText(tempJson, sb.ToString(), System.Text.Encoding.UTF8);
+        AssetDatabase.ReleaseCachedFileHandles();
+
+        var psi = new System.Diagnostics.ProcessStartInfo
+        {
+            FileName = "python",
+            Arguments = $"\"{pythonScript}\" person \"{xlsxPath}\" \"{tempJson}\"",
+            UseShellExecute = false,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            CreateNoWindow = true
+        };
+
+        using (var proc = System.Diagnostics.Process.Start(psi))
+        {
+            string output = proc.StandardOutput.ReadToEnd();
+            string error = proc.StandardError.ReadToEnd();
+            proc.WaitForExit(10000);
+
+            if (File.Exists(tempJson))
+                File.Delete(tempJson);
+
+            if (proc.ExitCode != 0)
+            {
+                Debug.LogError($"[AnimationConfigEditor] 自动新增角色失败: {error}");
+                return false;
+            }
+
+            Debug.Log($"[AnimationConfigEditor] 自动新增角色完成: {output.Trim()}");
+        }
+        return true;
+    }
+
+    private bool RunLubanGenCore()
     {
         string projectRoot = Directory.GetParent(Application.dataPath).FullName;
         string lubanDll = Path.Combine(projectRoot, "Tools", "Luban", "Luban", "Luban.dll");
@@ -1376,7 +1453,7 @@ public class AnimationConfigEditor : Editor
             if (exitCode != 0)
             {
                 Debug.LogError("[AnimationConfigEditor] Luban binary 生成失败!");
-                return;
+                return false;
             }
 
             Debug.Log("[AnimationConfigEditor] Luban 生成 json data...");
@@ -1405,8 +1482,12 @@ public class AnimationConfigEditor : Editor
         }
 
         AssetDatabase.Refresh();
+        return genSuccess;
+    }
 
-        if (genSuccess)
+    private void RunLubanGen()
+    {
+        if (RunLubanGenCore())
         {
             EditorUtility.DisplayDialog("完成", "全部导出 + Luban 生成已完成", "确定");
         }

@@ -88,9 +88,9 @@ public class BattleHealthBar : MonoBehaviour
     private void LateUpdate()
     {
         // 跟随目标头顶
-        if (_followTarget != null && transform.parent == _followTarget)
+        if (_followTarget != null && transform.IsChildOf(_followTarget))
         {
-            // 已经是子物体，保持本地位置即可
+            // 已经是目标的后代（含嵌套预制体），自动跟随，保持本地位置即可
             return;
         }
 

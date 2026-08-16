@@ -18,31 +18,31 @@ MonoBehaviour:
   m_GUID: 1d0b857097ee9b64f8fe86ceaae8a5cb
   m_SerializeEntries:
   - m_GUID: c0fac2f098b48904e9010832f41dbb2e
-    m_Address: scenes/Scene_Outer_City
+    m_Address: Assets/Scenes/Scene_Outer_City
     m_ReadOnly: 0
     m_SerializedLabels:
     - scene
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: aa5b0925f86163d40a6d88ae515f16ec
-    m_Address: scenes/Scene_Punk_City
+    m_Address: Assets/Scenes/Scene_Punk_City
     m_ReadOnly: 0
     m_SerializedLabels:
     - scene
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 1bc47a916aa2daf49be27e05e18ccef8
-    m_Address: scenes/Scene_Sewer
+    m_Address: Assets/Scenes/Scene_Sewer
     m_ReadOnly: 0
     m_SerializedLabels:
     - scene
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 7885e8548b0a3554cb5d16f915414e9b
-    m_Address: scenes/Scene_Staff_Lounge
+    m_Address: Assets/Scenes/Scene_Staff_Lounge
     m_ReadOnly: 0
     m_SerializedLabels:
     - scene
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 644874f37614fc347ba6ee7faed72df6
-    m_Address: scenes/Temple
+    m_Address: Assets/Scenes/Temple
     m_ReadOnly: 0
     m_SerializedLabels:
     - scene
@@ -72,19 +72,19 @@ MonoBehaviour:
     - scene
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: d02d3d1892dea5b428a013f105a3c2ae
-    m_Address: scenes/Scene_Doomed_Hospital
+    m_Address: Assets/Scenes/Scene_Doomed_Hospital
     m_ReadOnly: 0
     m_SerializedLabels:
     - scene
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 58115cbc267c4d144ae96e4b8e389e1a
-    m_Address: scenes/Scene_Battle
+    m_Address: Assets/Scenes/Scene_Battle
     m_ReadOnly: 0
     m_SerializedLabels:
     - scene
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 0bc30f55fbd87f344a877a3348bc3770
-    m_Address: scenes/Scene_Init
+    m_Address: Assets/Scenes/Scene_Init
     m_ReadOnly: 0
     m_SerializedLabels:
     - scene

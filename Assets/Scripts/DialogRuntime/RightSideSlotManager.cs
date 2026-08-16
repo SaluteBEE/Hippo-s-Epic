@@ -20,7 +20,7 @@ public class RightSideSlotManager : MonoBehaviour
     [SerializeField] private SlotSpriteConfig slot3Config = new SlotSpriteConfig { localPosition = new Vector3(0, 0, 0) };
 
     [Header("Addressables 根路径")]
-    [SerializeField] private string addressableRoot = "dialog_images";
+    [SerializeField] private string addressableRoot = "Assets/Art/DialogImages";
 
     private readonly SlotSpriteConfig[] _configs = new SlotSpriteConfig[3];
     private readonly GameObject[] _slotSpriteGOs = new GameObject[3];

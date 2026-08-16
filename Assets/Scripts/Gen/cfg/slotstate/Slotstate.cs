@@ -57,6 +57,11 @@ public sealed partial class Slotstate : Luban.BeanBase
         左胳膊 = _buf.ReadInt();
         发簪 = _buf.ReadInt();
         腰带 = _buf.ReadInt();
+        Guangyuan = _buf.ReadInt();
+        Zhanglang2 = _buf.ReadInt();
+        Zhanglang1 = _buf.ReadInt();
+        Deng = _buf.ReadInt();
+        Dengmie = _buf.ReadInt();
     }
 
     public static Slotstate DeserializeSlotstate(ByteBuf _buf)
@@ -225,6 +230,26 @@ public sealed partial class Slotstate : Luban.BeanBase
     /// 腰带插槽
     /// </summary>
     public readonly int 腰带;
+    /// <summary>
+    /// guangyuan插槽
+    /// </summary>
+    public readonly int Guangyuan;
+    /// <summary>
+    /// zhanglang2插槽
+    /// </summary>
+    public readonly int Zhanglang2;
+    /// <summary>
+    /// zhanglang1插槽
+    /// </summary>
+    public readonly int Zhanglang1;
+    /// <summary>
+    /// deng插槽
+    /// </summary>
+    public readonly int Deng;
+    /// <summary>
+    /// dengmie插槽
+    /// </summary>
+    public readonly int Dengmie;
    
     public const int __ID__ = 1393288654;
     public override int GetTypeId() => __ID__;
@@ -277,6 +302,11 @@ public sealed partial class Slotstate : Luban.BeanBase
         + "左胳膊:" + 左胳膊 + ","
         + "发簪:" + 发簪 + ","
         + "腰带:" + 腰带 + ","
+        + "guangyuan:" + Guangyuan + ","
+        + "zhanglang2:" + Zhanglang2 + ","
+        + "zhanglang1:" + Zhanglang1 + ","
+        + "deng:" + Deng + ","
+        + "dengmie:" + Dengmie + ","
         + "}";
     }
 }
