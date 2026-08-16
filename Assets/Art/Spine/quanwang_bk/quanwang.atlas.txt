@@ -1,0 +1,125 @@
+
+quanwang.png
+size: 2005,477
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+bq
+  rotate: true
+  xy: 1244, 10
+  size: 171, 210
+  orig: 171, 210
+  offset: 0, 0
+  index: -1
+fa
+  rotate: true
+  xy: 1702, 10
+  size: 189, 116
+  orig: 189, 116
+  offset: 0, 0
+  index: -1
+kua
+  rotate: true
+  xy: 1236, 183
+  size: 292, 126
+  orig: 292, 126
+  offset: 0, 0
+  index: -1
+ldabi
+  rotate: true
+  xy: 1364, 184
+  size: 291, 156
+  orig: 291, 156
+  offset: 0, 0
+  index: -1
+lquan
+  rotate: false
+  xy: 1820, 83
+  size: 142, 122
+  orig: 142, 122
+  offset: 0, 0
+  index: -1
+lshou1
+  rotate: false
+  xy: 2, 4
+  size: 199, 471
+  orig: 199, 471
+  offset: 0, 0
+  index: -1
+ltui
+  rotate: false
+  xy: 1125, 2
+  size: 117, 137
+  orig: 123, 137
+  offset: 0, 0
+  index: -1
+lxiaobi
+  rotate: false
+  xy: 1522, 193
+  size: 150, 282
+  orig: 155, 282
+  offset: 0, 0
+  index: -1
+rdabi
+  rotate: false
+  xy: 1456, 28
+  size: 244, 154
+  orig: 244, 154
+  offset: 0, 0
+  index: -1
+rquan
+  rotate: false
+  xy: 978, 2
+  size: 145, 137
+  orig: 145, 137
+  offset: 0, 0
+  index: -1
+rsdhou1
+  rotate: false
+  xy: 203, 5
+  size: 227, 470
+  orig: 227, 470
+  offset: 0, 0
+  index: -1
+rtui
+  rotate: false
+  xy: 1907, 341
+  size: 96, 134
+  orig: 104, 134
+  offset: 8, 0
+  index: -1
+rxiaobi
+  rotate: false
+  xy: 1772, 207
+  size: 133, 268
+  orig: 133, 268
+  offset: 0, 0
+  index: -1
+shenti
+  rotate: true
+  xy: 432, 39
+  size: 436, 544
+  orig: 436, 544
+  offset: 0, 0
+  index: -1
+tou
+  rotate: true
+  xy: 978, 141
+  size: 334, 256
+  orig: 334, 256
+  offset: 0, 0
+  index: -1
+yaodai
+  rotate: true
+  xy: 1674, 201
+  size: 274, 96
+  orig: 274, 96
+  offset: 0, 0
+  index: -1
+ying
+  rotate: false
+  xy: 432, 13
+  size: 406, 24
+  orig: 406, 241
+  offset: 0, 0
+  index: -1
