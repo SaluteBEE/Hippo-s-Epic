@@ -18,6 +18,7 @@ public static class AddressableAutoSetup
         public bool forceSprite;
         public string groupName;
         public string excludeSubDir;
+        public string removeLabel;
     }
 
     static readonly DirConfig[] _configs = new[]
@@ -30,7 +31,8 @@ public static class AddressableAutoSetup
         new DirConfig { dir = "Assets/Prefabs/Maps", addressPrefix = "prefabs/maps", label = "map_prefab", filter = "t:Prefab", forceSprite = false, groupName = "Maps", excludeSubDir = null },
         new DirConfig { dir = "Assets/Prefabs/MapObjects", addressPrefix = "prefabs/mapobjects", label = "mapobject_prefab", filter = "t:Prefab", forceSprite = false, groupName = "MapObjects", excludeSubDir = null },
         new DirConfig { dir = "Assets/Prefabs/player", addressPrefix = "prefabs/player", label = "player_prefab", filter = "t:Prefab", forceSprite = false, groupName = "DialogCharacters", excludeSubDir = null },
-        new DirConfig { dir = "Assets/Prefabs/npc", addressPrefix = "prefabs/npc", label = "npc_prefab", filter = "t:Prefab", forceSprite = false, groupName = "DialogCharacters", excludeSubDir = null },
+        new DirConfig { dir = "Assets/Prefabs/npc", addressPrefix = "prefabs/npc", label = "npc_prefab", filter = "t:Prefab", forceSprite = false, groupName = "DialogCharacters", excludeSubDir = "talk" },
+        new DirConfig { dir = "Assets/Prefabs/npc/talk", addressPrefix = "prefabs/npc/talk", label = "dialog_character", filter = "t:Prefab", forceSprite = false, groupName = "DialogCharacters", excludeSubDir = null, removeLabel = "npc_prefab" },
         new DirConfig { dir = "Assets/Scenes", addressPrefix = "scenes", label = "scene", filter = "t:Scene", forceSprite = false, groupName = "Scenes", excludeSubDir = "Test" },
     };
 
@@ -70,7 +72,7 @@ public static class AddressableAutoSetup
                 ? settings.DefaultGroup
                 : FindOrCreateGroup(settings, cfg.groupName);
 
-            added += SetupDirectory(settings, group, cfg.dir, cfg.addressPrefix, cfg.filter, cfg.label, cfg.forceSprite, cfg.excludeSubDir);
+            added += SetupDirectory(settings, group, cfg.dir, cfg.addressPrefix, cfg.filter, cfg.label, cfg.forceSprite, cfg.excludeSubDir, cfg.removeLabel);
         }
 
         added += SetupMapRoots(settings);
@@ -145,7 +147,7 @@ public static class AddressableAutoSetup
     }
 
     static int SetupDirectory(AddressableAssetSettings settings, AddressableAssetGroup group,
-        string dir, string addressPrefix, string filter, string label, bool forceSprite, string excludeSubDir = null)
+        string dir, string addressPrefix, string filter, string label, bool forceSprite, string excludeSubDir = null, string removeLabel = null)
     {
         int count = 0;
         var guids = AssetDatabase.FindAssets(filter, new[] { dir });
@@ -182,6 +184,9 @@ public static class AddressableAutoSetup
 
             if (label != null)
                 entry.SetLabel(label, true);
+
+            if (removeLabel != null)
+                entry.SetLabel(removeLabel, false);
 
             count++;
             Debug.Log($"  设置: {address} → {path}" + (label != null ? $" [label={label}]" : "") + $" [group={group.Name}]");

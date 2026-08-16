@@ -106,7 +106,7 @@ public class LevelController : MonoBehaviour
 
     private IEnumerator LoadPlayerAsync()
     {
-        _playerHandle = Addressables.LoadAssetAsync<GameObject>("prefabs/player/PlayerCharacter2D");
+        _playerHandle = Addressables.LoadAssetAsync<GameObject>("prefabs/player/Hippo");
         yield return _playerHandle;
 
         if (_playerHandle.Status != AsyncOperationStatus.Succeeded)

@@ -1,9 +1,5 @@
 fileFormatVersion: 2
-<<<<<<<< HEAD:Assets/Art/Spine/fog.meta
-guid: 81feb6f0e5838194c834439920b987ce
-========
-guid: 58db86b796f844fd0b60ddec2196cc2c
->>>>>>>> a62b0cb (feat: 伤害延迟出伤(演出打击时刻结算) + 血条fillAmount修复 + 防御系统移除):Assets/Scripts/UI/Test.meta
+guid: 4466dd2a715497a4a9f7be0002e3a74c
 folderAsset: yes
 DefaultImporter:
   externalObjects: {}

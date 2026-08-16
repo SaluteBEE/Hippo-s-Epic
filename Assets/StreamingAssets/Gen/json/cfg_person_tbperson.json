@@ -49,7 +49,7 @@
     "selfmatain_per": 0,
     "creatorwilling_per": 0,
     "animstate": 1,
-    "prefab1": "prefabs/npc/coach",
+    "prefab1": "prefabs/npc/talk/coach",
     "prefab2": "prefabs/npc/coach_fight",
     "buffIds": [
       2
