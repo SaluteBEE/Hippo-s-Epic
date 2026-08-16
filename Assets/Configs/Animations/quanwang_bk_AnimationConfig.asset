@@ -12,92 +12,175 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 667ecdb9b442b9f49a7a2aaee87ac430, type: 3}
   m_Name: quanwang_bk_AnimationConfig
   m_EditorClassIdentifier: 
-  skeletonData: {fileID: 11400000, guid: acb1d60f7182fdd47bb78e840c1d933d, type: 2}
+  skeletonData: {fileID: 11400000, guid: 09fec6aa3e0bf124daa3110b5650d501, type: 2}
   clips:
-  - name: body-idle
-    animation: {fileID: 11400000, guid: 8a8b8713e3944254494672215eed360a, type: 2}
-    animationName: body-idle
+  - name: attack_1
+    animation: {fileID: 11400000, guid: 57c6704d33372d34bad69c9110f8879d, type: 2}
+    animationName: attack_1
     speed: 1
     loop: 1
-    type: 1
-  - name: body-idle2
-    animation: {fileID: 11400000, guid: 4edf399577e389f43b8fb6484fd17539, type: 2}
-    animationName: body-idle2
+    type: 0
+  - name: attack_2_1
+    animation: {fileID: 11400000, guid: 7cf40d76f5ed9f041be77fc1370430d4, type: 2}
+    animationName: attack_2_1
     speed: 1
     loop: 1
-    type: 1
-  - name: body-salut
-    animation: {fileID: 11400000, guid: 687b5eed53f4c104dbd5bc49d020d604, type: 2}
-    animationName: body-salut
+    type: 0
+  - name: attack_2_2
+    animation: {fileID: 11400000, guid: fe66cec20a6e4be41ad00fa351993e76, type: 2}
+    animationName: attack_2_2
     speed: 1
     loop: 1
-    type: 1
-  - name: leg-idle
-    animation: {fileID: 11400000, guid: bbf0ac51f3c42e746a015fbca2147dc7, type: 2}
-    animationName: leg-idle
+    type: 0
+  - name: dead
+    animation: {fileID: 11400000, guid: caa1cce76dedec143ac425c57062e4e6, type: 2}
+    animationName: dead
     speed: 1
     loop: 1
-    type: 2
+    type: 0
+  - name: die
+    animation: {fileID: 11400000, guid: 8c8d7002119681e47bf343831da6c320, type: 2}
+    animationName: die
+    speed: 1
+    loop: 1
+    type: 0
+  - name: hurt_1
+    animation: {fileID: 11400000, guid: 9e3fb053ef23c244b9e2a46ea47517d3, type: 2}
+    animationName: hurt_1
+    speed: 1
+    loop: 1
+    type: 0
+  - name: hurt_2
+    animation: {fileID: 11400000, guid: e49948f52c637db42812863ac2235209, type: 2}
+    animationName: hurt_2
+    speed: 1
+    loop: 1
+    type: 0
+  - name: idle
+    animation: {fileID: 11400000, guid: 32d778d6463113c429df36067de61f67, type: 2}
+    animationName: idle
+    speed: 1
+    loop: 1
+    type: 0
+  - name: move
+    animation: {fileID: 11400000, guid: 4089c7e136c1ca846a022d11e2b44af0, type: 2}
+    animationName: move
+    speed: 1
+    loop: 1
+    type: 0
+  - name: xianbai
+    animation: {fileID: 11400000, guid: ef23280fc6a73cb4f9f2f87cf2da2d51, type: 2}
+    animationName: xianbai
+    speed: 1
+    loop: 1
+    type: 0
   layers:
   - name: Base
     trackIndex: 0
     defaultWeight: 1
     additive: 0
     slotNames: []
-    availableClipNames: []
+    availableClipNames:
+    - attack_2_1
+    - attack_1
+    - attack_2_2
+    - dead
+    - die
+    - hurt_1
+    - hurt_2
+    - idle
+    - move
+    - xianbai
   - name: UpperBody
     trackIndex: 1
     defaultWeight: 1
     additive: 0
     slotNames: []
-    availableClipNames:
-    - body-idle
-    - body-idle2
-    - body-salut
+    availableClipNames: []
   - name: LowerBody
     trackIndex: 2
     defaultWeight: 1
     additive: 0
     slotNames: []
-    availableClipNames:
-    - leg-idle
+    availableClipNames: []
   compositions:
-  - name: 1
+  - name: 0
     description: "\u63CF\u8FF0"
     layers:
-    - layerName: UpperBody
-      clipName: body-idle
+    - layerName: Base
+      clipName: idle
       weight: 1
       transitionTime: 0.1
       delay: 0
-    - layerName: LowerBody
-      clipName: leg-idle
+  - name: 4
+    description: "\u63CF\u8FF0"
+    layers:
+    - layerName: Base
+      clipName: attack_1
+      weight: 1
+      transitionTime: 0.1
+      delay: 0
+  - name: 16
+    description: "\u63CF\u8FF0"
+    layers:
+    - layerName: Base
+      clipName: attack_2_1
+      weight: 1
+      transitionTime: 0.1
+      delay: 0
+  - name: 21
+    description: "\u63CF\u8FF0"
+    layers:
+    - layerName: Base
+      clipName: attack_2_2
+      weight: 1
+      transitionTime: 0.1
+      delay: 0
+  - name: 9
+    description: "\u63CF\u8FF0"
+    layers:
+    - layerName: Base
+      clipName: dead
+      weight: 1
+      transitionTime: 0.1
+      delay: 0
+  - name: 8
+    description: "\u63CF\u8FF0"
+    layers:
+    - layerName: Base
+      clipName: die
+      weight: 1
+      transitionTime: 0.1
+      delay: 0
+  - name: 7
+    description: "\u63CF\u8FF0"
+    layers:
+    - layerName: Base
+      clipName: hurt_1
+      weight: 1
+      transitionTime: 0.1
+      delay: 0
+  - name: 22
+    description: "\u63CF\u8FF0"
+    layers:
+    - layerName: Base
+      clipName: hurt_2
+      weight: 1
+      transitionTime: 0.1
+      delay: 0
+  - name: 6
+    description: "\u63CF\u8FF0"
+    layers:
+    - layerName: Base
+      clipName: move
       weight: 1
       transitionTime: 0.1
       delay: 0
   - name: 2
     description: "\u63CF\u8FF0"
     layers:
-    - layerName: UpperBody
-      clipName: body-idle2
-      weight: 1
-      transitionTime: 0.1
-      delay: 0
-    - layerName: LowerBody
-      clipName: leg-idle
-      weight: 1
-      transitionTime: 0.1
-      delay: 0
-  - name: 15
-    description: "\u63CF\u8FF0"
-    layers:
-    - layerName: UpperBody
-      clipName: body-salut
-      weight: 1
-      transitionTime: 0.1
-      delay: 0
-    - layerName: LowerBody
-      clipName: leg-idle
+    - layerName: Base
+      clipName: xianbai
       weight: 1
       transitionTime: 0.1
       delay: 0

@@ -1522,7 +1522,7 @@
   {
     "id": 82,
     "dialogid": 1004001,
-    "type": 1,
+    "type": 2,
     "content": "完蛋操了。",
     "sortid": 0,
     "statename1": "idle",

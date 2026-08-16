@@ -21,4 +21,6 @@
     Die2,
     Dead2,
     Talk2,
+    Attack3,
+    Hurt1,
 }
