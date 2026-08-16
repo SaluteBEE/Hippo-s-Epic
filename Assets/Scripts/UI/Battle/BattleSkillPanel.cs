@@ -95,9 +95,6 @@ public class BattleSkillPanel : BattleSubPanel
                 }
             }
 
-            // 置灰 = 真正不可点击使用
-            if (btn != null) btn.interactable = !invalid;
-
             float a = invalid ? 0.45f : 1.00f;
             if (img != null) img.color = new Color(img.color.r, img.color.g, img.color.b, a);
             if (tmp != null) tmp.color = new Color(tmp.color.r, tmp.color.g, tmp.color.b, a);
@@ -198,8 +195,8 @@ public class BattleSkillPanel : BattleSubPanel
 
         if (btn != null)
         {
-            // 置灰（冷却/目标无效/行动点不足）即不可点击，杜绝"置灰仍可使用"
-            btn.interactable = !disabled && !invalidForTarget;
+            // 仅冷却禁用；行动点不足只置灰颜色仍可点，点击后由 OnSkillSelected 提示原因
+            btn.interactable = !disabled;
             int capturedId = skillId;
             btn.onClick.AddListener(() => _onSkillSelected?.Invoke(capturedId));
         }

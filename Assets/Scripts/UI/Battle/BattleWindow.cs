@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -42,16 +43,16 @@ public class BattleWindow : UIWindow
     private Camera _mainCamera;
     private BattleUnit _currentCursorTarget;
 
+    // 提示弹窗（技能无法使用时居中弹出，自动消失）
+    private GameObject _toastGo;
+    private TextMeshProUGUI _toastText;
+    private Coroutine _toastCoroutine;
+
     // ---- 事件推送缓存（严格 MVC：只由事件更新，不主动读取战斗状态）----
     private BattleUnit _currentUnit;
     private bool _isWaitingForPlayerAction;
     private List<BattleUnit> _playerUnits = new List<BattleUnit>();
     private List<BattleUnit> _enemyUnits = new List<BattleUnit>();
-
-    /// <summary>
-    /// 选中目标变化（切换/目标状态变化）——子面板（技能面板）订阅后刷新置灰
-    /// </summary>
-    public event System.Action OnTargetSelectionChanged;
 
     #endregion
 
@@ -90,10 +91,6 @@ public class BattleWindow : UIWindow
         SetActionButtonsVisible(false);
         CloseAllSubPanels();
 
-        // 选中目标变化 → 技能面板刷新置灰（事件驱动，面板自身不轮询）
-        if (skillPanel != null)
-            OnTargetSelectionChanged += skillPanel.RefreshInvalidState;
-
         if (logPanel != null) logPanel.ClearLogs();
 
         // 严格 MVC：请求管理器推送当前状态快照（由事件回调更新缓存，不主动读取）
@@ -107,23 +104,21 @@ public class BattleWindow : UIWindow
     public override void OnClose()
     {
         UnsubscribeEvents();
-        if (skillPanel != null)
-            OnTargetSelectionChanged -= skillPanel.RefreshInvalidState;
         _battleManager = null;
         _stageManager = null;
     }
 
     private void Update()
     {
-        // 目标选择模式（旧交互保留：点击角色释放/回车确认）
+        // 目标选择模式：先选技能后，点击/方向键选目标，回车/空格确认，Esc 取消
         if (_isSelectingTarget)
         {
-            // 鼠标点击选择（保留）
-            if (Input.GetMouseButtonDown(0))
+            // 鼠标点击选择（点击有效目标直接释放）
+            if (Input.GetMouseButtonDown(0) && !IsPointerOverUI())
             {
                 TrySelectTargetByClick();
             }
-            // 键盘游标切换目标（方向键/WASD：左右循环切换，上下切换行）
+            // 键盘游标切换目标（方向键/WASD：在有效目标间循环切换）
             else if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
             {
                 CycleTarget(1, 0);
@@ -151,26 +146,9 @@ public class BattleWindow : UIWindow
                 CancelTargetSelection();
                 if (logPanel != null)
                     logPanel.AddLog("已取消目标选择");
+                OnViolenceClicked();
             }
             return;
-        }
-
-        // 全局选中中心点：玩家回合等待行动时，鼠标点击/方向键随时切换选中目标（无需先进目标选择）
-        if (_battleManager != null && _isWaitingForPlayerAction
-            && _currentUnit != null && _currentUnit.IsPlayerControlled)
-        {
-            if (Input.GetMouseButtonDown(0) && !IsPointerOverUI())
-            {
-                TrySwitchTargetByClick();
-            }
-            else if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
-                CycleTarget(1, 0);
-            else if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A))
-                CycleTarget(-1, 0);
-            else if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
-                CycleTarget(0, -1);
-            else if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S))
-                CycleTarget(0, 1);
         }
     }
 
@@ -251,14 +229,12 @@ public class BattleWindow : UIWindow
         {
             if (_currentUnit == null) return;
             SetActionButtonsVisible(true);
-            // 全局选中中心点：进入玩家回合即默认选中（普攻→第一个存活敌人）
-            if (_currentCursorTarget == null)
-            {
-                _selectedSkillId = 0;
-                _currentCursorTarget = FindDefaultTarget();
-                if (_currentCursorTarget != null && _stageManager != null)
-                    _stageManager.ShowTargetSelected(_currentCursorTarget);
-            }
+            // 新流程：进入玩家回合不预选目标，等玩家先选技能再选目标
+            _selectedSkillId = 0;
+            _currentCursorTarget = null;
+            _isSelectingTarget = false;
+            if (_stageManager != null)
+                _stageManager.ClearTargetSelection();
         }
         else
         {
@@ -273,7 +249,6 @@ public class BattleWindow : UIWindow
     {
         _playerUnits = new List<BattleUnit>(players);
         _enemyUnits = new List<BattleUnit>(enemies);
-        OnTargetSelectionChanged?.Invoke();
     }
 
     private void OnBattleStart()
@@ -301,11 +276,12 @@ public class BattleWindow : UIWindow
         if (phase == UnitTurnPhase.Action && unit.IsPlayerControlled)
         {
             SetActionButtonsVisible(true);
-            // 全局选中中心点：进入玩家回合即默认选中（普攻→第一个存活敌人）
+            // 新流程：进入玩家回合不预选目标，等玩家先选技能再选目标
             _selectedSkillId = 0;
-            _currentCursorTarget = FindDefaultTarget();
-            if (_currentCursorTarget != null && _stageManager != null)
-                _stageManager.ShowTargetSelected(_currentCursorTarget);
+            _currentCursorTarget = null;
+            _isSelectingTarget = false;
+            if (_stageManager != null)
+                _stageManager.ClearTargetSelection();
         }
     }
 
@@ -433,8 +409,7 @@ public class BattleWindow : UIWindow
         CloseAllSubPanels();
         if (skillPanel != null)
         {
-            skillPanel.Open(_battleManager, _currentUnit, OnSkillSelected,
-                canUseOnTarget: skillId => IsTargetValidForSkill(_currentCursorTarget, skillId));
+            skillPanel.Open(_battleManager, _currentUnit, OnSkillSelected);
             if (subPanelContainer != null) subPanelContainer.SetActive(true);
         }
     }
@@ -485,7 +460,17 @@ public class BattleWindow : UIWindow
     {
         _selectedSkillId = skillId;
 
-        // 行动点不足：置灰但可点，点击给出提示
+        // 冷却中：给出提示，面板保持打开
+        if (skillId > 0 && _currentUnit != null && _currentUnit.IsSkillOnCooldown(skillId))
+        {
+            _currentUnit.SkillCooldowns.TryGetValue(skillId, out int cd);
+            if (logPanel != null)
+                logPanel.AddLog($"技能冷却中，还需{cd}回合");
+            ShowToast($"技能冷却中，还需{cd}回合");
+            return;
+        }
+
+        // 行动点不足：给出提示，面板保持打开
         if (_currentUnit != null)
         {
             int apCost = 1;
@@ -498,6 +483,7 @@ public class BattleWindow : UIWindow
             {
                 if (logPanel != null)
                     logPanel.AddLog($"行动点不足，无法使用（需要{apCost}点）");
+                ShowToast($"行动点不足，无法使用（需要{apCost}点）");
                 return; // 面板保持打开
             }
         }
@@ -515,24 +501,8 @@ public class BattleWindow : UIWindow
             }
         }
 
-        // 全局选中中心点：直接对当前选中目标释放（无需二次选择）
-        var target = _currentCursorTarget;
-        if (target == null || !IsTargetValidForSkill(target, skillId))
-        {
-            if (logPanel != null)
-                logPanel.AddLog("当前选中目标无法使用该技能，请先切换目标（方向键/点击角色）");
-            return; // 面板保持打开
-        }
-
-        CloseAllSubPanels();
-        _battleManager.PlayerUseSkill(skillId, target.SlotIndex);
-        if (_stageManager != null)
-            _stageManager.ShowTargetSelected(target);
-        if (logPanel != null && _currentUnit != null)
-        {
-            string skillName = skillId == 0 ? "普通攻击" : $"技能{skillId}";
-            logPanel.AddDamageLog(GetUnitName(_currentUnit), GetUnitName(target), 0, skillName);
-        }
+        // 先选技能 → 进入目标选择模式（再选目标）
+        StartTargetSelection();
     }
 
     private void OnTalkSelected(int choiceIndex)
@@ -557,67 +527,54 @@ public class BattleWindow : UIWindow
 
     private void StartTargetSelection()
     {
-        _isSelectingTarget = true;
-        if (logPanel != null)
-            logPanel.AddLog("请选择目标：点击 / 方向键切换 / 回车确认（默认选中敌人）");
+        // 关闭技能面板（已选技能，现在进入选目标）
+        if (skillPanel != null) skillPanel.Close();
+        if (subPanelContainer != null) subPanelContainer.SetActive(false);
 
-        // 默认选中一个目标并显示选中标签
+        // 默认选中第一个有效目标
         var defaultTarget = FindDefaultTarget();
+        if (defaultTarget == null)
+        {
+            if (logPanel != null)
+                logPanel.AddLog("无有效目标，无法释放该技能");
+            ShowToast("无有效目标，无法释放该技能");
+            return;
+        }
+
+        _isSelectingTarget = true;
         _currentCursorTarget = defaultTarget;
-        if (defaultTarget != null && _stageManager != null)
+        if (logPanel != null)
+            logPanel.AddLog("请选择目标：点击 / 方向键切换 / 回车确认（Esc 取消）");
+        if (_stageManager != null)
             _stageManager.ShowTargetSelected(defaultTarget);
     }
 
     /// <summary>
-    /// 目标选择模式的默认目标：按技能 targettype 决定阵营，取第一个存活单位
+    /// 目标选择模式的默认目标：当前技能的第一个有效目标
     /// </summary>
     private BattleUnit FindDefaultTarget()
     {
-        if (_battleManager == null || _currentUnit == null) return null;
+        var validTargets = GetValidTargets();
+        return validTargets.Count > 0 ? validTargets[0] : null;
+    }
 
-        if (_selectedSkillId > 0)
-        {
-            var skillCfg = _battleManager.GetTables()?.TbSkill.GetOrDefault(_selectedSkillId);
-            if (skillCfg != null)
-            {
-                var tt = (TargetType)skillCfg.Targettype;
-                if (tt == TargetType.Ally)
-                    // 治疗/增益默认选中自己（自身必然存活在场，点技能直接对自己生效）
-                    return _currentUnit;
-                if (tt == TargetType.Enemy)
-                    return _enemyUnits.Find(u => u.IsAlive);
-            }
-        }
+    /// <summary>
+    /// 当前技能的有效目标列表（普通攻击→存活敌人；技能→按 selectable + range 筛选的可落点单位）
+    /// </summary>
+    private List<BattleUnit> GetValidTargets()
+    {
+        if (_battleManager == null || _currentUnit == null) return new List<BattleUnit>();
 
-        // 普通攻击/未知类型 → 默认第一个存活敌人
-        return _enemyUnits.Find(u => u.IsAlive);
+        if (_selectedSkillId == 0)
+            return _enemyUnits.FindAll(u => u.IsAlive);
+
+        return _battleManager.GetAvailableTargetsForSkill(_currentUnit, _selectedSkillId);
     }
 
     private void CancelTargetSelection()
     {
         _isSelectingTarget = false;
         _currentCursorTarget = null;
-    }
-
-    /// <summary>
-    /// 点击场景角色切换选中目标（选中目标无任何限制，仅标记当前所指角色）
-    /// </summary>
-    private void TrySwitchTargetByClick()
-    {
-        if (_mainCamera == null) _mainCamera = Camera.main;
-        if (_mainCamera == null) return;
-
-        Vector2 worldPos = _mainCamera.ScreenToWorldPoint(Input.mousePosition);
-        var hit = Physics2D.OverlapPoint(worldPos);
-        if (hit == null) return;
-
-        var unit = FindUnitByGameObject(hit.gameObject);
-        if (unit == null || !unit.IsAlive) return;
-
-        _currentCursorTarget = unit;
-        if (_stageManager != null)
-            _stageManager.ShowTargetSelected(unit);
-        OnTargetSelectionChanged?.Invoke();
     }
 
     /// <summary> 鼠标是否悬停在 UI 上（避免点击角色时误触 UI 按钮） </summary>
@@ -642,19 +599,15 @@ public class BattleWindow : UIWindow
         var unit = FindUnitByGameObject(hit.gameObject);
         if (unit == null || !unit.IsAlive) return;
 
+        // 只接受有效目标（落在技能九宫格有效范围内）
+        if (!IsTargetValidForSkill(unit, _selectedSkillId)) return;
+
         // 执行技能
         _battleManager.PlayerUseSkill(_selectedSkillId, unit.SlotIndex);
 
         // 显示目标选中标签
         if (_stageManager != null)
             _stageManager.ShowTargetSelected(unit);
-
-        // 记录日志
-        if (logPanel != null && _currentUnit != null)
-        {
-            string skillName = _selectedSkillId == 0 ? "普通攻击" : $"技能{_selectedSkillId}";
-            logPanel.AddDamageLog(GetUnitName(_currentUnit), GetUnitName(unit), 0, skillName);
-        }
 
         CancelTargetSelection();
     }
@@ -676,21 +629,6 @@ public class BattleWindow : UIWindow
     }
 
     #region 键盘游标切换目标（3.2 动态选择轻量版）
-
-    /// <summary>
-    /// 所有存活单位（玩家+敌人合并），供键盘游标全场循环切换——选中目标无任何限制，
-    /// 可移动到任意单位（含自己）；技能可用性由 IsTargetValidForSkill（有效目标）置灰表达
-    /// </summary>
-    private List<BattleUnit> GetAllAliveUnits()
-    {
-        var result = new List<BattleUnit>();
-        if (_battleManager == null) return result;
-        foreach (var u in _playerUnits)
-            if (u.IsAlive) result.Add(u);
-        foreach (var u in _enemyUnits)
-            if (u.IsAlive) result.Add(u);
-        return result;
-    }
 
     /// <summary>
     /// 当前选中目标对该技能是否为有效目标：由技能九宫格配置（阵营 targettype + 可选落点 selectable + 范围 range）决定。
@@ -723,10 +661,10 @@ public class BattleWindow : UIWindow
         return _battleManager.GetSkillTargets(_currentUnit, skillCfg, target.SlotIndex).Count > 0;
     }
 
-    /// <summary> 键盘游标在当前目标基础上按行列偏移切换（左右循环，上下换行） </summary>
+    /// <summary> 键盘游标在当前有效目标基础上按行列偏移切换（左右循环，上下换行） </summary>
     private void CycleTarget(int colDelta, int rowDelta)
     {
-        var targets = GetAllAliveUnits();
+        var targets = GetValidTargets();
         if (targets.Count == 0) return;
 
         var current = _currentCursorTarget;
@@ -753,7 +691,6 @@ public class BattleWindow : UIWindow
         _currentCursorTarget = current;
         if (_stageManager != null)
             _stageManager.ShowTargetSelected(current);
-        OnTargetSelectionChanged?.Invoke();
     }
 
     /// <summary> 回车/空格：确认当前游标目标并释放技能 </summary>
@@ -762,17 +699,12 @@ public class BattleWindow : UIWindow
         if (_currentCursorTarget == null) return;
         var unit = _currentCursorTarget;
         if (!unit.IsAlive) return;
+        if (!IsTargetValidForSkill(unit, _selectedSkillId)) return;
 
         _battleManager.PlayerUseSkill(_selectedSkillId, unit.SlotIndex);
 
         if (_stageManager != null)
             _stageManager.ShowTargetSelected(unit);
-
-        if (logPanel != null && _currentUnit != null)
-        {
-            string skillName = _selectedSkillId == 0 ? "普通攻击" : $"技能{_selectedSkillId}";
-            logPanel.AddDamageLog(GetUnitName(_currentUnit), GetUnitName(unit), 0, skillName);
-        }
 
         CancelTargetSelection();
     }
@@ -797,6 +729,69 @@ public class BattleWindow : UIWindow
         if (itemPanel != null) itemPanel.Close();
         if (talkPanel != null) talkPanel.Close();
         if (subPanelContainer != null) subPanelContainer.SetActive(false);
+    }
+
+    /// <summary>
+    /// 弹出提示弹窗（技能无法使用等），居中显示，约 1.5 秒后自动消失
+    /// </summary>
+    private void ShowToast(string message)
+    {
+        if (_toastGo == null)
+            CreateToast();
+        if (_toastGo == null) return;
+
+        _toastGo.SetActive(true);
+        if (_toastText != null)
+            _toastText.text = message;
+
+        if (_toastCoroutine != null)
+            StopCoroutine(_toastCoroutine);
+        _toastCoroutine = StartCoroutine(HideToastRoutine());
+    }
+
+    /// <summary>
+    /// 动态创建提示弹窗（挂到 Canvas 下，屏幕居中偏上）
+    /// </summary>
+    private void CreateToast()
+    {
+        var canvas = GetComponentInParent<Canvas>();
+        var parent = canvas != null ? canvas.transform : transform;
+
+        var go = new GameObject("BattleToast", typeof(RectTransform), typeof(Image));
+        go.transform.SetParent(parent, false);
+        var rect = go.GetComponent<RectTransform>();
+        rect.anchorMin = new Vector2(0.5f, 0.5f);
+        rect.anchorMax = new Vector2(0.5f, 0.5f);
+        rect.pivot = new Vector2(0.5f, 0.5f);
+        rect.sizeDelta = new Vector2(460f, 130f);
+        rect.anchoredPosition = new Vector2(0f, 240f);
+
+        var bg = go.GetComponent<Image>();
+        bg.color = new Color(0f, 0f, 0f, 0.82f);
+
+        var textGo = new GameObject("Text", typeof(RectTransform), typeof(TextMeshProUGUI));
+        textGo.transform.SetParent(go.transform, false);
+        var textRect = textGo.GetComponent<RectTransform>();
+        textRect.anchorMin = Vector2.zero;
+        textRect.anchorMax = Vector2.one;
+        textRect.offsetMin = new Vector2(16f, 12f);
+        textRect.offsetMax = new Vector2(-16f, -12f);
+
+        _toastText = textGo.GetComponent<TextMeshProUGUI>();
+        _toastText.font = TMP_Settings.defaultFontAsset;
+        _toastText.fontSize = 26f;
+        _toastText.alignment = TextAlignmentOptions.Center;
+        _toastText.color = Color.white;
+
+        _toastGo = go;
+        _toastGo.SetActive(false);
+    }
+
+    private System.Collections.IEnumerator HideToastRoutine()
+    {
+        yield return new WaitForSeconds(1.5f);
+        if (_toastGo != null)
+            _toastGo.SetActive(false);
     }
 
     #endregion
