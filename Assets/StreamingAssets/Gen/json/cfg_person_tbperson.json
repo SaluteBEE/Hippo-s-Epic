@@ -109,7 +109,7 @@
     "selfmatain_per": 0,
     "creatorwilling_per": 0,
     "animstate": 1,
-    "prefab1": "Prefabs/npc/talk/light_talk",
+    "prefab1": "prefabs/npc/talk/light_talk",
     "prefab2": "prefabs/npc/light_scene",
     "buffIds": [],
     "animconfigs": [
