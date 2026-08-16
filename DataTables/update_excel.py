@@ -263,6 +263,75 @@ def update_slotstate(xlsx_path, json_path):
     print(f"OK slotstate: {', '.join(parts)}")
 
 
+def update_person(xlsx_path, json_path):
+    with open(json_path, "r", encoding="utf-8-sig") as f:
+        rows = json.load(f)
+
+    wb = openpyxl.load_workbook(xlsx_path)
+    ws = wb.active
+
+    header = {}
+    for c in range(1, ws.max_column + 1):
+        v = ws.cell(row=1, column=c).value
+        if v:
+            header[str(v)] = c
+
+    col_id = header.get("id", 2)
+    col_name = header.get("name", 3)
+    col_animstate = header.get("animstate")
+    col_animconfigs = header.get("animconfigs")
+
+    existing_names = set()
+    existing_configs = set()
+    max_id = 0
+    last_data_row = 0
+    for row_idx in range(1, ws.max_row + 1):
+        tag = ws.cell(row=row_idx, column=1).value
+        if tag is not None and str(tag).startswith("##"):
+            continue
+        pid = ws.cell(row=row_idx, column=col_id).value
+        name = ws.cell(row=row_idx, column=col_name).value
+        configs = ws.cell(row=row_idx, column=col_animconfigs).value if col_animconfigs else None
+        if pid is not None and isinstance(pid, (int, float)):
+            max_id = max(max_id, int(pid))
+            last_data_row = row_idx
+        if name is not None and str(name).strip():
+            existing_names.add(str(name).strip())
+        if configs:
+            for c in str(configs).split("|"):
+                c = c.strip()
+                if c:
+                    existing_configs.add(c)
+
+    added = 0
+    skipped = 0
+    write_row = last_data_row + 1
+    for row in rows:
+        name = str(row.get("name", "")).strip()
+        if not name:
+            continue
+        if name in existing_names or name in existing_configs:
+            skipped += 1
+            continue
+        max_id += 1
+        new_row = [None] * ws.max_column
+        new_row[col_id - 1] = max_id
+        new_row[col_name - 1] = name
+        if col_animstate:
+            new_row[col_animstate - 1] = 1
+        if col_animconfigs:
+            new_row[col_animconfigs - 1] = name
+        for c_idx in range(1, ws.max_column + 1):
+            ws.cell(row=write_row, column=c_idx).value = new_row[c_idx - 1]
+        write_row += 1
+        existing_names.add(name)
+        existing_configs.add(name)
+        added += 1
+
+    safe_save(wb, xlsx_path)
+    print(f"OK person: added={added}, skipped={skipped}")
+
+
 if __name__ == "__main__":
     mode = sys.argv[1]
     xlsx_path = sys.argv[2]
@@ -272,6 +341,8 @@ if __name__ == "__main__":
         update_animationstate(xlsx_path, json_path)
     elif mode == "slotstate":
         update_slotstate(xlsx_path, json_path)
+    elif mode == "person":
+        update_person(xlsx_path, json_path)
     else:
         print(f"ERR unknown mode: {mode}")
         sys.exit(1)

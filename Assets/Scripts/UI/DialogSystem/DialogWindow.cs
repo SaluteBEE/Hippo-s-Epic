@@ -250,12 +250,13 @@ public class DialogWindow : UIWindow
             return;
         }
 
-        var address = $"avatars/{avatarName}";
-        var handle = Addressables.LoadAssetAsync<Texture2D>(address);
-        _avatarHandles[avatarName] = handle;
+        var address = $"Assets/Art/Sprites/Head/{avatarName}";
+        AsyncOperationHandle<Texture2D> handle = default;
 
         try
         {
+            handle = Addressables.LoadAssetAsync<Texture2D>(address);
+            _avatarHandles[avatarName] = handle;
             await handle.Task;
         }
         catch (Exception)

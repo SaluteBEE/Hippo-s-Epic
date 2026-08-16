@@ -26,8 +26,8 @@ class PersonDataTests
         Assert.AreEqual(100, person.Hp);
         Assert.AreEqual(100, person.Hpmax);
         Assert.AreEqual(1, person.Animstate);
-        Assert.AreEqual("prefabs/player/homo_talk", person.Prefab1);
-        Assert.AreEqual("Assets\\Prefabs\\player\\Hippo", person.Prefab2);
+        Assert.AreEqual("Assets/Prefabs/player/homo_talk", person.Prefab1);
+        Assert.AreEqual("Assets/Prefabs/Battle/homa_battle", person.Prefab2);
         Assert.IsNotNull(person.BuffIds);
         CollectionAssert.AreEqual(new List<int> { 1 }, person.BuffIds);
     }
@@ -63,6 +63,6 @@ class PersonDataTests
     public void Person_PrefabPaths_ContainBackslash()
     {
         var person = tables.TbPerson.Get(1);
-        Assert.IsTrue(person.Prefab2.Contains("\\"));
+        Assert.IsTrue(person.Prefab2.Contains("/"));
     }
 }

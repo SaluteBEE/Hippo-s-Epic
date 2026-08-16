@@ -8,7 +8,7 @@ using UnityEngine.UI;
 public sealed class BackgroundView : MonoBehaviour
 {
     [SerializeField] private Image target;
-    [SerializeField] private string addressableRoot = "backgrounds";
+    [SerializeField] private string addressableRoot = "Assets/Art/Backgrounds";
 
     private readonly Dictionary<string, Sprite> _cache = new Dictionary<string, Sprite>();
     private readonly Dictionary<string, AsyncOperationHandle<Texture2D>> _handles = new Dictionary<string, AsyncOperationHandle<Texture2D>>();

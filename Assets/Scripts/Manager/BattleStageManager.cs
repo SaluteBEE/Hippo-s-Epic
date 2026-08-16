@@ -241,46 +241,34 @@ public class BattleStageManager : MonoBehaviour
         // 统一缩放为合理大小（可根据预制体调整）
         // go.transform.localScale = Vector3.one;
 
-        // 敌方面向左边（翻转）
-        if (!unit.IsPlayerSide)
+        // 敌方面向左边（仅翻转视觉层 Spine，避免镜像血条/指示器等 UI 子节点）
+        var visual = FindChildRecursive(go.transform, "Visual");
+        if (visual != null)
         {
-            var scale = go.transform.localScale;
-            scale.x = -Mathf.Abs(scale.x);
-            go.transform.localScale = scale;
-        }
-        else
-        {
-            var scale = go.transform.localScale;
-            scale.x = Mathf.Abs(scale.x);
-            go.transform.localScale = scale;
+            var scale = visual.localScale;
+            scale.x = unit.IsPlayerSide ? Mathf.Abs(scale.x) : -Mathf.Abs(scale.x);
+            visual.localScale = scale;
         }
 
-        // 添加点击检测子节点（HitArea），方便单独调整点击区域
-        if (hitAreaPrefab != null)
+        // 预制体已内置 HitArea / 血条 / 指示器，运行时只查找并管理
+
+        // 查找预制体中的血条并 Setup（血条是角色子节点，LateUpdate 保持本地位置）
+        var healthBar = go.GetComponentInChildren<BattleHealthBar>();
+        if (healthBar != null)
         {
-            var hitArea = Instantiate(hitAreaPrefab, go.transform);
-            hitArea.name = "HitArea";
-        }
-        else
-        {
-            var hitArea = new GameObject("HitArea");
-            hitArea.transform.SetParent(go.transform, false);
-            var col = hitArea.AddComponent<BoxCollider2D>();
-            col.size = new Vector2(1f, 2f);
-            col.offset = new Vector2(0, 1f);
+            healthBar.Setup(unit, go.transform, healthBarOffset);
+            var healthBarDict = unit.IsPlayerSide ? _playerHealthBars : _enemyHealthBars;
+            healthBarDict[unit.SlotIndex] = healthBar;
         }
 
-        // 移除角色根节点上旧的整体碰撞体，统一交给 HitArea 子节点
-        var oldCollider = go.GetComponent<Collider2D>();
-        if (oldCollider != null)
-            Destroy(oldCollider);
+        // 查找当前行动指示箭头（默认隐藏，高亮时显示）
+        var indicator = FindChildRecursive(go.transform, "CurrentIndicator");
+        if (indicator != null)
+            indicator.gameObject.SetActive(false);
 
         // 记录
         var dict = unit.IsPlayerSide ? _playerUnits : _enemyUnits;
         dict[unit.SlotIndex] = go;
-
-        // 创建血条
-        CreateHealthBar(unit, go.transform);
 
         Debug.Log($"[BattleStageManager] 生成角色: {person.Name} at slot {unit.SlotIndex} ({(unit.IsPlayerSide ? "Player" : "Enemy")})");
         onComplete?.Invoke();
@@ -289,75 +277,6 @@ public class BattleStageManager : MonoBehaviour
     #endregion
 
     #region 血条
-
-    private void CreateHealthBar(BattleUnit unit, Transform unitTransform)
-    {
-        if (healthBarPrefab == null)
-        {
-            // 动态创建简单血条
-            CreateSimpleHealthBar(unit, unitTransform);
-            return;
-        }
-
-        var barGo = Instantiate(healthBarPrefab, unitTransform.position + healthBarOffset, Quaternion.identity);
-        var bar = barGo.GetComponent<BattleHealthBar>();
-        if (bar == null) bar = barGo.AddComponent<BattleHealthBar>();
-
-        bar.Setup(unit, unitTransform, healthBarOffset);
-
-        var dict = unit.IsPlayerSide ? _playerHealthBars : _enemyHealthBars;
-        dict[unit.SlotIndex] = bar;
-    }
-
-    /// <summary>
-    /// 动态创建简单血条（无需预制体）
-    /// </summary>
-    private void CreateSimpleHealthBar(BattleUnit unit, Transform unitTransform)
-    {
-        // 创建World Space Canvas
-        var canvasGo = new GameObject($"HealthBar_P{unit.PersonId}_S{unit.SlotIndex}");
-        canvasGo.transform.SetParent(unitTransform);
-        canvasGo.transform.localPosition = healthBarOffset;
-
-        var canvas = canvasGo.AddComponent<Canvas>();
-        canvas.renderMode = RenderMode.WorldSpace;
-        canvas.sortingOrder = 10;
-
-        var canvasRect = canvasGo.GetComponent<RectTransform>();
-        canvasRect.sizeDelta = new Vector2(120, 15);
-        canvasRect.localScale = Vector3.one * 0.01f; // World Space缩放
-
-        // 背景
-        var bgGo = new GameObject("Background");
-        bgGo.transform.SetParent(canvasGo.transform, false);
-        var bgRect = bgGo.AddComponent<RectTransform>();
-        bgRect.anchorMin = Vector2.zero;
-        bgRect.anchorMax = Vector2.one;
-        bgRect.offsetMin = Vector2.zero;
-        bgRect.offsetMax = Vector2.zero;
-        var bgImage = bgGo.AddComponent<UnityEngine.UI.Image>();
-        bgImage.color = new Color(0f, 0f, 0f, 0.8f); // 黑色背景
-
-        // 填充条
-        var fillGo = new GameObject("Fill");
-        fillGo.transform.SetParent(bgGo.transform, false);
-        var fillRect = fillGo.AddComponent<RectTransform>();
-        fillRect.anchorMin = Vector2.zero;
-        fillRect.anchorMax = Vector2.one;
-        fillRect.offsetMin = new Vector2(2, 2);
-        fillRect.offsetMax = new Vector2(-2, -2);
-        var fillImage = fillGo.AddComponent<UnityEngine.UI.Image>();
-        fillImage.color = new Color(0.8f, 0.2f, 0.2f); // 固定红色血条(不随血量变色)
-        fillImage.type = UnityEngine.UI.Image.Type.Filled;
-        fillImage.fillMethod = UnityEngine.UI.Image.FillMethod.Horizontal;
-
-        // 添加BattleHealthBar组件
-        var bar = canvasGo.AddComponent<BattleHealthBar>();
-        bar.SetupSimple(unit, fillImage, unitTransform, healthBarOffset);
-
-        var dict = unit.IsPlayerSide ? _playerHealthBars : _enemyHealthBars;
-        dict[unit.SlotIndex] = bar;
-    }
 
     /// <summary>
     /// 更新指定单位的血条
@@ -393,19 +312,11 @@ public class BattleStageManager : MonoBehaviour
         var dict = unit.IsPlayerSide ? _playerUnits : _enemyUnits;
         if (!dict.TryGetValue(unit.SlotIndex, out var go)) return;
 
-        // 创建简单指示箭头（红色三角形）
-        _currentIndicator = new GameObject("CurrentIndicator");
-        _currentIndicator.transform.SetParent(go.transform);
-        _currentIndicator.transform.localPosition = new Vector3(0, 2f, 0);
-
-        // 用SpriteRenderer画一个三角形
-        var sr = _currentIndicator.AddComponent<SpriteRenderer>();
-        sr.sprite = CreateTriangleSprite();
-        sr.color = Color.red;
-        sr.sortingOrder = 20;
-
-        // 添加简单的上下浮动动画
-        var rb = _currentIndicator.AddComponent<BattleIndicatorFloat>();
+        // 显示预制体中的当前行动指示箭头
+        var indicator = FindChildRecursive(go.transform, "CurrentIndicator");
+        if (indicator == null) return;
+        indicator.gameObject.SetActive(true);
+        _currentIndicator = indicator.gameObject;
     }
 
     /// <summary>
@@ -415,7 +326,7 @@ public class BattleStageManager : MonoBehaviour
     {
         if (_currentIndicator != null)
         {
-            Destroy(_currentIndicator);
+            _currentIndicator.SetActive(false);
             _currentIndicator = null;
         }
     }
@@ -513,6 +424,20 @@ public class BattleStageManager : MonoBehaviour
         var slots = isPlayerSide ? playerSlots : enemySlots;
         if (slots == null || slotIndex < 0 || slotIndex >= slots.Length) return null;
         return slots[slotIndex];
+    }
+
+    /// <summary>
+    /// 递归查找子节点（兼容嵌套预制体，节点不在根的直接子节点下）
+    /// </summary>
+    private Transform FindChildRecursive(Transform parent, string name)
+    {
+        if (parent.name == name) return parent;
+        for (int i = 0; i < parent.childCount; i++)
+        {
+            var found = FindChildRecursive(parent.GetChild(i), name);
+            if (found != null) return found;
+        }
+        return null;
     }
 
     public GameObject GetUnitObject(bool isPlayerSide, int slotIndex)
