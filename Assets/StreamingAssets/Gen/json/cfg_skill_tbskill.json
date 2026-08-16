@@ -16,7 +16,8 @@
       5
     ],
     "selectable": [],
-    "cooldown": 0
+    "cooldown": 0,
+    "hitdelay": 0
   },
   {
     "id": 2,
@@ -35,7 +36,8 @@
       5
     ],
     "selectable": [],
-    "cooldown": 0
+    "cooldown": 0,
+    "hitdelay": 0
   },
   {
     "id": 3,
@@ -54,7 +56,8 @@
       5
     ],
     "selectable": [],
-    "cooldown": 0
+    "cooldown": 0,
+    "hitdelay": 0
   },
   {
     "id": 4,
@@ -73,7 +76,8 @@
       5
     ],
     "selectable": [],
-    "cooldown": 0
+    "cooldown": 0,
+    "hitdelay": 0
   },
   {
     "id": 5,
@@ -92,7 +96,8 @@
       5
     ],
     "selectable": [],
-    "cooldown": 0
+    "cooldown": 0,
+    "hitdelay": 0
   },
   {
     "id": 6,
@@ -118,6 +123,7 @@
       4,
       7
     ],
-    "cooldown": 0
+    "cooldown": 0,
+    "hitdelay": 0
   }
 ]

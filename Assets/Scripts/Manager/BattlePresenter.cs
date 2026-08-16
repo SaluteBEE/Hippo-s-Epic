@@ -185,6 +185,25 @@ public class BattlePresenter : MonoBehaviour
                 yield return W(HitInterval);
             }
 
+            // ── [~0.96s] 伤害逻辑结算：打击时刻已过，真正扣血/回血 ──
+            // 受击表现（闪白/后仰）与伤害逻辑分离；支持技能表 hitdelay 配置延迟出伤。
+            // Spine 关键帧扩展：未来可在动画事件（AnimationEvent）里调用 _battleManager.ResolvePendingHits() 触发。
+            if (_battleManager != null)
+            {
+                float hitDelay = 0f;
+                if (skillId > 0)
+                {
+                    var cfg = _battleManager.GetTables()?.TbSkill.GetOrDefault(skillId);
+                    if (cfg != null)
+                        hitDelay = cfg.Hitdelay;
+                }
+
+                if (hitDelay > 0f)
+                    yield return W(hitDelay);
+
+                _battleManager.ResolvePendingHits();
+            }
+
             // ── [1.02s] 喜剧延迟：受击演完停顿一拍，再飘字（WoL 滑稽感关键）──
             yield return W(ComedyDelay);
 

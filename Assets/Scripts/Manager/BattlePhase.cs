@@ -21,7 +21,6 @@ public enum ActionType
 {
     Skill,
     Item,
-    Defend,
     Flee
 }
 

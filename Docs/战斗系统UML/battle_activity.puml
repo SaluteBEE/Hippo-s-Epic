@@ -1,10 +1,10 @@
 @startuml battle_activity
-' 战斗系统活动图 - 回合循环（含表现层演出）
+' 战斗系统活动图 - 回合循环（含表现层演出 + 行动点）
 skinparam defaultFontName "Noto Sans CJK SC"
 skinparam activityFontSize 12
 skinparam activityDiamondFontSize 12
 
-title 战斗回合循环活动图（含前端表现）
+title 战斗回合循环活动图（含前端表现 + 行动点）
 
 start
 :GameApp.EnterBattle(battleId);
@@ -18,41 +18,34 @@ repeat
   :处理召唤事件 / RoundStart 事件 / 全局 TurnStart Buff;
   :按 FinalSpeed 降序排序 → 建 TurnQueue;
   repeat
-    :StartUnitTurn (TurnStart 事件/Buff);
+    :StartUnitTurn (TurnStart 事件/Buff;\n行动点重置 = Stats.ActionPoint 默认2);
     :ProcessStatusCheck (眩晕/冻结 → 跳过行动);
     if (单位是玩家控制?) then (是)
       :IsWaitingForPlayerAction = true;
       :UI: 高亮单位 + 显示操作按钮 + 默认选中目标;
       repeat
-        :玩家操作 (技能/物品/防御/发呆/逃跑);
-      repeatwhile (未选择行动?)
-      :PlayerUseSkill/Item/Defend → 构造 BattleAction;
-    else (否)
-      :BattleAI.Decide → 构造 BattleAction;
-    endif
-
-    :ExecuteAction → ResolveTargets;
-    if (行动类型?) then (技能)
-      :ExecuteSkill (伤害/治疗/Buff 结算 + 事件广播);
-      :**Presenter.PlaySkillSequence** (演出序列);
-      :转身 → 走向 → 蓄力 → 冲刺 → 命中停顿;
-      :受击闪白/后仰 → 喜剧延迟;
-      :DamageFx 飘字 + 血条白条残影;
-      :归位;
-    elseif (物品) then
-      :ExecuteItem (Buff + 背包扣除);
-    elseif (防御) then
-      :ExecuteDefend (IsDefending=true);
-    else (逃跑)
-      :ExecuteFlee → EndBattle(Flee);
-    endif
-
-    if (演出结束回调后) then
-      :CheckDeaths;
-      if (有单位死亡?) then (是)
-        :**DeathRoutine** (等演出完 → 0.45s 倒地 → 隐藏);
-      endif
+        :玩家操作 (技能/物品/发呆/逃跑);
+        if (选择发呆?) then (是)
+          :PlayerDeferTurn → 当前单位排到队尾;
+        elseif (选择逃跑?) then (是)
+          :ExecuteFlee → EndBattle(Flee);
+        elseif (选择技能?) then (是)
+          :PlayerUseSkill → 扣 skill.Cost 行动点;
+          :ExecuteSkill → QueuePendingHit 暂存伤害\n(不立即扣血);
+          :**Presenter.PlaySkillSequence**\n(转身→走向→蓄力→冲刺→命中停顿→\n受击闪白/后仰→[打击时刻] ResolvePendingHits\n真正扣血→喜剧延迟→飘字→归位);
+          :CheckDeaths → **DeathRoutine**\n(等演出完→倒地→隐藏);
+        else (物品)
+          :ExecuteItem (Buff + 背包扣除;\n不扣行动点, 不结束回合);
+          :CheckDeaths;
+        endif
+      repeatwhile (剩余行动点 > 0 且未选发呆/逃跑?)
       :EndUnitTurn (TurnEnd 事件/Buff);
+      :AdvanceTurnQueue;
+    else (否)
+      :BattleAI.Decide → 构造 BattleAction\n(敌人一回合招, 不走行动点);
+      :ExecuteAction → ExecuteSkill/普攻\n(QueuePendingHit 暂存 → 演出打击时刻结算);
+      :演出序列 + CheckDeaths + DeathRoutine;
+      :EndUnitTurn;
       :AdvanceTurnQueue;
     endif
   repeatwhile (TurnQueue 非空?)

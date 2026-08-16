@@ -52,18 +52,19 @@ loop 每回合
     WIN -> WIN : 显示操作按钮 + 默认选中目标
     WIN -> WIN : FindDefaultTarget + ShowTargetSelected
     玩家 -> WIN : 点击"暴力行为"→选技能\n或方向键切换目标
-    WIN -> BM : PlayerUseSkill(skillId, targetSlot)
+    WIN -> BM : PlayerUseSkill(skillId, targetSlot)\n(扣 skill.Cost 行动点, 不足置灰拦截)
   else AI单位
     BM -> BM : BattleAI.Decide(unit) → action
   end
-  BM -> BM : ExecuteAction(action)
+  BM -> BM : ExecuteAction(action)\n  (物品: 不扣AP不结束回合, 执行完回等待)
   activate BM
-  BM -> BM : ResolveTargets → ExecuteSkill\n(CalcDamage/ApplyDamage/ApplyHeal/Buff)
-  BM --> WIN : OnDamageTaken / OnHealed / OnBuffApplied
-  WIN -> STAGE : UpdateHealthBar(unit)
+  BM -> BM : ResolveTargets → ExecuteSkill\n(CalcDamage → QueuePendingHit 暂存伤害/治疗,\n不立即扣血)
   BM -> PRES : PlaySkillSequence(actor, skill, targets,\nbeforeHp, onComplete)
   activate PRES
-  PRES -> PRES : 演出序列(0.1s停顿→转身→走向→蓄力→\n冲刺→命中停顿→受击闪白/后仰→\n喜剧延迟→飘字+白条残影→归位)
+  PRES -> PRES : 演出序列(0.1s停顿→转身→走向→蓄力→\n冲刺→命中停顿→受击闪白/后仰→\n**[打击时刻] ResolvePendingHits 真正扣血**\n(支持技能表 hitdelay 延迟出伤)→\n喜剧延迟→飘字+白条残影→归位)
+  PRES -> BM : ResolvePendingHits()\n(OnHit buff 一并触发)
+  BM --> WIN : OnDamageTaken / OnHealed / OnBuffApplied
+  WIN -> STAGE : UpdateHealthBar(unit)
   PRES -> FX : SpawnFloatText(target, "-5", Damage)
   FX -> FX : 上升1.0 + 淡出0.9s (worldCamera+父级scale)
   PRES -> STAGE : GetHealthBar.PlayGhostAnimation(白条)
@@ -77,7 +78,12 @@ loop 每回合
     deactivate PRES
     BM --> WIN : OnUnitDeath → 日志
   end
-  BM -> BM : EndUnitTurn(unit)
+  alt 玩家单位且剩余行动点>0
+    BM -> BM : ContinuePlayerTurnIfApLeft\n(不结束回合, 重新等待玩家操作, 可连放)
+    BM --> WIN : OnPlayerActionWaitChanged(true) → 按钮/默认目标重新显示
+  else 行动点用完 / AI单位
+    BM -> BM : EndUnitTurn(unit)
+  end
   BM --> WIN : OnUnitTurnEnd → 清高亮/按钮
   BM -> BM : AdvanceTurnQueue()
 end

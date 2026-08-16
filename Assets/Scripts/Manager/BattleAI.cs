@@ -48,7 +48,8 @@ public static class BattleAI
                 new List<int> { target.SlotIndex }, TargetType.Enemy);
         }
 
-        return new BattleAction(unit, ActionType.Defend, 0, new List<int>(), TargetType.Self);
+        // 无任何可攻击目标（防御已删除）→ 返回 null，跳过行动直接结束回合
+        return null;
     }
 
     /// <summary>

@@ -15,7 +15,11 @@ public class BattleUnit
     public Dictionary<int, int> SkillCooldowns = new Dictionary<int, int>();
     public UnitTurnPhase CurrentPhase = UnitTurnPhase.None;
     public bool SkipAction;
-    public bool IsDefending;
+
+    /// <summary>
+    /// 当前回合剩余行动点（回合开始时重置为 Stats.ActionPoint；技能按 cost 消耗，用完结束回合）
+    /// </summary>
+    public int CurrentActionPoints;
 
     public int GetRow() => SlotIndex / 3;
     public int GetColumn() => SlotIndex % 3;
@@ -24,7 +28,7 @@ public class BattleUnit
     {
         CurrentPhase = UnitTurnPhase.None;
         SkipAction = false;
-        IsDefending = false;
+        CurrentActionPoints = Stats != null ? Stats.ActionPoint : 0;
     }
 
     public void DecrementCooldowns()

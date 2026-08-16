@@ -336,7 +336,7 @@ public class BattleStageManager : MonoBehaviour
         bgRect.offsetMin = Vector2.zero;
         bgRect.offsetMax = Vector2.zero;
         var bgImage = bgGo.AddComponent<UnityEngine.UI.Image>();
-        bgImage.color = new Color(0.2f, 0.2f, 0.2f, 0.8f);
+        bgImage.color = new Color(0f, 0f, 0f, 0.8f); // 黑色背景
 
         // 填充条
         var fillGo = new GameObject("Fill");
@@ -347,7 +347,7 @@ public class BattleStageManager : MonoBehaviour
         fillRect.offsetMin = new Vector2(2, 2);
         fillRect.offsetMax = new Vector2(-2, -2);
         var fillImage = fillGo.AddComponent<UnityEngine.UI.Image>();
-        fillImage.color = unit.IsPlayerSide ? new Color(0.2f, 0.8f, 0.2f) : new Color(0.8f, 0.2f, 0.2f);
+        fillImage.color = new Color(0.8f, 0.2f, 0.2f); // 固定红色血条(不随血量变色)
         fillImage.type = UnityEngine.UI.Image.Type.Filled;
         fillImage.fillMethod = UnityEngine.UI.Image.FillMethod.Horizontal;
 

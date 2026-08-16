@@ -8,6 +8,25 @@ using UnityEngine.UI;
 /// </summary>
 public class BattleHealthBar : MonoBehaviour
 {
+    /// <summary>
+    /// 共享白色精灵（UGUI Filled 类型必须有 sprite，fillAmount 才生效；动态创建时未赋 sprite 会导致只变色不缩短）
+    /// </summary>
+    private static Sprite _whiteSprite;
+    public static Sprite WhiteSprite
+    {
+        get
+        {
+            if (_whiteSprite == null)
+            {
+                var tex = new Texture2D(1, 1);
+                tex.SetPixel(0, 0, Color.white);
+                tex.Apply();
+                _whiteSprite = Sprite.Create(tex, new Rect(0, 0, 1, 1), new Vector2(0.5f, 0.5f));
+            }
+            return _whiteSprite;
+        }
+    }
+
     private BattleUnit _unit;
     private Transform _followTarget;
     private Vector3 _offset;
@@ -39,6 +58,7 @@ public class BattleHealthBar : MonoBehaviour
             if (fillGo != null) _fillImage = fillGo.GetComponent<Image>();
         }
 
+        EnsureFillSprite();
         UpdateHealth();
     }
 
@@ -51,7 +71,18 @@ public class BattleHealthBar : MonoBehaviour
         _fillImage = fillImage;
         _followTarget = followTarget;
         _offset = offset;
+        EnsureFillSprite();
         UpdateHealth();
+    }
+
+    /// <summary>
+    /// UGUI Filled 类型 Image 必须有 sprite，fillAmount 才会在渲染层生效；
+    /// 动态创建时未赋 sprite 的已知坑：血条只变色、不按百分比缩短。
+    /// </summary>
+    private void EnsureFillSprite()
+    {
+        if (_fillImage != null && _fillImage.sprite == null)
+            _fillImage.sprite = WhiteSprite;
     }
 
     private void LateUpdate()
@@ -87,12 +118,7 @@ public class BattleHealthBar : MonoBehaviour
                 _fillImage.fillAmount = ratio;
             else
                 _fillImage.rectTransform.localScale = new Vector3(ratio, 1, 1);
-
-            // 血量低时变红
-            if (ratio <= 0.25f)
-                _fillImage.color = Color.red;
-            else if (ratio <= 0.5f)
-                _fillImage.color = new Color(1f, 0.6f, 0f); // 橙色
+            // 颜色固定为创建时的红色，不随血量变色
         }
 
         // 阵亡时隐藏
@@ -167,6 +193,7 @@ public class BattleHealthBar : MonoBehaviour
         var ghost = ghostGo.AddComponent<Image>();
         ghost.color = new Color(1f, 1f, 1f, 0.85f);
         ghost.raycastTarget = false;
+        ghost.sprite = _fillImage.sprite != null ? _fillImage.sprite : WhiteSprite;
 
         if (_fillImage.type == Image.Type.Filled)
         {

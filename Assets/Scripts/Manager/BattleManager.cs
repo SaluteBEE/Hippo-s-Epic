@@ -59,7 +59,6 @@ public class BattleManager
     public event Action<BattleUnit, int> OnBuffRemoved;
     public event Action<BattleUnit, int, List<BattleUnit>> OnSkillExecuted;
     public event Action<BattleUnit> OnUnitDeath;
-    public event Action<BattleUnit> OnUnitDefend;
     public event Action OnPlayerFlee;
     public event Action<List<BattleUnit>> OnNewUnitsReady;
     public event Action<BattleUnit> OnCurrentUnitChanged;
@@ -85,6 +84,71 @@ public class BattleManager
     /// 测试模式：为玩家单位解锁技能表中所有技能
     /// </summary>
     public bool UnlockAllSkillsForTest;
+
+    #region 待结算命中（受击表现与伤害逻辑分离）
+
+    /// <summary>
+    /// 待结算命中：技能执行时只计算并暂存，由演出在打击时刻统一结算（延迟出伤）
+    /// </summary>
+    public struct PendingHit
+    {
+        public BattleUnit Target;
+        public int Amount;
+        public bool IsHeal;
+        public int BuffId;
+
+        public PendingHit(BattleUnit target, int amount, bool isHeal, int buffId)
+        {
+            Target = target;
+            Amount = amount;
+            IsHeal = isHeal;
+            BuffId = buffId;
+        }
+    }
+
+    private readonly List<PendingHit> _pendingHits = new List<PendingHit>();
+
+    /// <summary>
+    /// 暂存一次命中（伤害/治疗），不立即扣血；命中buff也一并延迟到打击时刻
+    /// </summary>
+    public void QueuePendingHit(BattleUnit target, int amount, bool isHeal, int buffId)
+    {
+        if (target == null || !target.IsAlive) return;
+        _pendingHits.Add(new PendingHit(target, amount, isHeal, buffId));
+    }
+
+    /// <summary>
+    /// 结算所有待结算命中：真正扣血/回血 + 触发OnHit buff（打击时刻调用）
+    /// </summary>
+    public void ResolvePendingHits()
+    {
+        if (_pendingHits.Count == 0) return;
+
+        foreach (var hit in _pendingHits)
+        {
+            if (hit.Target == null || !hit.Target.IsAlive) continue;
+
+            if (hit.IsHeal)
+            {
+                ApplyHeal(hit.Target, hit.Amount);
+            }
+            else
+            {
+                ApplyDamage(hit.Target, hit.Amount);
+                TriggerBuffs(hit.Target, BuffTrigger.OnHit);
+            }
+
+            if (hit.BuffId > 0)
+            {
+                hit.Target.UnitBuffs.ApplyBuff(hit.BuffId);
+                OnBuffApplied?.Invoke(hit.Target, hit.BuffId, 0);
+            }
+        }
+
+        _pendingHits.Clear();
+    }
+
+    #endregion
 
     #region 初始化
 
@@ -285,6 +349,7 @@ public class BattleManager
             Level = playerStats.Level,
             Exp = playerStats.Exp,
             SkillPoint = playerStats.SkillPoint,
+            ActionPoint = playerStats.ActionPoint,
             ExpBonus = playerStats.ExpBonus,
             CurrencyBonus = playerStats.CurrencyBonus
         };
@@ -488,14 +553,14 @@ public class BattleManager
 
     public void ExecuteAction(BattleAction action)
     {
-        BattleLogger.Log($"   P{action.Actor?.PersonId} 执行 {action.Type} (id={action.ActionId})");
-
         if (action == null || action.Actor == null || !action.Actor.IsAlive)
         {
             BattleLogger.Log($"   行动无效(Actor死亡或为空)，跳过");
             AdvanceTurnQueue();
             return;
         }
+
+        BattleLogger.Log($"   P{action.Actor.PersonId} 执行 {action.Type} (id={action.ActionId})");
 
         IsWaitingForPlayerAction = false;
 
@@ -525,9 +590,6 @@ public class BattleManager
             case ActionType.Item:
                 ExecuteItem(action.Actor, action.ActionId, targets);
                 break;
-            case ActionType.Defend:
-                ExecuteDefend(action.Actor);
-                break;
             case ActionType.Flee:
                 ExecuteFlee(action.Actor);
                 break;
@@ -545,16 +607,34 @@ public class BattleManager
             {
                 CheckDeaths();
                 if (Phase == BattlePhase.BattleEnd) return;
-                EndUnitTurn(action.Actor);
+                if (!ContinuePlayerTurnIfApLeft(action.Actor))
+                    EndUnitTurn(action.Actor);
             });
             return;
         }
+
+        // 无演出（Presenter 不可用）时的兜底：立即结算待结算命中
+        ResolvePendingHits();
 
         CheckDeaths();
 
         if (Phase == BattlePhase.BattleEnd) return;
 
-        EndUnitTurn(action.Actor);
+        if (!ContinuePlayerTurnIfApLeft(action.Actor))
+            EndUnitTurn(action.Actor);
+    }
+
+    /// <summary>
+    /// 玩家单位行动后仍有剩余行动点 → 不结束回合，重新等待玩家操作（物品/低费技能可连续行动）
+    /// </summary>
+    private bool ContinuePlayerTurnIfApLeft(BattleUnit unit)
+    {
+        if (unit == null || !unit.IsPlayerControlled || !unit.IsAlive) return false;
+        if (unit.CurrentActionPoints <= 0) return false;
+
+        BattleLogger.Log($"    剩余行动点 {unit.CurrentActionPoints}，继续行动");
+        IsWaitingForPlayerAction = true;
+        return true;
     }
 
     private void EndUnitTurn(BattleUnit unit)
@@ -623,6 +703,13 @@ public class BattleManager
 
         if (skillId == 0)
         {
+            if (CurrentUnit.CurrentActionPoints < 1)
+            {
+                BattleLogger.LogWarning(" 行动点不足，无法普通攻击");
+                return;
+            }
+            CurrentUnit.CurrentActionPoints -= 1;
+
             var normalAction = new BattleAction(CurrentUnit, ActionType.Skill, 0,
                 new List<int> { targetSlotIndex }, TargetType.Enemy);
             ExecuteAction(normalAction);
@@ -638,6 +725,12 @@ public class BattleManager
         if (CurrentUnit.IsSkillOnCooldown(skillId))
         {
             BattleLogger.LogWarning($" 技能{skillId}冷却中");
+            return;
+        }
+
+        if (CurrentUnit.CurrentActionPoints < skillCfg.Cost)
+        {
+            BattleLogger.LogWarning($" 行动点不足: 需要{skillCfg.Cost}, 当前{CurrentUnit.CurrentActionPoints}");
             return;
         }
 
@@ -658,6 +751,8 @@ public class BattleManager
         if (skillCfg.Cooldown > 0)
             CurrentUnit.SetCooldown(skillId, skillCfg.Cooldown);
 
+        CurrentUnit.CurrentActionPoints -= skillCfg.Cost;
+
         // TargetSlotIndices 只存落点中心，range 在 ResolveTargets 时展开
         int centerSlot = targetType == TargetType.Self ? CurrentUnit.SlotIndex : targetSlotIndex;
         var action = new BattleAction(CurrentUnit, ActionType.Skill, skillId,
@@ -672,14 +767,6 @@ public class BattleManager
         var targets = GetTargetsBySide(TargetType.Ally, CurrentUnit, new List<int> { targetSlotIndex });
         var action = new BattleAction(CurrentUnit, ActionType.Item, itemId,
             targets.Select(t => t.SlotIndex).ToList(), TargetType.Ally);
-        ExecuteAction(action);
-    }
-
-    public void PlayerDefend()
-    {
-        if (!IsWaitingForPlayerAction || CurrentUnit == null) return;
-
-        var action = new BattleAction(CurrentUnit, ActionType.Defend, 0, new List<int>(), TargetType.Self);
         ExecuteAction(action);
     }
 
@@ -730,14 +817,7 @@ public class BattleManager
                 if (!target.IsAlive) continue;
 
                 int damage = CalcDamage(actor, target);
-                if (target.IsDefending)
-                {
-                    damage = damage / 2;
-                    BattleLogger.Log($"    P{target.PersonId} 防御，伤害减半");
-                }
-
-                ApplyDamage(target, damage);
-                TriggerBuffs(target, BuffTrigger.OnHit);
+                QueuePendingHit(target, damage, false, 0);
             }
 
             OnSkillExecuted?.Invoke(actor, skillId, targets);
@@ -762,36 +842,29 @@ public class BattleManager
             switch (skillType)
             {
                 case SkillType.Heal:
-                    ApplyHeal(target, effectValue);
+                    QueuePendingHit(target, effectValue, true, buffId);
                     break;
 
                 case SkillType.PhysicalDamage:
                 case SkillType.MagicDamage:
                 {
                     int damage = effectValue;
-                    if (target.IsDefending)
-                    {
-                        damage = damage / 2;
-                        BattleLogger.Log($"    P{target.PersonId} 防御，伤害减半");
-                    }
-
-                    ApplyDamage(target, damage);
-                    TriggerBuffs(target, BuffTrigger.OnHit);
+                    QueuePendingHit(target, damage, false, buffId);
                     break;
                 }
 
                 case SkillType.BuffOnly:
                     BattleLogger.Log($"    P{actor.PersonId} 使用 {skillCfg.Name}: 附加Buff id={buffId} → P{target.PersonId}");
+                    if (buffId > 0)
+                    {
+                        target.UnitBuffs.ApplyBuff(buffId);
+                        OnBuffApplied?.Invoke(target, buffId, 0);
+                    }
                     break;
                 default:
                     break;
             }
 
-            if (buffId > 0)
-            {
-                target.UnitBuffs.ApplyBuff(buffId);
-                OnBuffApplied?.Invoke(target, buffId, 0);
-            }
         }
 
         OnSkillExecuted?.Invoke(actor, skillId, targets);
@@ -820,13 +893,6 @@ public class BattleManager
 
         BagManager.Instance.RemoveItem(itemId, 1);
         BattleLogger.Log($" {actor.PersonId} 使用物品{itemCfg.Name}({itemId})");
-    }
-
-    private void ExecuteDefend(BattleUnit unit)
-    {
-        unit.IsDefending = true;
-        OnUnitDefend?.Invoke(unit);
-        BattleLogger.Log($"    P{unit.PersonId} 防御 (下回合伤害减半)");
     }
 
     private void ExecuteFlee(BattleUnit unit)
@@ -917,7 +983,7 @@ public class BattleManager
 
     private List<BattleUnit> ResolveTargets(BattleAction action)
     {
-        if (action.Type == ActionType.Defend || action.Type == ActionType.Flee)
+        if (action.Type == ActionType.Flee)
             return new List<BattleUnit> { action.Actor };
 
         // 技能：TargetSlotIndices[0] 为落点中心；配置技能按 range 展开，普通攻击打单格

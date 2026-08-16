@@ -63,14 +63,6 @@ public class BattleLogPanel : MonoBehaviour
     }
 
     /// <summary>
-    /// 添加防御记录
-    /// </summary>
-    public void AddDefendLog(string unitName)
-    {
-        AddLogInternal($"{unitName} 进入防御姿态", normalColor);
-    }
-
-    /// <summary>
     /// 添加阵亡记录
     /// </summary>
     public void AddDeathLog(string unitName)

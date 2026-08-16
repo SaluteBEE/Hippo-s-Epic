@@ -234,6 +234,11 @@ MonoBehaviour:
     m_SerializedLabels:
     - ui_prefab
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 2e7f1ea8ac19cadd89eb31e1e9cfac77
+    m_Address: ui/Test/TestUIPanel
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: dd90b6ecff8020e40aa537a3ddf43594, type: 2}
   m_SchemaSet:

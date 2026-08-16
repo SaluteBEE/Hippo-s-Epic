@@ -14,5 +14,6 @@ public static class UIWindowRegistry
         UIManager.RegisterAddress(typeof(MapPanel), "ui/map/MapPanel");
         UIManager.RegisterAddress(typeof(MainPanelController), "ui/Global/MainPanel");
         UIManager.RegisterAddress(typeof(BattleWindow), "ui/Battle/BattleWindow");
+        UIManager.RegisterAddress(typeof(TestUIPanel), "ui/Test/TestUIPanel");
     }
 }

@@ -175,6 +175,8 @@ MonoBehaviour:
   debugAnimationPersonId: 1
   debugAnimationPrefabType: 1
   debugEnableBagTest: 1
+  debugEnableHub: 1
+  debugHubHotkey: 1
   ui: {fileID: 2048630439}
   audio: {fileID: 2104528045}
   scene: {fileID: 1182991098}
@@ -186,8 +188,6 @@ MonoBehaviour:
   debugEnableDialogTest: 1
   debugDialogId: 1001001
   autoStartTest: 0
-  debugEnableHub: 1
-  debugHubHotkey: 1
   debugEnableBattleTest: 1
   debugBattleId: 1
 --- !u!1 &506944131

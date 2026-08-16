@@ -47,6 +47,11 @@ public class BattleWindow : UIWindow
     private List<BattleUnit> _playerUnits = new List<BattleUnit>();
     private List<BattleUnit> _enemyUnits = new List<BattleUnit>();
 
+    /// <summary>
+    /// 选中目标变化（切换/目标状态变化）——子面板（技能面板）订阅后刷新置灰
+    /// </summary>
+    public event System.Action OnTargetSelectionChanged;
+
     #endregion
 
     #region 生命周期
@@ -84,6 +89,10 @@ public class BattleWindow : UIWindow
         SetActionButtonsVisible(false);
         CloseAllSubPanels();
 
+        // 选中目标变化 → 技能面板刷新置灰（事件驱动，面板自身不轮询）
+        if (skillPanel != null)
+            OnTargetSelectionChanged += skillPanel.RefreshInvalidState;
+
         if (logPanel != null) logPanel.ClearLogs();
 
         // 严格 MVC：请求管理器推送当前状态快照（由事件回调更新缓存，不主动读取）
@@ -97,6 +106,8 @@ public class BattleWindow : UIWindow
     public override void OnClose()
     {
         UnsubscribeEvents();
+        if (skillPanel != null)
+            OnTargetSelectionChanged -= skillPanel.RefreshInvalidState;
         _battleManager = null;
         _stageManager = null;
     }
@@ -172,7 +183,6 @@ public class BattleWindow : UIWindow
         _battleManager.OnDamageTaken += OnDamageTaken;
         _battleManager.OnHealed += OnHealed;
         _battleManager.OnUnitDeath += OnUnitDeath;
-        _battleManager.OnUnitDefend += OnUnitDefend;
         _battleManager.OnUnitTurnEnd += OnUnitTurnEnd;
         _battleManager.OnRoundEnd += OnRoundEnd;
         _battleManager.OnBattleEnd += OnBattleEnd;
@@ -199,7 +209,6 @@ public class BattleWindow : UIWindow
         _battleManager.OnDamageTaken -= OnDamageTaken;
         _battleManager.OnHealed -= OnHealed;
         _battleManager.OnUnitDeath -= OnUnitDeath;
-        _battleManager.OnUnitDefend -= OnUnitDefend;
         _battleManager.OnUnitTurnEnd -= OnUnitTurnEnd;
         _battleManager.OnRoundEnd -= OnRoundEnd;
         _battleManager.OnBattleEnd -= OnBattleEnd;
@@ -231,6 +240,8 @@ public class BattleWindow : UIWindow
     /// </summary>
     private void OnPlayerActionWaitChanged(bool waiting)
     {
+        // 缓存等待状态（严格 MVC：CanOperate/Update 门控读取此字段）
+        _isWaitingForPlayerAction = waiting;
         if (waiting)
         {
             if (_currentUnit == null) return;
@@ -257,6 +268,7 @@ public class BattleWindow : UIWindow
     {
         _playerUnits = new List<BattleUnit>(players);
         _enemyUnits = new List<BattleUnit>(enemies);
+        OnTargetSelectionChanged?.Invoke();
     }
 
     private void OnBattleStart()
@@ -320,11 +332,6 @@ public class BattleWindow : UIWindow
         if (_stageManager != null)
             _stageManager.UpdateHealthBar(unit);
         if (logPanel != null) logPanel.AddDeathLog(GetUnitName(unit));
-    }
-
-    private void OnUnitDefend(BattleUnit unit)
-    {
-        if (logPanel != null) logPanel.AddDefendLog(GetUnitName(unit));
     }
 
     private void OnUnitTurnEnd(BattleUnit unit)
@@ -472,6 +479,23 @@ public class BattleWindow : UIWindow
     private void OnSkillSelected(int skillId)
     {
         _selectedSkillId = skillId;
+
+        // 行动点不足：置灰但可点，点击给出提示
+        if (_currentUnit != null)
+        {
+            int apCost = 1;
+            if (skillId > 0)
+            {
+                var costCfg = _battleManager?.GetTables()?.TbSkill.GetOrDefault(skillId);
+                if (costCfg != null) apCost = costCfg.Cost;
+            }
+            if (_currentUnit.CurrentActionPoints < apCost)
+            {
+                if (logPanel != null)
+                    logPanel.AddLog($"行动点不足，无法使用（需要{apCost}点）");
+                return; // 面板保持打开
+            }
+        }
 
         // targettype=Self 无需选目标，直接对自身释放
         if (skillId > 0 && _battleManager != null)
@@ -733,6 +757,7 @@ public class BattleWindow : UIWindow
         _currentCursorTarget = current;
         if (_stageManager != null)
             _stageManager.ShowTargetSelected(current);
+        OnTargetSelectionChanged?.Invoke();
     }
 
     /// <summary> 回车/空格：确认当前游标目标并释放技能 </summary>

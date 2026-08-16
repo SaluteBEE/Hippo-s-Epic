@@ -56,6 +56,9 @@ public class BattleSkillPanel : BattleSubPanel
     private Func<int, bool> _canUseOnTarget;
     private BattleUnit _unit;  // 打开面板时的当前单位（由上层事件缓存传入，不主动读取）
 
+    /// <summary> 已创建的技能项（非冷却项，供目标有效性重算时刷新置灰） </summary>
+    private readonly List<(int skillId, Image img, TextMeshProUGUI tmp)> _items = new List<(int, Image, TextMeshProUGUI)>();
+
     public void Open(BattleManager battleManager, BattleUnit unit, Action<int> onSkillSelected,
                      Func<int, bool> canUseOnTarget = null)
     {
@@ -64,6 +67,38 @@ public class BattleSkillPanel : BattleSubPanel
         _onSkillSelected = onSkillSelected;
         _canUseOnTarget = canUseOnTarget;
         RefreshSkillList();
+    }
+
+    /// <summary>
+    /// 目标切换/目标状态变化后刷新置灰（事件驱动，由上层订阅触发；只重算 alpha，不重建列表）
+    /// </summary>
+    public void RefreshInvalidState()
+    {
+        if (_battleManager == null || _unit == null) return;
+        if (panelRoot != null && !panelRoot.activeSelf) return;
+
+        int remainingAp = _unit.CurrentActionPoints;
+
+        foreach (var (skillId, img, tmp) in _items)
+        {
+            bool invalid = IsInvalidForTarget(skillId);
+
+            // 行动点不足同样置灰（技能 cost / 普攻 1 点）
+            if (!invalid)
+            {
+                if (skillId == 0)
+                    invalid = remainingAp < 1;
+                else
+                {
+                    var cfg = _battleManager.GetTables()?.TbSkill.GetOrDefault(skillId);
+                    invalid = cfg != null && remainingAp < cfg.Cost;
+                }
+            }
+
+            float a = invalid ? 0.45f : 1.00f;
+            if (img != null) img.color = new Color(img.color.r, img.color.g, img.color.b, a);
+            if (tmp != null) tmp.color = new Color(tmp.color.r, tmp.color.g, tmp.color.b, a);
+        }
     }
 
     private void RefreshSkillList()
@@ -80,12 +115,16 @@ public class BattleSkillPanel : BattleSubPanel
         // 清空旧列表
         foreach (Transform child in skillContainer)
             Destroy(child.gameObject);
+        _items.Clear();
 
         var unit = _unit;
         var tables = _battleManager.GetTables();
 
-        // 添加普通攻击
-        AddSkillItem(0, "普通攻击", false, IsInvalidForTarget(0));
+        // 行动点信息（置灰判断依据：cost > 剩余行动点）
+        int remainingAp = unit.CurrentActionPoints;
+
+        // 添加普通攻击（固定消耗 1 行动点）
+        AddSkillItem(0, "普通攻击", false, IsInvalidForTarget(0) || remainingAp < 1);
 
         // 添加技能
         foreach (int skillId in unit.AvailableSkills)
@@ -100,7 +139,9 @@ public class BattleSkillPanel : BattleSubPanel
                 name += $" (冷却{cd})";
             }
 
-            AddSkillItem(skillId, name, onCooldown, IsInvalidForTarget(skillId));
+            bool apNotEnough = skillCfg != null && remainingAp < skillCfg.Cost;
+            AddSkillItem(skillId, name, onCooldown,
+                IsInvalidForTarget(skillId) || apNotEnough);
         }
     }
 
@@ -163,15 +204,16 @@ public class BattleSkillPanel : BattleSubPanel
         // 注意: 模板根 Image 可能本身 alpha=0.45, 因此有效时必须显式设回 1.00
         var baseImg = go.GetComponent<Image>();
         var baseTmp = go.GetComponentInChildren<TextMeshProUGUI>();
-        if (!disabled && baseImg != null)
+        if (!disabled)
         {
+            // 记录非冷却项，供目标切换后 RefreshInvalidState 重算置灰
+            _items.Add((skillId, baseImg, baseTmp));
+
             float a = invalidForTarget ? 0.45f : 1.00f;
-            baseImg.color = new Color(baseImg.color.r, baseImg.color.g, baseImg.color.b, a);
-        }
-        if (!disabled && baseTmp != null)
-        {
-            float a = invalidForTarget ? 0.45f : 1.00f;
-            baseTmp.color = new Color(baseTmp.color.r, baseTmp.color.g, baseTmp.color.b, a);
+            if (baseImg != null)
+                baseImg.color = new Color(baseImg.color.r, baseImg.color.g, baseImg.color.b, a);
+            if (baseTmp != null)
+                baseTmp.color = new Color(baseTmp.color.r, baseTmp.color.g, baseTmp.color.b, a);
         }
     }
 

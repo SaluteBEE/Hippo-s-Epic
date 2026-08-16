@@ -29,6 +29,7 @@ public sealed partial class Skill : Luban.BeanBase
         {int n0 = _buf.ReadSize(); Range = new System.Collections.Generic.List<int>(n0);for(var i0 = 0 ; i0 < n0 ; i0++) { int _e0;  _e0 = _buf.ReadInt(); Range.Add(_e0);}}
         {int n0 = _buf.ReadSize(); Selectable = new System.Collections.Generic.List<int>(n0);for(var i0 = 0 ; i0 < n0 ; i0++) { int _e0;  _e0 = _buf.ReadInt(); Selectable.Add(_e0);}}
         Cooldown = _buf.ReadInt();
+        Hitdelay = _buf.ReadFloat();
     }
 
     public static Skill DeserializeSkill(ByteBuf _buf)
@@ -88,6 +89,10 @@ public sealed partial class Skill : Luban.BeanBase
     /// 0
     /// </summary>
     public readonly int Cooldown;
+    /// <summary>
+    /// 出伤延迟秒数<br/>0=打击时刻立即结算<br/>&gt;0=命中后延迟该秒数再扣血<br/>(spine关键帧作为后续扩展)
+    /// </summary>
+    public readonly float Hitdelay;
    
     public const int __ID__ = 1539215818;
     public override int GetTypeId() => __ID__;
@@ -112,6 +117,7 @@ public sealed partial class Skill : Luban.BeanBase
         + "range:" + Luban.StringUtil.CollectionToString(Range) + ","
         + "selectable:" + Luban.StringUtil.CollectionToString(Selectable) + ","
         + "cooldown:" + Cooldown + ","
+        + "hitdelay:" + Hitdelay + ","
         + "}";
     }
 }

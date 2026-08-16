@@ -25,9 +25,12 @@ class BattleManager {
   + StartRound()
   + ProcessTurnQueue()
   + ExecuteAction(action)
-  + PlayerUseSkill(skillId, targetSlot)
-  + PlayerUseItem / PlayerDefend / PlayerDeferTurn / PlayerFlee
-  + ExecuteSkill / ExecuteItem / ExecuteDefend / ExecuteFlee
+  + PlayerUseSkill(skillId, targetSlot)  [按 skill.Cost 扣行动点]
+  + PlayerUseItem / PlayerDeferTurn / PlayerFlee
+  + ExecuteSkill / ExecuteItem / ExecuteFlee
+  + QueuePendingHit(target, amount, isHeal, buffId)  [暂存命中, 不立即扣血]
+  + ResolvePendingHits()  [打击时刻结算: 扣血/回血 + OnHit buff]
+  + ContinuePlayerTurnIfApLeft(unit) : bool  [玩家剩余AP>0→不结束回合继续等待]
   + GetSkillTargets / ResolveTargets / GetTargetsBySide
   + CalcDamage / ApplyDamage / ApplyHeal
   + TriggerBuffs / TriggerGlobalBuffs
@@ -39,7 +42,7 @@ class BattleManager {
   {field} + event OnUnitPhaseChange / OnUnitActionExecute / OnUnitTurnEnd
   {field} + event OnRoundEnd / OnBattleEnd / OnDamageTaken / OnHealed
   {field} + event OnBuffApplied / OnBuffRemoved / OnSkillExecuted
-  {field} + event OnUnitDeath / OnUnitDefend / OnPlayerFlee / OnNewUnitsReady
+  {field} + event OnUnitDeath / OnPlayerFlee / OnNewUnitsReady
   {field} + event OnCurrentUnitChanged / OnPlayerActionWaitChanged / OnUnitListsChanged
 }
 
@@ -51,6 +54,7 @@ class BattleUnit {
   + AvailableSkills : List<int>
   + SkillCooldowns : Dictionary<int,int>
   + CurrentPhase : UnitTurnPhase
+  + CurrentActionPoints : int  [回合开始重置为 Stats.ActionPoint(默认2)]
   + GetRow() : int
   + GetColumn() : int
   + ResetTurnState()
@@ -65,6 +69,13 @@ class BattleAction {
   + ActionId : int
   + TargetSlotIndices : List<int>
   + TargetType : TargetType
+}
+
+class PendingHit {
+  + Target : BattleUnit
+  + Amount : int
+  + IsHeal : bool
+  + BuffId : int
 }
 
 class BattleAI {
@@ -104,7 +115,7 @@ enum UnitTurnPhase {
 }
 
 enum ActionType {
-  Skill / Item / Defend / Flee
+  Skill / Item / Flee
 }
 
 enum TargetType {
@@ -121,6 +132,7 @@ enum BattleResult {
 
 BattleManager o-- BattleUnit : 管理
 BattleManager o-- BattleEventQueue
+BattleManager o-- PendingHit : 待结算队列
 BattleManager ..> BattleAction : 执行
 BattleManager ..> BattleAI : AI决策
 BattleEventQueue ..> BattleEvent : 队列元素
@@ -140,6 +152,7 @@ class BattlePresenter {
   + IsDeathPlaying : bool
   + event OnSequenceBegin / OnSequenceEnd
   + PlaySkillSequence(actor, skillId, targets, beforeHp, onComplete)
+  [打击时刻调 _battleManager.ResolvePendingHits();\n支持技能表 hitdelay 延迟出伤;\nSpine 关键帧扩展: 动画事件里调 ResolvePendingHits()]
   + OnUnitDeath(unit)
   - DeathRoutine(unit)
   - W(seconds) : WaitForSeconds
@@ -213,7 +226,7 @@ class BattleWindow {
   - SubscribeEvents / UnsubscribeEvents
   - OnBattleStart / OnRoundStart / OnUnitTurnStart
   - OnUnitPhaseChange / OnDamageTaken / OnHealed
-  - OnBuffApplied / OnUnitDeath / OnUnitDefend
+  - OnBuffApplied / OnUnitDeath
   - OnUnitTurnEnd / OnRoundEnd / OnBattleEnd
   - OnCurrentUnitChanged / OnPlayerActionWaitChanged / OnUnitListsChanged
   - OnSequenceBegin / OnSequenceEnd
@@ -232,6 +245,7 @@ class BattleSkillPanel {
   + Open(battleManager, unit, onSkillSelected, canUseOnTarget)
   [unit 由事件推送的当前行动单位传入]
   - RefreshSkillList()
+  + RefreshInvalidState()  [目标切换/AP变化时重算置灰, 事件驱动]
   - AddSkillItem(skillId, name, disabled, invalid)
   - IsInvalidForTarget(skillId) : bool
 }
@@ -248,7 +262,7 @@ class BattleTalkPanel {
 
 class BattleLogPanel {
   + AddLog / AddDamageLog / AddHealLog
-  + AddDefendLog / AddDeathLog / AddRoundLog
+  + AddDeathLog / AddRoundLog
   + ClearLogs()
 }
 

@@ -33,6 +33,12 @@ public class CharacterStats
     public int Level;
     public int SkillPoint;
 
+    /// <summary>
+    /// 行动点（每回合可用行动点，玩家基础属性；技能按 cost 消耗，用完结束回合）。
+    /// 默认 2，后续从配表读取
+    /// </summary>
+    public int ActionPoint = 2;
+
     public float ExpBonus = 1f;
     public float CurrencyBonus = 1f;
 
@@ -155,6 +161,7 @@ public class CharacterStats
         public int exp;
         public int level;
         public int skillPoint;
+        public int actionPoint;
         public float expBonus;
         public float currencyBonus;
         public List<int> unlockedSkills;
@@ -187,6 +194,7 @@ public class CharacterStats
             exp = Exp,
             level = Level,
             skillPoint = SkillPoint,
+            actionPoint = ActionPoint,
             expBonus = ExpBonus,
             currencyBonus = CurrencyBonus,
             unlockedSkills = new List<int>(UnlockedSkills),
@@ -220,6 +228,8 @@ public class CharacterStats
         Exp = data.exp;
         Level = data.level;
         SkillPoint = data.skillPoint;
+        // 存档兼容：旧存档无 actionPoint 字段 → 保持默认 2
+        ActionPoint = data.actionPoint > 0 ? data.actionPoint : 2;
         ExpBonus = data.expBonus > 0 ? data.expBonus : 1f;
         CurrencyBonus = data.currencyBonus > 0 ? data.currencyBonus : 1f;
 
