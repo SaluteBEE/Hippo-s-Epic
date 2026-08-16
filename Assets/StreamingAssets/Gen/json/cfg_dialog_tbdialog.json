@@ -163,73 +163,13 @@
     ]
   },
   {
-    "id": 9000001,
+    "id": 1004001,
     "type": 1,
-    "param1": [
-      9000002
-    ],
+    "param1": [],
     "param2": "",
     "selection_name": "",
     "speakerid1": 1,
-    "speakerid2": 2,
-    "gain_item_id": 0,
-    "condition_ids": [
-      0
-    ]
-  },
-  {
-    "id": 9000002,
-    "type": 2,
-    "param1": [
-      9000003,
-      9000004,
-      9000005
-    ],
-    "param2": "1|1|1",
-    "selection_name": "",
-    "speakerid1": 1,
-    "speakerid2": 2,
-    "gain_item_id": 0,
-    "condition_ids": [
-      6,
-      3,
-      0
-    ]
-  },
-  {
-    "id": 9000003,
-    "type": 1,
-    "param1": [],
-    "param2": "",
-    "selection_name": "我有钥匙，让我进去",
-    "speakerid1": 1,
-    "speakerid2": 2,
-    "gain_item_id": 0,
-    "condition_ids": [
-      0
-    ]
-  },
-  {
-    "id": 9000004,
-    "type": 1,
-    "param1": [],
-    "param2": "",
-    "selection_name": "我打败了拳王！",
-    "speakerid1": 1,
-    "speakerid2": 2,
-    "gain_item_id": 0,
-    "condition_ids": [
-      0
-    ]
-  },
-  {
-    "id": 9000005,
-    "type": 1,
-    "param1": [],
-    "param2": "",
-    "selection_name": "算了，我走",
-    "speakerid1": 1,
-    "speakerid2": 2,
+    "speakerid2": 4,
     "gain_item_id": 0,
     "condition_ids": [
       0
