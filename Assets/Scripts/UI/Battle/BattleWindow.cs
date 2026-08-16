@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 /// <summary>
@@ -154,11 +155,15 @@ public class BattleWindow : UIWindow
             return;
         }
 
-        // 全局选中中心点：玩家回合等待行动时，方向键随时切换选中目标（无需先进目标选择）
+        // 全局选中中心点：玩家回合等待行动时，鼠标点击/方向键随时切换选中目标（无需先进目标选择）
         if (_battleManager != null && _isWaitingForPlayerAction
             && _currentUnit != null && _currentUnit.IsPlayerControlled)
         {
-            if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
+            if (Input.GetMouseButtonDown(0) && !IsPointerOverUI())
+            {
+                TrySwitchTargetByClick();
+            }
+            else if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
                 CycleTarget(1, 0);
             else if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A))
                 CycleTarget(-1, 0);
@@ -595,6 +600,33 @@ public class BattleWindow : UIWindow
     }
 
     /// <summary>
+    /// 点击场景角色切换选中目标（选中目标无任何限制，仅标记当前所指角色）
+    /// </summary>
+    private void TrySwitchTargetByClick()
+    {
+        if (_mainCamera == null) _mainCamera = Camera.main;
+        if (_mainCamera == null) return;
+
+        Vector2 worldPos = _mainCamera.ScreenToWorldPoint(Input.mousePosition);
+        var hit = Physics2D.OverlapPoint(worldPos);
+        if (hit == null) return;
+
+        var unit = FindUnitByGameObject(hit.gameObject);
+        if (unit == null || !unit.IsAlive) return;
+
+        _currentCursorTarget = unit;
+        if (_stageManager != null)
+            _stageManager.ShowTargetSelected(unit);
+        OnTargetSelectionChanged?.Invoke();
+    }
+
+    /// <summary> 鼠标是否悬停在 UI 上（避免点击角色时误触 UI 按钮） </summary>
+    private bool IsPointerOverUI()
+    {
+        return EventSystem.current != null && EventSystem.current.IsPointerOverGameObject();
+    }
+
+    /// <summary>
     /// 点击场景中的角色来选择目标
     /// </summary>
     private void TrySelectTargetByClick()
@@ -629,30 +661,16 @@ public class BattleWindow : UIWindow
 
     private BattleUnit FindUnitByGameObject(GameObject go)
     {
-        if (_battleManager == null) return null;
+        if (_battleManager == null || _stageManager == null) return null;
 
-        // 向上查找父物体名
-        Transform current = go.transform;
-        while (current != null)
+        // 通过槽位唯一定位被点击的单位（支持同一 personId 的多个单位）
+        if (!_stageManager.TryResolveUnitSlot(go, out bool isPlayerSide, out int slotIndex))
+            return null;
+
+        var list = isPlayerSide ? _playerUnits : _enemyUnits;
+        foreach (var unit in list)
         {
-            string name = current.name;
-            if (name.StartsWith("Unit_"))
-            {
-                // 解析 "Unit_{personId}_{name}"
-                string[] parts = name.Split('_');
-                if (parts.Length >= 2 && int.TryParse(parts[1], out int personId))
-                {
-                    foreach (var unit in _playerUnits)
-                    {
-                        if (unit.PersonId == personId && unit.IsAlive) return unit;
-                    }
-                    foreach (var unit in _enemyUnits)
-                    {
-                        if (unit.PersonId == personId && unit.IsAlive) return unit;
-                    }
-                }
-            }
-            current = current.parent;
+            if (unit.SlotIndex == slotIndex && unit.IsAlive) return unit;
         }
         return null;
     }
@@ -660,16 +678,8 @@ public class BattleWindow : UIWindow
     #region 键盘游标切换目标（3.2 动态选择轻量版）
 
     /// <summary>
-    /// 获取当前技能可选目标的存活单位列表（按槽位排序）
-    /// </summary>
-    private List<BattleUnit> GetValidTargets()
-    {
-        return GetValidTargetsForSkill(_selectedSkillId);
-    }
-
-    /// <summary>
-    /// 所有存活单位（玩家+敌人合并），供键盘游标全场循环切换——游标可移动到任意单位（含自己），
-    /// 技能的可用性由 IsTargetValidForSkill 置灰表达
+    /// 所有存活单位（玩家+敌人合并），供键盘游标全场循环切换——选中目标无任何限制，
+    /// 可移动到任意单位（含自己）；技能可用性由 IsTargetValidForSkill（有效目标）置灰表达
     /// </summary>
     private List<BattleUnit> GetAllAliveUnits()
     {
@@ -683,48 +693,34 @@ public class BattleWindow : UIWindow
     }
 
     /// <summary>
-    /// 指定技能的可选目标列表（skillId=0 普通攻击→敌人；按 targettype 分阵营；Self→自身）
+    /// 当前选中目标对该技能是否为有效目标：由技能九宫格配置（阵营 targettype + 可选落点 selectable + 范围 range）决定。
+    /// 选中目标与有效目标分离——选中目标无限制（鼠标所指任意角色），只有落在技能九宫格有效范围内才算有效目标，
+    /// 技能仅在有有效目标时才允许释放。
     /// </summary>
-    private List<BattleUnit> GetValidTargetsForSkill(int skillId)
-    {
-        var result = new List<BattleUnit>();
-        if (_battleManager == null || _currentUnit == null) return result;
-
-        if (skillId > 0)
-        {
-            var skillCfg = _battleManager.GetTables()?.TbSkill.GetOrDefault(skillId);
-            if (skillCfg != null)
-            {
-                var tt = (TargetType)skillCfg.Targettype;
-                if (tt == TargetType.Self)
-                {
-                    result.Add(_currentUnit);
-                    return result;
-                }
-                var pool = tt == TargetType.Ally ? _playerUnits : _enemyUnits;
-                foreach (var u in pool)
-                {
-                    // 治疗/增益类(Ally)目标池包含自己——可对自己释放（引用比较，敌我 SlotIndex 可能相同不能按索引排除）
-                    if (!u.IsAlive) continue;
-                    result.Add(u);
-                }
-                result.Sort((a, b) => a.SlotIndex.CompareTo(b.SlotIndex));
-                return result;
-            }
-        }
-
-        // 普通攻击：默认敌人
-        foreach (var u in _enemyUnits)
-            if (u.IsAlive) result.Add(u);
-        result.Sort((a, b) => a.SlotIndex.CompareTo(b.SlotIndex));
-        return result;
-    }
-
-    /// <summary> 当前选中目标对该技能是否有效（存活 + 在可选列表内） </summary>
     private bool IsTargetValidForSkill(BattleUnit target, int skillId)
     {
         if (target == null || !target.IsAlive) return false;
-        return GetValidTargetsForSkill(skillId).Contains(target);
+        if (_battleManager == null || _currentUnit == null) return false;
+
+        // 普通攻击：只对敌方单位有效（单格命中）
+        if (skillId == 0)
+            return target.IsPlayerSide != _currentUnit.IsPlayerSide;
+
+        var skillCfg = _battleManager.GetTables()?.TbSkill.GetOrDefault(skillId);
+        if (skillCfg == null) return false;
+
+        var tt = (TargetType)skillCfg.Targettype;
+        // Self 技能无需选目标，始终有效（可用性由行动点/冷却决定，不受选中目标影响）
+        if (tt == TargetType.Self)
+            return true;
+
+        // 阵营校验：targettype 决定有效阵营（Ally→友方，Enemy→敌方）
+        bool expectedSide = tt == TargetType.Ally ? _currentUnit.IsPlayerSide : !_currentUnit.IsPlayerSide;
+        if (target.IsPlayerSide != expectedSide) return false;
+
+        // 九宫格校验：GetSkillTargets 内部统一校验 selectable（落点可选）与 range（范围内命中），
+        // 以选中目标所在槽位为落点中心，范围展开后至少命中一个存活单位才算有效
+        return _battleManager.GetSkillTargets(_currentUnit, skillCfg, target.SlotIndex).Count > 0;
     }
 
     /// <summary> 键盘游标在当前目标基础上按行列偏移切换（左右循环，上下换行） </summary>

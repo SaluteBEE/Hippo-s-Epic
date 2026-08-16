@@ -4,7 +4,7 @@
     "name": "走廊遭遇战",
     "enemypersonids": [
       2,
-      3,
+      2,
       2,
       0,
       0,
@@ -15,7 +15,7 @@
     ],
     "playerpersonids": [
       1,
-      3,
+      2,
       2,
       0,
       0,
@@ -31,7 +31,7 @@
     "expreward": 10,
     "currencyreward": 5,
     "canflee": true,
-    "comment": "3v3多人测试战斗"
+    "comment": "3v3多人测试战斗(河马+教练)"
   },
   {
     "id": 2,

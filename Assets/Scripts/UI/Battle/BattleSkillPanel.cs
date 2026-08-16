@@ -56,8 +56,8 @@ public class BattleSkillPanel : BattleSubPanel
     private Func<int, bool> _canUseOnTarget;
     private BattleUnit _unit;  // 打开面板时的当前单位（由上层事件缓存传入，不主动读取）
 
-    /// <summary> 已创建的技能项（非冷却项，供目标有效性重算时刷新置灰） </summary>
-    private readonly List<(int skillId, Image img, TextMeshProUGUI tmp)> _items = new List<(int, Image, TextMeshProUGUI)>();
+    /// <summary> 已创建的技能项（非冷却项，供目标有效性重算时刷新置灰与 interactable） </summary>
+    private readonly List<(int skillId, Button btn, Image img, TextMeshProUGUI tmp)> _items = new List<(int, Button, Image, TextMeshProUGUI)>();
 
     public void Open(BattleManager battleManager, BattleUnit unit, Action<int> onSkillSelected,
                      Func<int, bool> canUseOnTarget = null)
@@ -79,7 +79,7 @@ public class BattleSkillPanel : BattleSubPanel
 
         int remainingAp = _unit.CurrentActionPoints;
 
-        foreach (var (skillId, img, tmp) in _items)
+        foreach (var (skillId, btn, img, tmp) in _items)
         {
             bool invalid = IsInvalidForTarget(skillId);
 
@@ -94,6 +94,9 @@ public class BattleSkillPanel : BattleSubPanel
                     invalid = cfg != null && remainingAp < cfg.Cost;
                 }
             }
+
+            // 置灰 = 真正不可点击使用
+            if (btn != null) btn.interactable = !invalid;
 
             float a = invalid ? 0.45f : 1.00f;
             if (img != null) img.color = new Color(img.color.r, img.color.g, img.color.b, a);
@@ -195,7 +198,8 @@ public class BattleSkillPanel : BattleSubPanel
 
         if (btn != null)
         {
-            btn.interactable = !disabled;
+            // 置灰（冷却/目标无效/行动点不足）即不可点击，杜绝"置灰仍可使用"
+            btn.interactable = !disabled && !invalidForTarget;
             int capturedId = skillId;
             btn.onClick.AddListener(() => _onSkillSelected?.Invoke(capturedId));
         }
@@ -206,8 +210,8 @@ public class BattleSkillPanel : BattleSubPanel
         var baseTmp = go.GetComponentInChildren<TextMeshProUGUI>();
         if (!disabled)
         {
-            // 记录非冷却项，供目标切换后 RefreshInvalidState 重算置灰
-            _items.Add((skillId, baseImg, baseTmp));
+            // 记录非冷却项，供目标切换后 RefreshInvalidState 重算置灰与 interactable
+            _items.Add((skillId, btn, baseImg, baseTmp));
 
             float a = invalidForTarget ? 0.45f : 1.00f;
             if (baseImg != null)

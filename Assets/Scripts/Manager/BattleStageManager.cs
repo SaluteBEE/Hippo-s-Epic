@@ -37,6 +37,9 @@ public class BattleStageManager : MonoBehaviour
     [Tooltip("角色下方的选中标签节点（不拖则自动查找子节点 TargetSelectionIndicator）")]
     [SerializeField] private GameObject targetIndicator;
 
+    [Tooltip("目标选中标签的显示缩放倍数")]
+    [SerializeField] private float targetIndicatorScale = 4f;
+
     [Header("点击检测")]
     [Tooltip("角色点击检测预制体（含 Collider2D），不拖则运行时动态创建 HitArea 子节点")]
     [SerializeField] private GameObject hitAreaPrefab;
@@ -350,8 +353,8 @@ public class BattleStageManager : MonoBehaviour
         _targetIndicator.transform.position = go.transform.position;
 
         // 显式重置缩放: 场景文件里该节点 localScale=1, 但内存场景可能被放大(如10倍),
-        // 每次显示前重置, 保证选中点大小稳定
-        _targetIndicator.transform.localScale = Vector3.one;
+        // 每次显示前重置, 保证选中点大小稳定; 按配置倍数放大显示
+        _targetIndicator.transform.localScale = Vector3.one * targetIndicatorScale;
 
         var sr = _targetIndicator.GetComponent<SpriteRenderer>();
         if (sr != null)
@@ -444,6 +447,42 @@ public class BattleStageManager : MonoBehaviour
     {
         var dict = isPlayerSide ? _playerUnits : _enemyUnits;
         return dict.TryGetValue(slotIndex, out var go) ? go : null;
+    }
+
+    /// <summary>
+    /// 通过被点击的 GameObject（角色根节点或其任意子节点，如 HitArea）反查所属单位槽位。
+    /// 支持同一 personId 的多个单位（用槽位唯一定位，而非 personId）。
+    /// </summary>
+    public bool TryResolveUnitSlot(GameObject obj, out bool isPlayerSide, out int slotIndex)
+    {
+        isPlayerSide = false;
+        slotIndex = -1;
+        if (obj == null) return false;
+
+        Transform t = obj.transform;
+        while (t != null)
+        {
+            foreach (var kv in _playerUnits)
+            {
+                if (kv.Value == t.gameObject)
+                {
+                    isPlayerSide = true;
+                    slotIndex = kv.Key;
+                    return true;
+                }
+            }
+            foreach (var kv in _enemyUnits)
+            {
+                if (kv.Value == t.gameObject)
+                {
+                    isPlayerSide = false;
+                    slotIndex = kv.Key;
+                    return true;
+                }
+            }
+            t = t.parent;
+        }
+        return false;
     }
 
     public BattleHealthBar GetHealthBar(bool isPlayerSide, int slotIndex)
