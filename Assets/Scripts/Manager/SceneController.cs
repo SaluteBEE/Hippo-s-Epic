@@ -30,7 +30,7 @@ public class SceneController : MonoBehaviour
             DontDestroyOnLoad(esGo);
         }
 
-        string addressableKey = $"scenes/{sceneName}";
+        string addressableKey = $"Assets/Scenes/{sceneName}";
         var handle = Addressables.LoadSceneAsync(addressableKey, activateOnLoad: false);
         yield return handle;
 

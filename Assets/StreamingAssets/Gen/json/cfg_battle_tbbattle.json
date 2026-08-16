@@ -4,8 +4,8 @@
     "name": "走廊遭遇战",
     "enemypersonids": [
       2,
-      0,
-      0,
+      3,
+      2,
       0,
       0,
       0,
@@ -15,8 +15,8 @@
     ],
     "playerpersonids": [
       1,
-      0,
-      0,
+      3,
+      2,
       0,
       0,
       0,
@@ -31,7 +31,7 @@
     "expreward": 10,
     "currencyreward": 5,
     "canflee": true,
-    "comment": "1v1测试战斗"
+    "comment": "3v3多人测试战斗"
   },
   {
     "id": 2,

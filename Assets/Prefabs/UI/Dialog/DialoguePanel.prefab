@@ -235,7 +235,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 2759805488968852071}
-  addressableRoot: backgrounds
+  addressableRoot: Assets/Art/Backgrounds
 --- !u!1 &6959236824382047781
 GameObject:
   m_ObjectHideFlags: 0

@@ -80,6 +80,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5612704985068391902, guid: cee416f96dd202443bc72885fd0112a8, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -0.41
+      objectReference: {fileID: 0}
+    - target: {fileID: 5612704985068391902, guid: cee416f96dd202443bc72885fd0112a8, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 8.65
+      objectReference: {fileID: 0}
     - target: {fileID: 7530474131437242138, guid: cee416f96dd202443bc72885fd0112a8, type: 3}
       propertyPath: m_Name
       value: common_battle

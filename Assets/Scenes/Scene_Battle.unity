@@ -524,7 +524,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 6.57
+  orthographic size: 10
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
@@ -868,6 +868,7 @@ MonoBehaviour:
   healthBarPrefab: {fileID: 0}
   healthBarOffset: {x: 0, y: 1.5, z: 0}
   targetIndicator: {fileID: 0}
+  hitAreaPrefab: {fileID: 0}
 --- !u!4 &1983888109
 Transform:
   m_ObjectHideFlags: 0
