@@ -53,12 +53,12 @@ public class BattleManager
     public event Action<BattleUnit> OnUnitTurnEnd;
     public event Action<int> OnRoundEnd;
     public event Action<BattleResult> OnBattleEnd;
-    public event Action<BattleUnit, int> OnDamageTaken;
-    public event Action<BattleUnit, int> OnHealed;
+    public event Action<BattleUnit, BattleUnit, int> OnDamageTaken;   // 攻击方, 受击方, 伤害
+    public event Action<BattleUnit, BattleUnit, int> OnHealed;       // 治疗者, 受治方, 治疗量
     public event Action<BattleUnit, int, int> OnBuffApplied;
     public event Action<BattleUnit, int> OnBuffRemoved;
     public event Action<BattleUnit, int, List<BattleUnit>> OnSkillExecuted;
-    public event Action<BattleUnit> OnUnitDeath;
+    public event Action<BattleUnit, BattleUnit> OnUnitDeath;   // 击杀方, 阵亡方
     public event Action OnPlayerFlee;
     public event Action<List<BattleUnit>> OnNewUnitsReady;
     public event Action<BattleUnit> OnCurrentUnitChanged;
@@ -80,6 +80,9 @@ public class BattleManager
     private cfg.cfg.battle.Battle _battleConfig;
     private int _unitIdCounter;
 
+    /// <summary> 各单位的最近一次伤害来源（用于阵亡时确定击杀方） </summary>
+    private readonly Dictionary<BattleUnit, BattleUnit> _lastKillers = new Dictionary<BattleUnit, BattleUnit>();
+
     /// <summary>
     /// 测试模式：为玩家单位解锁技能表中所有技能
     /// </summary>
@@ -92,13 +95,15 @@ public class BattleManager
     /// </summary>
     public struct PendingHit
     {
+        public BattleUnit Actor;
         public BattleUnit Target;
         public int Amount;
         public bool IsHeal;
         public int BuffId;
 
-        public PendingHit(BattleUnit target, int amount, bool isHeal, int buffId)
+        public PendingHit(BattleUnit actor, BattleUnit target, int amount, bool isHeal, int buffId)
         {
+            Actor = actor;
             Target = target;
             Amount = amount;
             IsHeal = isHeal;
@@ -111,10 +116,10 @@ public class BattleManager
     /// <summary>
     /// 暂存一次命中（伤害/治疗），不立即扣血；命中buff也一并延迟到打击时刻
     /// </summary>
-    public void QueuePendingHit(BattleUnit target, int amount, bool isHeal, int buffId)
+    public void QueuePendingHit(BattleUnit actor, BattleUnit target, int amount, bool isHeal, int buffId)
     {
         if (target == null || !target.IsAlive) return;
-        _pendingHits.Add(new PendingHit(target, amount, isHeal, buffId));
+        _pendingHits.Add(new PendingHit(actor, target, amount, isHeal, buffId));
     }
 
     /// <summary>
@@ -130,11 +135,11 @@ public class BattleManager
 
             if (hit.IsHeal)
             {
-                ApplyHeal(hit.Target, hit.Amount);
+                ApplyHeal(hit.Actor, hit.Target, hit.Amount);
             }
             else
             {
-                ApplyDamage(hit.Target, hit.Amount);
+                ApplyDamage(hit.Actor, hit.Target, hit.Amount);
                 TriggerBuffs(hit.Target, BuffTrigger.OnHit);
             }
 
@@ -166,6 +171,7 @@ public class BattleManager
         TurnQueue.Clear();
         CurrentUnit = null;
         IsWaitingForPlayerAction = false;
+        _lastKillers.Clear();
 
         EventQueue = new BattleEventQueue(this);
 
@@ -508,7 +514,7 @@ public class BattleManager
             if (funcType == BuffFuncType.Heal)
             {
                 BattleLogger.Log($"   P{unit.PersonId} TurnStart Buff恢复HP+{cfg.Param1}");
-                ApplyHeal(unit, cfg.Param1);
+                ApplyHeal(unit, unit, cfg.Param1);
             }
         }
 
@@ -817,7 +823,7 @@ public class BattleManager
                 if (!target.IsAlive) continue;
 
                 int damage = CalcDamage(actor, target);
-                QueuePendingHit(target, damage, false, 0);
+                QueuePendingHit(actor, target, damage, false, 0);
             }
 
             OnSkillExecuted?.Invoke(actor, skillId, targets);
@@ -842,14 +848,14 @@ public class BattleManager
             switch (skillType)
             {
                 case SkillType.Heal:
-                    QueuePendingHit(target, effectValue, true, buffId);
+                    QueuePendingHit(actor, target, effectValue, true, buffId);
                     break;
 
                 case SkillType.PhysicalDamage:
                 case SkillType.MagicDamage:
                 {
                     int damage = effectValue;
-                    QueuePendingHit(target, damage, false, buffId);
+                    QueuePendingHit(actor, target, damage, false, buffId);
                     break;
                 }
 
@@ -1052,9 +1058,12 @@ public class BattleManager
         return Mathf.Max(0, raw);
     }
 
-    public void ApplyDamage(BattleUnit unit, int damage)
+    public void ApplyDamage(BattleUnit actor, BattleUnit unit, int damage)
     {
         if (damage <= 0 || !unit.IsAlive) return;
+
+        // 记录伤害来源（阵亡时用于确定击杀方）
+        _lastKillers[unit] = actor;
 
         int shieldAbsorbed = unit.UnitBuffs.AbsorbDamage(damage);
         int remaining = damage - shieldAbsorbed;
@@ -1069,20 +1078,20 @@ public class BattleManager
             }
         }
 
-        OnDamageTaken?.Invoke(unit, damage);
+        OnDamageTaken?.Invoke(actor, unit, damage);
         var absorbMsg = shieldAbsorbed > 0 ? string.Format(" [护盾吸收{0}]", shieldAbsorbed) : "";
         var beforeHp = unit.Stats.Hp + remaining + shieldAbsorbed;
         BattleLogger.Log(string.Format("    P{0} HP: {1} -> {2} (-{3}){4}", unit.PersonId, beforeHp, unit.Stats.Hp, damage, absorbMsg));
     }
 
-    public void ApplyHeal(BattleUnit unit, int amount)
+    public void ApplyHeal(BattleUnit actor, BattleUnit unit, int amount)
     {
         if (amount <= 0 || !unit.IsAlive) return;
 
         unit.Stats.Hp += amount;
         unit.Stats.ClampHp();
 
-        OnHealed?.Invoke(unit, amount);
+        OnHealed?.Invoke(actor, unit, amount);
         BattleLogger.Log($"    P{unit.PersonId} 治疗+{amount}, HP={unit.Stats.Hp}/{unit.Stats.FinalHpMax}");
     }
 
@@ -1105,13 +1114,13 @@ public class BattleManager
             switch (funcType)
             {
                 case BuffFuncType.Heal:
-                    ApplyHeal(unit, cfg.Param1);
+                    ApplyHeal(unit, unit, cfg.Param1);
                     break;
                 case BuffFuncType.CounterDamage:
                     if (trigger == BuffTrigger.OnHit && CurrentUnit != null && CurrentUnit != unit)
                     {
                         int counterDmg = cfg.Param1;
-                        ApplyDamage(CurrentUnit, counterDmg);
+                        ApplyDamage(unit, CurrentUnit, counterDmg);
 
                         if (cfg.Param2 > 0)
                         {
@@ -1166,7 +1175,8 @@ public class BattleManager
     {
         foreach (var unit in AllUnits.Where(u => !u.IsAlive && u.Stats.Hp <= 0))
         {
-            OnUnitDeath?.Invoke(unit);
+            _lastKillers.TryGetValue(unit, out var killer);
+            OnUnitDeath?.Invoke(killer, unit);
             BattleLogger.Log($"    P{unit.PersonId} 阵亡！");
         }
 

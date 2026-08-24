@@ -18,10 +18,13 @@ public class BattleWindow : UIWindow
     [SerializeField] private RectTransform bottomPanel;
 
     [Header("左侧操作按钮")]
-    [SerializeField] private Button btnViolence;    // 暴力行为 → 技能列表
-    [SerializeField] private Button btnTalk;        // 咄咄逼人 → 对话选择
-    [SerializeField] private Button btnItem;        // 翻找工具 → 物品列表
-    [SerializeField] private Button btnIdle;        // 正在发呆 → 跳过回合
+    [SerializeField] private Toggle btnViolence;    // 暴力行为 → 技能列表
+    [SerializeField] private Toggle btnTalk;        // 咄咄逼人 → 对话选择
+    [SerializeField] private Toggle btnItem;        // 翻找工具 → 物品列表
+    [SerializeField] private Toggle btnIdle;        // 正在发呆 → 跳过回合
+
+    [Header("右上角按钮")]
+    [SerializeField] private Button btnRun;         // common btn：逃跑按钮 → 战斗按失败结算
 
     [Header("右侧内容区")]
     [SerializeField] private BattleLogPanel logPanel;          // 战斗记录
@@ -31,6 +34,20 @@ public class BattleWindow : UIWindow
     [SerializeField] private BattleSkillPanel skillPanel;
     [SerializeField] private BattleItemPanel itemPanel;
     [SerializeField] private BattleTalkPanel talkPanel;
+
+    [Header("按钮/技能描述")]
+    [Tooltip("底部按钮或技能悬浮时显示描述的文字")]
+    [SerializeField] private TextMeshProUGUI btnDetailText;
+
+    #endregion
+
+    #region 按钮描述常量
+
+    private const string DetailViolence = "暴力行为：打！往死里整，别停！";
+    private const string DetailTalk = "咄咄逼人：操你妈，快！呈口舌之快！";
+    private const string DetailItem = "使用物品：又嗑又砸！血条涨，对面躺！";
+    private const string DetailIdle = "原地发呆：老子不动，看谁敢先动手！";
+    private const string DetailRun = "逃跑：打不过就跑，认怂保命！";
 
     #endregion
 
@@ -59,14 +76,19 @@ public class BattleWindow : UIWindow
     #region 生命周期
 
     /// <summary>
-    /// 窗口创建：绑定四个操作按钮点击事件（暴力/咄咄逼人/翻找/发呆）
+    /// 窗口创建：绑定四个操作按钮（Toggle 点击触发对应操作，执行后自动复位）
     /// </summary>
     public override void OnCreate(object args)
     {
-        if (btnViolence != null) btnViolence.onClick.AddListener(OnViolenceClicked);
-        if (btnTalk != null) btnTalk.onClick.AddListener(OnTalkClicked);
-        if (btnItem != null) btnItem.onClick.AddListener(OnItemClicked);
-        if (btnIdle != null) btnIdle.onClick.AddListener(OnIdleClicked);
+        // 四个操作按钮：onValueChanged=true 时执行操作，并复位为未选中
+        BindActionToggle(btnViolence, DetailViolence, OnViolenceClicked);
+        BindActionToggle(btnTalk, DetailTalk, OnTalkClicked);
+        BindActionToggle(btnItem, DetailItem, OnItemClicked);
+        BindActionToggle(btnIdle, DetailIdle, OnIdleClicked);
+
+        // 右上角逃跑按钮（点击即逃跑，战斗按失败结算）
+        if (btnRun != null) btnRun.onClick.AddListener(OnRunClicked);
+        BindHoverDetail(btnRun, DetailRun);
 
         CloseAllSubPanels();
 
@@ -170,6 +192,7 @@ public class BattleWindow : UIWindow
         _battleManager.OnRoundEnd += OnRoundEnd;
         _battleManager.OnBattleEnd += OnBattleEnd;
         _battleManager.OnBuffApplied += OnBuffApplied;
+        _battleManager.OnSkillExecuted += OnSkillExecuted;
         _battleManager.OnCurrentUnitChanged += OnCurrentUnitChanged;
         _battleManager.OnPlayerActionWaitChanged += OnPlayerActionWaitChanged;
         _battleManager.OnUnitListsChanged += OnUnitListsChanged;
@@ -196,6 +219,7 @@ public class BattleWindow : UIWindow
         _battleManager.OnRoundEnd -= OnRoundEnd;
         _battleManager.OnBattleEnd -= OnBattleEnd;
         _battleManager.OnBuffApplied -= OnBuffApplied;
+        _battleManager.OnSkillExecuted -= OnSkillExecuted;
         _battleManager.OnCurrentUnitChanged -= OnCurrentUnitChanged;
         _battleManager.OnPlayerActionWaitChanged -= OnPlayerActionWaitChanged;
         _battleManager.OnUnitListsChanged -= OnUnitListsChanged;
@@ -219,7 +243,7 @@ public class BattleWindow : UIWindow
     }
 
     /// <summary>
-    /// 玩家操作等待状态变化：进入等待 → 显示操作按钮并默认选中目标；结束 → 隐藏按钮并清理
+    /// 玩家操作等待状态变化：进入等待 → 显示操作按钮并在当前角色显示行动指示器；结束 → 隐藏按钮并清理
     /// </summary>
     private void OnPlayerActionWaitChanged(bool waiting)
     {
@@ -234,13 +258,20 @@ public class BattleWindow : UIWindow
             _currentCursorTarget = null;
             _isSelectingTarget = false;
             if (_stageManager != null)
+            {
                 _stageManager.ClearTargetSelection();
+                // 仅玩家可操作时在当前角色显示行动指示器
+                _stageManager.HighlightCurrentUnit(_currentUnit);
+            }
         }
         else
         {
             SetActionButtonsVisible(false);
             CloseAllSubPanels();
             CancelTargetSelection();
+            // 执行/不可操作时不显示行动指示器
+            if (_stageManager != null)
+                _stageManager.ClearHighlight();
         }
     }
 
@@ -266,8 +297,8 @@ public class BattleWindow : UIWindow
         if (_stageManager != null)
         {
             // 清除上一位被选中的目标标签
+            // 行动指示器不在此显示：改为仅玩家可操作时（OnPlayerActionWaitChanged(true)）显示
             _stageManager.ClearTargetSelection();
-            _stageManager.HighlightCurrentUnit(unit);
         }
     }
 
@@ -285,34 +316,84 @@ public class BattleWindow : UIWindow
         }
     }
 
-    private void OnDamageTaken(BattleUnit unit, int damage)
+    private void OnDamageTaken(BattleUnit actor, BattleUnit unit, int damage)
     {
         // 更新场景血条
         if (_stageManager != null)
             _stageManager.UpdateHealthBar(unit);
+        // 结果归入攻击方阵营：玩家方攻击结果在左，敌方攻击结果在右；日志具体到人
         if (logPanel != null)
-            logPanel.AddLog($"{GetUnitName(unit)} 受到 {damage} 点伤害");
+        {
+            var cell = actor != null && !actor.IsPlayerSide ? BattleLogCellType.Right : BattleLogCellType.Left;
+            if (actor != null)
+                logPanel.AddLog($"{GetUnitName(actor)} 对 {GetUnitName(unit)} 造成 {damage} 点伤害", cell);
+            else
+                logPanel.AddLog($"{GetUnitName(unit)} 受到 {damage} 点伤害", cell);
+        }
     }
 
-    private void OnHealed(BattleUnit unit, int amount)
+    private void OnHealed(BattleUnit actor, BattleUnit unit, int amount)
     {
         if (_stageManager != null)
             _stageManager.UpdateHealthBar(unit);
         if (logPanel != null)
-            logPanel.AddLog($"{GetUnitName(unit)} 恢复 {amount} 点生命");
+        {
+            var cell = actor != null && !actor.IsPlayerSide ? BattleLogCellType.Right : BattleLogCellType.Left;
+            if (actor != null && actor != unit)
+                logPanel.AddLog($"{GetUnitName(actor)} 为 {GetUnitName(unit)} 恢复 {amount} 点生命", cell);
+            else
+                logPanel.AddLog($"{GetUnitName(unit)} 恢复 {amount} 点生命", cell);
+        }
+    }
+
+    /// <summary> 行动记录：玩家/友方行动在左，敌方行动在右；目标具体到每个人 </summary>
+    private void OnSkillExecuted(BattleUnit actor, int skillId, List<BattleUnit> targets)
+    {
+        if (logPanel == null || actor == null) return;
+
+        string actorName = GetUnitName(actor);
+        string skillName = "普通攻击";
+        if (skillId > 0)
+        {
+            var skillCfg = _battleManager?.GetTables()?.TbSkill.GetOrDefault(skillId);
+            if (skillCfg != null) skillName = skillCfg.Name;
+        }
+
+        var cell = actor.IsPlayerSide ? BattleLogCellType.Left : BattleLogCellType.Right;
+        if (targets != null && targets.Count > 0)
+        {
+            var names = new List<string>();
+            foreach (var t in targets)
+            {
+                if (t != null && t.IsAlive)
+                    names.Add(GetUnitName(t));
+            }
+            string targetStr = names.Count > 0 ? string.Join("、", names) : "";
+            if (!string.IsNullOrEmpty(targetStr))
+                logPanel.AddLog($"{actorName} 使用 {skillName} 攻击 {targetStr}", cell);
+            else
+                logPanel.AddLog($"{actorName} 使用 {skillName}", cell);
+        }
+        else
+        {
+            logPanel.AddLog($"{actorName} 使用 {skillName}", cell);
+        }
     }
 
     private void OnBuffApplied(BattleUnit unit, int buffId, int param)
     {
+        // Buff/场地效果提示居中
         if (logPanel != null)
-            logPanel.AddLog($"{GetUnitName(unit)} 获得Buff({buffId})");
+            logPanel.AddLog($"{GetUnitName(unit)} 获得Buff({buffId})", BattleLogCellType.Middle);
     }
 
-    private void OnUnitDeath(BattleUnit unit)
+    private void OnUnitDeath(BattleUnit killer, BattleUnit unit)
     {
         if (_stageManager != null)
             _stageManager.UpdateHealthBar(unit);
-        if (logPanel != null) logPanel.AddDeathLog(GetUnitName(unit));
+        // 阵亡提示统一居中
+        if (logPanel != null)
+            logPanel.AddDeathLog(GetUnitName(unit), BattleLogCellType.Middle);
     }
 
     private void OnUnitTurnEnd(BattleUnit unit)
@@ -352,9 +433,9 @@ public class BattleWindow : UIWindow
         {
             switch (result)
             {
-                case BattleResult.Win: logPanel.AddLog("战斗胜利！"); break;
-                case BattleResult.Lose: logPanel.AddLog("战斗失败..."); break;
-                case BattleResult.Flee: logPanel.AddLog("成功逃跑！"); break;
+                case BattleResult.Win: logPanel.AddLog("战斗胜利！", BattleLogCellType.Middle); break;
+                case BattleResult.Lose: logPanel.AddLog("战斗失败...", BattleLogCellType.Middle); break;
+                case BattleResult.Flee: logPanel.AddLog("成功逃跑！", BattleLogCellType.Middle); break;
             }
         }
 
@@ -409,7 +490,7 @@ public class BattleWindow : UIWindow
         CloseAllSubPanels();
         if (skillPanel != null)
         {
-            skillPanel.Open(_battleManager, _currentUnit, OnSkillSelected);
+            skillPanel.Open(_battleManager, _currentUnit, OnSkillSelected, hoverDetail: ShowDetail);
             if (subPanelContainer != null) subPanelContainer.SetActive(true);
         }
     }
@@ -443,6 +524,24 @@ public class BattleWindow : UIWindow
     {
         if (!CanOperate()) return;
         _battleManager.PlayerDeferTurn();
+    }
+
+    /// <summary> 右上角逃跑 → 战斗按失败结算（能否逃跑由战斗配置 Canflee 决定） </summary>
+    private void OnRunClicked()
+    {
+        if (!CanOperate()) return;
+
+        // 战斗配置不可逃跑时给出提示，不执行逃跑
+        var cfg = _battleManager?.GetTables()?.TbBattle.GetOrDefault(_battleManager.BattleId);
+        if (cfg != null && !cfg.Canflee)
+        {
+            if (logPanel != null)
+                logPanel.AddLog("此战斗无法逃跑！", BattleLogCellType.Middle);
+            ShowToast("此战斗无法逃跑！");
+            return;
+        }
+
+        _battleManager.PlayerFlee();
     }
 
     private bool CanOperate()
@@ -715,12 +814,82 @@ public class BattleWindow : UIWindow
 
     #region UI控制
 
+    /// <summary>
+    /// 给目标按钮绑定悬浮显示描述（PointerEnter 显示，PointerExit 清空）
+    /// </summary>
+    private void BindHoverDetail(Component target, string enterText)
+    {
+        if (target == null) return;
+        var trigger = target.GetComponent<EventTrigger>() ?? target.gameObject.AddComponent<EventTrigger>();
+        trigger.triggers.Clear();
+
+        var enter = new EventTrigger.Entry { eventID = EventTriggerType.PointerEnter };
+        string text = enterText;
+        enter.callback.AddListener(_ => ShowDetail(text));
+        trigger.triggers.Add(enter);
+
+        var exit = new EventTrigger.Entry { eventID = EventTriggerType.PointerExit };
+        exit.callback.AddListener(_ => ClearDetail());
+        trigger.triggers.Add(exit);
+    }
+
+    /// <summary>
+    /// 绑定操作按钮（Toggle）：onValueChanged=true 时执行操作，执行后自动复位为未选中
+    /// </summary>
+    private void BindActionToggle(Toggle toggle, string detail, System.Action onClick)
+    {
+        if (toggle == null) return;
+
+        toggle.onValueChanged.AddListener(isOn =>
+        {
+            if (isOn) onClick();
+            // 点击即执行，执行后复位，避免 toggle 保持选中态
+            toggle.SetIsOnWithoutNotify(false);
+        });
+
+        BindHoverDetail(toggle, detail);
+    }
+
+    /// <summary>
+    /// 显示按钮/技能描述到 btnDetail（null 或空串则清空）
+    /// </summary>
+    public void ShowDetail(string text)
+    {
+        if (btnDetailText != null)
+            btnDetailText.text = string.IsNullOrEmpty(text) ? "" : text;
+    }
+
+    /// <summary>
+    /// 清空按钮/技能描述
+    /// </summary>
+    public void ClearDetail()
+    {
+        if (btnDetailText != null)
+            btnDetailText.text = "";
+    }
+
     private void SetActionButtonsVisible(bool visible)
     {
-        if (btnViolence != null) btnViolence.gameObject.SetActive(visible);
-        if (btnTalk != null) btnTalk.gameObject.SetActive(visible);
-        if (btnItem != null) btnItem.gameObject.SetActive(visible);
-        if (btnIdle != null) btnIdle.gameObject.SetActive(visible);
+        if (btnViolence != null)
+        {
+            btnViolence.gameObject.SetActive(visible);
+            if (!visible) btnViolence.SetIsOnWithoutNotify(false);
+        }
+        if (btnTalk != null)
+        {
+            btnTalk.gameObject.SetActive(visible);
+            if (!visible) btnTalk.SetIsOnWithoutNotify(false);
+        }
+        if (btnItem != null)
+        {
+            btnItem.gameObject.SetActive(visible);
+            if (!visible) btnItem.SetIsOnWithoutNotify(false);
+        }
+        if (btnIdle != null)
+        {
+            btnIdle.gameObject.SetActive(visible);
+            if (!visible) btnIdle.SetIsOnWithoutNotify(false);
+        }
     }
 
     private void CloseAllSubPanels()
@@ -729,6 +898,7 @@ public class BattleWindow : UIWindow
         if (itemPanel != null) itemPanel.Close();
         if (talkPanel != null) talkPanel.Close();
         if (subPanelContainer != null) subPanelContainer.SetActive(false);
+        ClearDetail();
     }
 
     /// <summary>

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 /// <summary>
@@ -54,18 +55,20 @@ public class BattleSkillPanel : BattleSubPanel
 
     private Action<int> _onSkillSelected;
     private Func<int, bool> _canUseOnTarget;
+    private Action<string> _onSkillHover;  // 技能悬浮回调（显示介绍到 btnDetail）
     private BattleUnit _unit;  // 打开面板时的当前单位（由上层事件缓存传入，不主动读取）
 
     /// <summary> 已创建的技能项（非冷却项，供目标有效性重算时刷新置灰与 interactable） </summary>
     private readonly List<(int skillId, Button btn, Image img, TextMeshProUGUI tmp)> _items = new List<(int, Button, Image, TextMeshProUGUI)>();
 
     public void Open(BattleManager battleManager, BattleUnit unit, Action<int> onSkillSelected,
-                     Func<int, bool> canUseOnTarget = null)
+                     Func<int, bool> canUseOnTarget = null, Action<string> hoverDetail = null)
     {
         base.Open(battleManager);
         _unit = unit;
         _onSkillSelected = onSkillSelected;
         _canUseOnTarget = canUseOnTarget;
+        _onSkillHover = hoverDetail;
         RefreshSkillList();
     }
 
@@ -124,7 +127,8 @@ public class BattleSkillPanel : BattleSubPanel
         int remainingAp = unit.CurrentActionPoints;
 
         // 添加普通攻击（固定消耗 1 行动点）
-        AddSkillItem(0, "普通攻击", false, IsInvalidForTarget(0) || remainingAp < 1);
+        AddSkillItem(0, "普通攻击", false, IsInvalidForTarget(0) || remainingAp < 1,
+            "普通攻击：基础打击，消耗 1 行动点");
 
         // 添加技能
         foreach (int skillId in unit.AvailableSkills)
@@ -139,9 +143,13 @@ public class BattleSkillPanel : BattleSubPanel
                 name += $" (冷却{cd})";
             }
 
+            string intro = skillCfg != null && !string.IsNullOrEmpty(skillCfg.Comment)
+                ? skillCfg.Comment
+                : $"技能：{name}";
+
             bool apNotEnough = skillCfg != null && remainingAp < skillCfg.Cost;
             AddSkillItem(skillId, name, onCooldown,
-                IsInvalidForTarget(skillId) || apNotEnough);
+                IsInvalidForTarget(skillId) || apNotEnough, intro);
         }
     }
 
@@ -151,7 +159,7 @@ public class BattleSkillPanel : BattleSubPanel
         return _canUseOnTarget != null && !_canUseOnTarget(skillId);
     }
 
-    private void AddSkillItem(int skillId, string name, bool disabled, bool invalidForTarget = false)
+    private void AddSkillItem(int skillId, string name, bool disabled, bool invalidForTarget = false, string intro = null)
     {
         var srcBtn = skillItemPrefab;
         bool srcIsScene = srcBtn != null && srcBtn.gameObject.scene.IsValid();
@@ -199,6 +207,20 @@ public class BattleSkillPanel : BattleSubPanel
             btn.interactable = !disabled;
             int capturedId = skillId;
             btn.onClick.AddListener(() => _onSkillSelected?.Invoke(capturedId));
+
+            // 悬浮显示技能介绍
+            if (_onSkillHover != null)
+            {
+                var trigger = btn.GetComponent<EventTrigger>() ?? btn.gameObject.AddComponent<EventTrigger>();
+                trigger.triggers.Clear();
+                string introText = intro ?? name;
+                var enter = new EventTrigger.Entry { eventID = EventTriggerType.PointerEnter };
+                enter.callback.AddListener(_ => _onSkillHover(introText));
+                trigger.triggers.Add(enter);
+                var exit = new EventTrigger.Entry { eventID = EventTriggerType.PointerExit };
+                exit.callback.AddListener(_ => _onSkillHover(null));
+                trigger.triggers.Add(exit);
+            }
         }
 
         // 目标有效性 → 显式设置颜色（有效恢复全色，无效置灰；不依赖模板原色）

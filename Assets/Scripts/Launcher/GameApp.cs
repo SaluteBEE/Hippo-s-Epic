@@ -483,6 +483,7 @@ public partial class GameApp : MonoBehaviour
                 var stageManager = FindObjectOfType<BattleStageManager>();
                 if (stageManager != null && BattleManager != null)
                 {
+                    stageManager.ApplyBackground(BattleManager.BattleId);
                     var allUnits = new List<BattleUnit>();
                     allUnits.AddRange(BattleManager.PlayerUnits);
                     allUnits.AddRange(BattleManager.EnemyUnits);
@@ -506,6 +507,7 @@ public partial class GameApp : MonoBehaviour
             var stageManager = FindObjectOfType<BattleStageManager>();
             if (stageManager != null && BattleManager != null)
             {
+                stageManager.ApplyBackground(BattleManager.BattleId);
                 var allUnits = new List<BattleUnit>();
                 allUnits.AddRange(BattleManager.PlayerUnits);
                 allUnits.AddRange(BattleManager.EnemyUnits);

@@ -44,6 +44,13 @@ public class BattleStageManager : MonoBehaviour
     [Tooltip("角色点击检测预制体（含 Collider2D），不拖则运行时动态创建 HitArea 子节点")]
     [SerializeField] private GameObject hitAreaPrefab;
 
+    [Header("背景")]
+    [Tooltip("战斗背景渲染器（不拖则自动查找子节点 bg）")]
+    [SerializeField] private SpriteRenderer backgroundRenderer;
+
+    [Tooltip("战斗背景图 Addressable 根目录")]
+    [SerializeField] private string backgroundRoot = "Assets/Art/Sprites/Battle/bg";
+
     #endregion
 
     #region 运行时数据
@@ -73,6 +80,7 @@ public class BattleStageManager : MonoBehaviour
     {
         _instance = this;
         AutoFindSlots();
+        AutoFindBackground();
 
         // 表现层总控（技能释放演出序列）
         if (GetComponent<BattlePresenter>() == null)
@@ -114,6 +122,68 @@ public class BattleStageManager : MonoBehaviour
                 for (int i = 0; i < root.childCount; i++)
                     enemySlots[i] = root.GetChild(i);
             }
+        }
+    }
+
+    /// <summary>
+    /// 自动查找背景节点（场景子节点 bg 上的 SpriteRenderer，Inspector 未手动赋值时调用）
+    /// </summary>
+    private void AutoFindBackground()
+    {
+        if (backgroundRenderer != null) return;
+        var bgTransform = transform.Find("bg");
+        if (bgTransform != null)
+            backgroundRenderer = bgTransform.GetComponent<SpriteRenderer>();
+    }
+
+    /// <summary>
+    /// 根据战斗配置动态加载背景图并设置到 bg 节点（Addressables）
+    /// </summary>
+    public void ApplyBackground(int battleId)
+    {
+        var tables = ManagerRegistry.GetTables<cfg.Tables>();
+        if (tables == null)
+        {
+            Debug.LogWarning("[BattleStageManager] Tables 未加载，无法应用战斗背景");
+            return;
+        }
+
+        var battleCfg = tables.TbBattle.GetOrDefault(battleId);
+        if (battleCfg == null || string.IsNullOrWhiteSpace(battleCfg.Bg))
+        {
+            Debug.LogWarning($"[BattleStageManager] 战斗配置无背景图: battleId={battleId}");
+            return;
+        }
+
+        AutoFindBackground();
+        StartCoroutine(LoadBackgroundCoroutine($"{backgroundRoot}/{battleCfg.Bg}"));
+    }
+
+    /// <summary>
+    /// 通过 Addressables 加载背景 Sprite 并赋值给背景节点
+    /// </summary>
+    private IEnumerator LoadBackgroundCoroutine(string address)
+    {
+        var handle = Addressables.LoadAssetAsync<Sprite>(address);
+        _loadHandles.Add(handle);
+        yield return handle;
+
+        if (handle.Status == AsyncOperationStatus.Succeeded && handle.Result != null)
+        {
+            if (backgroundRenderer == null) AutoFindBackground();
+            if (backgroundRenderer != null)
+            {
+                backgroundRenderer.sprite = handle.Result;
+                Debug.Log($"[BattleStageManager] 战斗背景加载完成: {address}");
+            }
+            else
+            {
+                Debug.LogWarning("[BattleStageManager] 未找到背景节点 bg，无法显示背景图");
+            }
+        }
+        else
+        {
+            Debug.LogWarning($"[BattleStageManager] 无法加载战斗背景图: {address}");
         }
     }
 

@@ -257,7 +257,7 @@ public class BattlePresenter : MonoBehaviour
 
     #region 死亡演出
 
-    private void OnUnitDeath(BattleUnit unit)
+    private void OnUnitDeath(BattleUnit killer, BattleUnit unit)
     {
         StartCoroutine(DeathRoutine(unit));
     }

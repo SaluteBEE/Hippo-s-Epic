@@ -243,6 +243,38 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3234445339721186285, guid: cee416f96dd202443bc72885fd0112a8, type: 3}
+      propertyPath: m_SortingLayer
+      value: -3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3234445339721186285, guid: cee416f96dd202443bc72885fd0112a8, type: 3}
+      propertyPath: m_SortingLayerID
+      value: 353928075
+      objectReference: {fileID: 0}
+    - target: {fileID: 7098213553269183169, guid: cee416f96dd202443bc72885fd0112a8, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7098213553269183169, guid: cee416f96dd202443bc72885fd0112a8, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7098213553269183169, guid: cee416f96dd202443bc72885fd0112a8, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7098213553269183169, guid: cee416f96dd202443bc72885fd0112a8, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.07
+      objectReference: {fileID: 0}
+    - target: {fileID: 7098213553269183169, guid: cee416f96dd202443bc72885fd0112a8, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7098213553269183169, guid: cee416f96dd202443bc72885fd0112a8, type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7530474131437242138, guid: cee416f96dd202443bc72885fd0112a8, type: 3}
       propertyPath: m_Name
       value: common_battle

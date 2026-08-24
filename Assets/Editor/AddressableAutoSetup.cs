@@ -24,6 +24,7 @@ public static class AddressableAutoSetup
     static readonly DirConfig[] _configs = new[]
     {
         new DirConfig { dir = "Assets/Art/Backgrounds", addressPrefix = "Assets/Art/Backgrounds", label = "background", filter = "t:Texture2D", forceSprite = false, groupName = null, excludeSubDir = null },
+        new DirConfig { dir = "Assets/Art/Sprites/Battle/bg", addressPrefix = "Assets/Art/Sprites/Battle/bg", label = "battle_bg", filter = "t:Texture2D", forceSprite = true, groupName = null, excludeSubDir = null },
         new DirConfig { dir = "Assets/Art/DialogImages", addressPrefix = "Assets/Art/DialogImages", label = null, filter = "t:Texture2D", forceSprite = false, groupName = null, excludeSubDir = null },
         new DirConfig { dir = "Assets/Art/Sprites/UI/Item", addressPrefix = "Assets/Art/Sprites/UI/Item", label = "icon", filter = "t:Texture2D", forceSprite = true, groupName = null, excludeSubDir = null },
         new DirConfig { dir = "Assets/Art/Sprites/Head", addressPrefix = "Assets/Art/Sprites/Head", label = "avatar", filter = "t:Texture2D", forceSprite = true, groupName = null, excludeSubDir = null },

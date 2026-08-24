@@ -31,7 +31,8 @@
     "expreward": 10,
     "currencyreward": 5,
     "canflee": true,
-    "comment": "3v3多人测试战斗(河马+教练)"
+    "comment": "3v3多人测试战斗(河马+教练)",
+    "bg": "default"
   },
   {
     "id": 2,
@@ -66,6 +67,7 @@
     "expreward": 20,
     "currencyreward": 10,
     "canflee": false,
-    "comment": "1v2测试战斗"
+    "comment": "1v2测试战斗",
+    "bg": "default"
   }
 ]

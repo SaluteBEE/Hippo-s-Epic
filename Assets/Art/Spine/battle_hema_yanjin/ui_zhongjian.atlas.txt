@@ -1,0 +1,76 @@
+
+ui_zhongjian.png
+size: 369,502
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+bizi
+  rotate: true
+  xy: 266, 177
+  size: 175, 101
+  orig: 175, 101
+  offset: 0, 0
+  index: -1
+lshouh
+  rotate: true
+  xy: 266, 133
+  size: 42, 85
+  orig: 42, 85
+  offset: 0, 0
+  index: -1
+lshouz
+  rotate: false
+  xy: 201, 5
+  size: 161, 60
+  orig: 161, 60
+  offset: 0, 0
+  index: -1
+lyan
+  rotate: false
+  xy: 232, 342
+  size: 10, 10
+  orig: 10, 10
+  offset: 0, 0
+  index: -1
+rshou
+  rotate: true
+  xy: 232, 354
+  size: 146, 124
+  orig: 146, 124
+  offset: 0, 0
+  index: -1
+ryan
+  rotate: false
+  xy: 232, 330
+  size: 10, 10
+  orig: 10, 10
+  offset: 0, 0
+  index: -1
+shouzhi
+  rotate: false
+  xy: 266, 84
+  size: 53, 47
+  orig: 53, 47
+  offset: 0, 0
+  index: -1
+st
+  rotate: false
+  xy: 2, 263
+  size: 228, 237
+  orig: 228, 237
+  offset: 0, 0
+  index: -1
+tou
+  rotate: false
+  xy: 2, 67
+  size: 262, 194
+  orig: 262, 194
+  offset: 0, 0
+  index: -1
+zui
+  rotate: false
+  xy: 2, 2
+  size: 197, 63
+  orig: 197, 63
+  offset: 0, 0
+  index: -1

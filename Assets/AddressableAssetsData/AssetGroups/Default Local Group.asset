@@ -246,11 +246,11 @@ MonoBehaviour:
     m_SerializedLabels:
     - ui_prefab
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: e26a95a942b26764d86e2d40f4f0790c
-    m_Address: Assets/Prefabs/UI/Battle/BattleLogEntry
+  - m_GUID: 89ddf4a3ddd117f4f93d58fec9ad4886
+    m_Address: Assets/Art/Sprites/Battle/bg/default
     m_ReadOnly: 0
     m_SerializedLabels:
-    - ui_prefab
+    - battle_bg
     FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: dd90b6ecff8020e40aa537a3ddf43594, type: 2}

@@ -142,12 +142,12 @@ public class BattleEventQueue
 
             case BattleEventType.ApplyDamage:
                 if (evt.TargetUnit != null && evt.TargetUnit.IsAlive)
-                    _battle.ApplyDamage(evt.TargetUnit, evt.Param1);
+                    _battle.ApplyDamage(null, evt.TargetUnit, evt.Param1);
                 break;
 
             case BattleEventType.ApplyHeal:
                 if (evt.TargetUnit != null && evt.TargetUnit.IsAlive)
-                    _battle.ApplyHeal(evt.TargetUnit, evt.Param1);
+                    _battle.ApplyHeal(null, evt.TargetUnit, evt.Param1);
                 break;
 
             case BattleEventType.ApplyBuff:

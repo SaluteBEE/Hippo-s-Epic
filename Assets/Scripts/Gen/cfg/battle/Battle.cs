@@ -25,6 +25,7 @@ public sealed partial class Battle : Luban.BeanBase
         Currencyreward = _buf.ReadInt();
         Canflee = _buf.ReadBool();
         Comment = _buf.ReadString();
+        Bg = _buf.ReadString();
     }
 
     public static Battle DeserializeBattle(ByteBuf _buf)
@@ -69,6 +70,10 @@ public sealed partial class Battle : Luban.BeanBase
     /// 备注
     /// </summary>
     public readonly string Comment;
+    /// <summary>
+    /// 战斗背景图(Addressable资源名)
+    /// </summary>
+    public readonly string Bg;
    
     public const int __ID__ = -1332539708;
     public override int GetTypeId() => __ID__;
@@ -92,6 +97,7 @@ public sealed partial class Battle : Luban.BeanBase
         + "currencyreward:" + Currencyreward + ","
         + "canflee:" + Canflee + ","
         + "comment:" + Comment + ","
+        + "bg:" + Bg + ","
         + "}";
     }
 }
