@@ -115,5 +115,31 @@
     "func": [],
     "param1": "11",
     "battletip": "又遇到猫了？没问题！遇到狗了？没问题！遇到变异动物了？那更没问题了！我们天生就是他妈干这个的！马上到那野狗楼下！我爱生活！\\n战斗中为你解决字面意义上的野狗敌人"
+  },
+  {
+    "id": 12,
+    "type": 6,
+    "childtype": 0,
+    "name": "鞭炮",
+    "icon": 2,
+    "price": 0,
+    "stackable": false,
+    "tip": "爆炸！爆炸！",
+    "func": [],
+    "param1": "11",
+    "battletip": "炸毁一切！\\n炸掉敌人10点生命值"
+  },
+  {
+    "id": 13,
+    "type": 6,
+    "childtype": 0,
+    "name": "绷带",
+    "icon": 2,
+    "price": 0,
+    "stackable": false,
+    "tip": "治疗！治疗！",
+    "func": [],
+    "param1": "11",
+    "battletip": "包扎伤口\\n为选中的友方单位回复10点生命值"
   }
 ]
