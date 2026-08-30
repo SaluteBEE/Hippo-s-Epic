@@ -23,7 +23,7 @@
       "homo_talk",
       "homo_move"
     ],
-    "avatar": "avatar_hippo",
+    "avatar": "",
     "speed": 5,
     "skills": [
       1,
@@ -57,7 +57,7 @@
     "animconfigs": [
       "coach"
     ],
-    "avatar": "avatar_coach",
+    "avatar": "",
     "speed": 5,
     "skills": [
       4,
@@ -86,7 +86,7 @@
     "animconfigs": [
       "quanwang_bk"
     ],
-    "avatar": "avatar_quanwang",
+    "avatar": "",
     "speed": 5,
     "skills": [
       4,
@@ -116,7 +116,7 @@
       "light_talk",
       "light_scene"
     ],
-    "avatar": "avatar_mob1",
+    "avatar": "",
     "speed": 5,
     "skills": []
   },
