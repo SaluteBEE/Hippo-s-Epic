@@ -22,7 +22,7 @@
   {
     "id": 2,
     "name": "厚脸皮",
-    "icon": 2,
+    "icon": 1,
     "cost": 1,
     "buffid": 23,
     "skilltype": 0,
@@ -42,7 +42,7 @@
   {
     "id": 3,
     "name": "意志之力",
-    "icon": 3,
+    "icon": 1,
     "cost": 2,
     "buffid": 26,
     "skilltype": 0,
@@ -62,7 +62,7 @@
   {
     "id": 4,
     "name": "铁拳头",
-    "icon": 3,
+    "icon": 1,
     "cost": 2,
     "buffid": 0,
     "skilltype": 2,
@@ -82,7 +82,7 @@
   {
     "id": 5,
     "name": "踢睾丸",
-    "icon": 4,
+    "icon": 1,
     "cost": 2,
     "buffid": 0,
     "skilltype": 2,
@@ -102,7 +102,7 @@
   {
     "id": 6,
     "name": "升龙拳",
-    "icon": 5,
+    "icon": 1,
     "cost": 2,
     "buffid": 0,
     "skilltype": 2,
