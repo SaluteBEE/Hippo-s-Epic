@@ -26,6 +26,7 @@ public sealed partial class Item : Luban.BeanBase
         Tip = _buf.ReadString();
         {int n0 = _buf.ReadSize(); Func = new System.Collections.Generic.List<int>(n0);for(var i0 = 0 ; i0 < n0 ; i0++) { int _e0;  _e0 = _buf.ReadInt(); Func.Add(_e0);}}
         Param1 = _buf.ReadString();
+        Battletip = _buf.ReadString();
     }
 
     public static Item DeserializeItem(ByteBuf _buf)
@@ -73,6 +74,10 @@ public sealed partial class Item : Luban.BeanBase
     /// 参数1
     /// </summary>
     public readonly string Param1;
+    /// <summary>
+    /// 物品战斗使用时详情
+    /// </summary>
+    public readonly string Battletip;
    
     public const int __ID__ = -1740355548;
     public override int GetTypeId() => __ID__;
@@ -94,6 +99,7 @@ public sealed partial class Item : Luban.BeanBase
         + "tip:" + Tip + ","
         + "func:" + Luban.StringUtil.CollectionToString(Func) + ","
         + "param1:" + Param1 + ","
+        + "battletip:" + Battletip + ","
         + "}";
     }
 }

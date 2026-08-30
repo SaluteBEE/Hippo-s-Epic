@@ -2,7 +2,10 @@ using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
+using UnityEngine.AddressableAssets.ResourceLocators;
 using UnityEngine.EventSystems;
+using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.UI;
 
 /// <summary>
@@ -51,25 +54,51 @@ public class BattleSkillPanel : BattleSubPanel
 {
     [Header("技能列表")]
     [SerializeField] private Transform skillContainer;
-    [SerializeField] private Button skillItemPrefab;
+    [SerializeField] private GameObject skillItemPrefab;
+
+    [Header("技能图标")]
+    [Tooltip("技能图标加载地址格式，{0} 为技能表 Icon 字段；找不到地址时保留模板默认图标")]
+    [SerializeField] private string skillIconPathFormat = "Assets/Art/Sprites/UI/Skill/{0}";
 
     private Action<int> _onSkillSelected;
     private Func<int, bool> _canUseOnTarget;
-    private Action<string> _onSkillHover;  // 技能悬浮回调（显示介绍到 btnDetail）
     private BattleUnit _unit;  // 打开面板时的当前单位（由上层事件缓存传入，不主动读取）
 
     /// <summary> 已创建的技能项（非冷却项，供目标有效性重算时刷新置灰与 interactable） </summary>
-    private readonly List<(int skillId, Button btn, Image img, TextMeshProUGUI tmp)> _items = new List<(int, Button, Image, TextMeshProUGUI)>();
+    private readonly List<(int skillId, Button btn, Image bgImg, TextMeshProUGUI nameTmp, TextMeshProUGUI detailTmp)> _items =
+        new List<(int, Button, Image, TextMeshProUGUI, TextMeshProUGUI)>();
+
+    /// <summary>
+    /// 初始化兜底：skillItemPrefab 未拖引用时，取容器内第一个子对象作为模板；
+    /// 若模板是场景实例则隐藏，避免其残留在列表里（Project 资产不隐藏）
+    /// </summary>
+    protected override void Awake()
+    {
+        base.Awake();
+        if (skillItemPrefab == null && skillContainer != null && skillContainer.childCount > 0)
+            skillItemPrefab = skillContainer.GetChild(0).gameObject;
+
+        if (skillItemPrefab != null && skillItemPrefab.scene.IsValid())
+            skillItemPrefab.SetActive(false);
+    }
 
     public void Open(BattleManager battleManager, BattleUnit unit, Action<int> onSkillSelected,
-                     Func<int, bool> canUseOnTarget = null, Action<string> hoverDetail = null)
+                     Func<int, bool> canUseOnTarget = null)
     {
+        Debug.Log($"[BattleSkillPanel] Open: unit={unit} 面板activeSelf={panelRoot != null && panelRoot.activeSelf} " +
+                  $"canUseOnTarget={(canUseOnTarget != null ? "有" : "无")}");
         base.Open(battleManager);
         _unit = unit;
         _onSkillSelected = onSkillSelected;
         _canUseOnTarget = canUseOnTarget;
-        _onSkillHover = hoverDetail;
         RefreshSkillList();
+    }
+
+    public override void Close()
+    {
+        Debug.Log($"[BattleSkillPanel] Close: 面板activeSelf={panelRoot != null && panelRoot.activeSelf} " +
+                  $"container={skillContainer} childCount={skillContainer?.childCount}");
+        base.Close();
     }
 
     /// <summary>
@@ -82,7 +111,7 @@ public class BattleSkillPanel : BattleSubPanel
 
         int remainingAp = _unit.CurrentActionPoints;
 
-        foreach (var (skillId, btn, img, tmp) in _items)
+        foreach (var (skillId, btn, bgImg, nameTmp, detailTmp) in _items)
         {
             bool invalid = IsInvalidForTarget(skillId);
 
@@ -99,8 +128,9 @@ public class BattleSkillPanel : BattleSubPanel
             }
 
             float a = invalid ? 0.45f : 1.00f;
-            if (img != null) img.color = new Color(img.color.r, img.color.g, img.color.b, a);
-            if (tmp != null) tmp.color = new Color(tmp.color.r, tmp.color.g, tmp.color.b, a);
+            if (bgImg != null) bgImg.color = new Color(bgImg.color.r, bgImg.color.g, bgImg.color.b, a);
+            if (nameTmp != null) nameTmp.color = new Color(nameTmp.color.r, nameTmp.color.g, nameTmp.color.b, a);
+            if (detailTmp != null) detailTmp.color = new Color(detailTmp.color.r, detailTmp.color.g, detailTmp.color.b, a);
         }
     }
 
@@ -115,9 +145,20 @@ public class BattleSkillPanel : BattleSubPanel
         if (skillContainer == null || skillItemPrefab == null) return;
         if (_battleManager == null || _unit == null) return;
 
-        // 清空旧列表
+        // 清空旧列表（保留模板本身，模板可能是容器内被隐藏的场景对象）
+        Debug.Log($"[BattleSkillPanel] 清空前: container={skillContainer.name} childCount={skillContainer.childCount} " +
+                  $"模板引用有效={skillItemPrefab != null} 模板transform={skillItemPrefab?.transform}");
         foreach (Transform child in skillContainer)
+        {
+            if (skillItemPrefab != null && child == skillItemPrefab.transform)
+            {
+                Debug.Log($"[BattleSkillPanel] 清理跳过模板: {child.name}");
+                continue;
+            }
+            Debug.Log($"[BattleSkillPanel] 清理销毁: {child.name} activeInHierarchy={child.gameObject.activeInHierarchy}");
+            child.gameObject.SetActive(false);  // 先隐藏，避免销毁延迟期间遮挡新项
             Destroy(child.gameObject);
+        }
         _items.Clear();
 
         var unit = _unit;
@@ -149,7 +190,16 @@ public class BattleSkillPanel : BattleSubPanel
 
             bool apNotEnough = skillCfg != null && remainingAp < skillCfg.Cost;
             AddSkillItem(skillId, name, onCooldown,
-                IsInvalidForTarget(skillId) || apNotEnough, intro);
+                IsInvalidForTarget(skillId) || apNotEnough, intro, skillCfg?.Icon ?? 0);
+        }
+
+        // 重置滚动位置到顶部，避免关闭再打开时 Content 残留上次滚动位置导致技能项错位/点不到
+        var scrollRect = skillContainer.GetComponentInParent<ScrollRect>();
+        if (scrollRect != null)
+        {
+            Canvas.ForceUpdateCanvases();
+            scrollRect.verticalNormalizedPosition = 1f;
+            scrollRect.horizontalNormalizedPosition = 0f;
         }
     }
 
@@ -159,113 +209,116 @@ public class BattleSkillPanel : BattleSubPanel
         return _canUseOnTarget != null && !_canUseOnTarget(skillId);
     }
 
-    private void AddSkillItem(int skillId, string name, bool disabled, bool invalidForTarget = false, string intro = null)
+    private void AddSkillItem(int skillId, string name, bool disabled, bool invalidForTarget = false, string intro = null, int iconId = 0)
     {
-        var srcBtn = skillItemPrefab;
-        bool srcIsScene = srcBtn != null && srcBtn.gameObject.scene.IsValid();
-        Debug.Log($"[BattleSkillPanel][{name}] 源模板: " +
-                  $"skillItemPrefab={(srcBtn ? "非空" : "NULL")} " +
-                  $"srcIsSceneInstance={srcIsScene} " +
-                  $"btnEnabled={srcBtn?.enabled} btnInteractable={srcBtn?.interactable} " +
-                  $"goActive={srcBtn != null && srcBtn.gameObject.activeSelf}");
-
-        var go = Instantiate(skillItemPrefab.gameObject, skillContainer);
+        var go = Instantiate(skillItemPrefab, skillContainer);
         go.SetActive(true);
 
-        // skillItemPrefab 作为模板时组件可能是 disabled，克隆后需显式启用，
-        // 否则 SetActive 只会激活 GameObject，disable 的组件仍不工作
-        var imgMore = go.GetComponentInChildren<Image>();
-        if (imgMore != null) imgMore.enabled = true;
+        // 模板组件可能是 disabled，克隆后需显式启用，否则 SetActive 不会激活 disable 的组件
+        var bg = go.transform.Find("bg");
+        var icon = go.transform.Find("icon");
+        var nameGo = go.transform.Find("skill_name");
+        var detailGo = go.transform.Find("skill_detail");
 
-        var btnMore = go.GetComponent<Button>();
-        if (btnMore != null) btnMore.enabled = true;
+        foreach (var g in new[] { bg, icon, nameGo, detailGo })
+        {
+            if (g == null) continue;
+            foreach (var c in g.GetComponents<Behaviour>())
+                c.enabled = true;
+        }
 
-        var tmp = go.GetComponentInChildren<TextMeshProUGUI>();
-        if (tmp != null) tmp.enabled = true;
-        if (tmp != null) tmp.text = name;
+        var bgImg = bg != null ? bg.GetComponent<Image>() : null;
+        var btn = bg != null ? bg.GetComponent<Button>() : null;
+        var nameTmp = nameGo != null ? nameGo.GetComponent<TextMeshProUGUI>() : null;
+        var detailTmp = detailGo != null ? detailGo.GetComponent<TextMeshProUGUI>() : null;
+        var iconImg = icon != null ? icon.GetComponent<Image>() : null;
 
-        var btn = go.GetComponent<Button>();
-        var grid = go.GetComponentInParent<GridLayoutGroup>();
-        var contentFitter = go.GetComponentInParent<ContentSizeFitter>();
+        if (nameTmp != null) nameTmp.text = name;
+        if (detailTmp != null) detailTmp.text = intro ?? name;
+        if (iconImg != null)
+        {
+            if (iconId > 0)
+                LoadIcon(iconImg, iconId);  // 有图标配置时动态加载
+            else
+                iconImg.gameObject.SetActive(false);  // 无图标配置时隐藏
+        }
 
-        Debug.Log($"[BattleSkillPanel][{name}] 实例化即时: " +
-                  $"goActiveSelf={go.activeSelf} goActiveInHierarchy={go.activeInHierarchy} " +
-                  $"btn={btn} btnEnabled={btn?.enabled} btnInteractable={btn?.interactable} " +
-                  $"tmp={tmp} tmpEnabled={tmp?.enabled} tmpActiveInHierarchy={(tmp != null ? tmp.gameObject.activeInHierarchy : false)} " +
-                  $"iconImage={go.GetComponentInChildren<Image>()?.gameObject.name} " +
-                  $"grid={grid} gridEnabled={grid?.enabled} gridActive={(grid != null && grid.gameObject.activeInHierarchy)} " +
-                  $"fitter={contentFitter} fitterEnabled={contentFitter?.enabled}");
-
-        if (isActiveAndEnabled)
-            StartCoroutine(LogFinalState(skillId, name, go));
-        else
-            LogItemState(skillId, name, go, "自检(宿主未激活,无下一帧)");
+        // 文本/图标设为不拦截点击，确保点击穿透到 bg 的 Button（否则命中文字区域时 onClick 不触发）
+        if (iconImg != null) iconImg.raycastTarget = false;
+        if (nameTmp != null) nameTmp.raycastTarget = false;
+        if (detailTmp != null) detailTmp.raycastTarget = false;
 
         if (btn != null)
         {
-            // 仅冷却禁用；行动点不足只置灰颜色仍可点，点击后由 OnSkillSelected 提示原因
-            btn.interactable = !disabled;
+            // 所有技能项均可点击（含冷却/置灰），点击后由 OnSkillSelected 判断并提示不可用原因
+            btn.interactable = true;
             int capturedId = skillId;
-            btn.onClick.AddListener(() => _onSkillSelected?.Invoke(capturedId));
-
-            // 悬浮显示技能介绍
-            if (_onSkillHover != null)
+            btn.onClick.AddListener(() =>
             {
-                var trigger = btn.GetComponent<EventTrigger>() ?? btn.gameObject.AddComponent<EventTrigger>();
-                trigger.triggers.Clear();
-                string introText = intro ?? name;
-                var enter = new EventTrigger.Entry { eventID = EventTriggerType.PointerEnter };
-                enter.callback.AddListener(_ => _onSkillHover(introText));
-                trigger.triggers.Add(enter);
-                var exit = new EventTrigger.Entry { eventID = EventTriggerType.PointerExit };
-                exit.callback.AddListener(_ => _onSkillHover(null));
-                trigger.triggers.Add(exit);
-            }
+                Debug.Log($"[BattleSkillPanel] 点击技能项: skillId={capturedId} " +
+                          $"按钮activeInHierarchy={btn.gameObject.activeInHierarchy} " +
+                          $"_onSkillSelected={( _onSkillSelected != null ? "已绑定" : "为空")}");
+                _onSkillSelected?.Invoke(capturedId);
+            });
         }
 
-        // 目标有效性 → 显式设置颜色（有效恢复全色，无效置灰；不依赖模板原色）
-        // 注意: 模板根 Image 可能本身 alpha=0.45, 因此有效时必须显式设回 1.00
-        var baseImg = go.GetComponent<Image>();
-        var baseTmp = go.GetComponentInChildren<TextMeshProUGUI>();
+        // 置灰视觉：冷却 或 目标无效/行动点不足 → alpha 0.45；有效恢复全色（不依赖模板原色）
+        float a = (disabled || invalidForTarget) ? 0.45f : 1.00f;
+        if (bgImg != null)
+            bgImg.color = new Color(bgImg.color.r, bgImg.color.g, bgImg.color.b, a);
+        if (nameTmp != null)
+            nameTmp.color = new Color(nameTmp.color.r, nameTmp.color.g, nameTmp.color.b, a);
+        if (detailTmp != null)
+            detailTmp.color = new Color(detailTmp.color.r, detailTmp.color.g, detailTmp.color.b, a);
+
+        // 非冷却项记录，供目标切换后 RefreshInvalidState 重算置灰与 interactable
         if (!disabled)
         {
-            // 记录非冷却项，供目标切换后 RefreshInvalidState 重算置灰与 interactable
-            _items.Add((skillId, btn, baseImg, baseTmp));
-
-            float a = invalidForTarget ? 0.45f : 1.00f;
-            if (baseImg != null)
-                baseImg.color = new Color(baseImg.color.r, baseImg.color.g, baseImg.color.b, a);
-            if (baseTmp != null)
-                baseTmp.color = new Color(baseTmp.color.r, baseTmp.color.g, baseTmp.color.b, a);
+            _items.Add((skillId, btn, bgImg, nameTmp, detailTmp));
         }
+
+        Debug.Log($"[BattleSkillPanel][{name}] 已创建: " +
+                  $"btn={btn} btnEnabled={btn?.enabled} btnInteractable={btn?.interactable} " +
+                  $"nameTmp={nameTmp} detailTmp={detailTmp} bgImg={bgImg}");
+    }
+
+    /// <summary> 检查 Addressable 是否存在该地址（不存在则静默跳过，避免 LoadAsset 报错） </summary>
+    private static bool KeyExists(object key)
+    {
+        foreach (IResourceLocator locator in Addressables.ResourceLocators)
+        {
+            if (locator.Locate(key, typeof(UnityEngine.Object), out _))
+                return true;
+        }
+        return false;
     }
 
     /// <summary>
-    /// 等一帧再打印一次终态，暴露是否有组件在实例化后的帧里被禁用
+    /// 异步加载技能图标到 icon；配置的图标资源不存在时隐藏 icon
     /// </summary>
-    private System.Collections.IEnumerator LogFinalState(int skillId, string name, GameObject go)
+    private void LoadIcon(Image target, int iconId)
     {
-        yield return null;
-        if (go == null) yield break;
-        LogItemState(skillId, name, go, "下一帧终态");
-    }
+        string address = string.Format(skillIconPathFormat, iconId);
+        if (!KeyExists(address))
+        {
+            target.gameObject.SetActive(false);  // 图标地址不存在 → 隐藏
+            return;
+        }
 
-    /// <summary>
-    /// 打印技能项的当前组件/激活状态
-    /// </summary>
-    private void LogItemState(int skillId, string name, GameObject go, string stage)
-    {
-        if (go == null) return;
-
-        var btn = go.GetComponent<Button>();
-        var tmp = go.GetComponentInChildren<TextMeshProUGUI>();
-        var image = go.GetComponentInChildren<Image>();
-        var grid = go.GetComponentInParent<GridLayoutGroup>();
-        Debug.Log($"[BattleSkillPanel][{name}] {stage}: " +
-                  $"goActiveInHierarchy={go.activeInHierarchy} " +
-                  $"btnEnabled={btn?.enabled} btnInteractable={btn?.interactable} " +
-                  $"tmpEnabled={tmp?.enabled} tmpActive={(tmp != null && tmp.gameObject.activeInHierarchy)} " +
-                  $"imageEnabled={image?.enabled} imageActive={(image != null && image.gameObject.activeInHierarchy)} " +
-                  $"gridEnabled={grid?.enabled} gridActive={(grid != null && grid.gameObject.activeInHierarchy)}");
+        var handle = Addressables.LoadAssetAsync<Sprite>(address);
+        handle.Completed += op =>
+        {
+            if (op.Status == AsyncOperationStatus.Succeeded && target != null)
+            {
+                target.sprite = op.Result;
+            }
+            else
+            {
+                if (target != null)
+                    target.gameObject.SetActive(false);  // 加载失败 → 隐藏 icon
+                if (op.IsValid())
+                    Addressables.Release(op);
+            }
+        };
     }
 }

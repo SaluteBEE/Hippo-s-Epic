@@ -65,6 +65,9 @@ public class BattleWindow : UIWindow
     private TextMeshProUGUI _toastText;
     private Coroutine _toastCoroutine;
 
+    // 当前打开子面板的功能描述（btnDetail 常驻显示；悬浮其它功能临时覆盖，移出后恢复）
+    private string _currentPanelDetail;
+
     // ---- 事件推送缓存（严格 MVC：只由事件更新，不主动读取战斗状态）----
     private BattleUnit _currentUnit;
     private bool _isWaitingForPlayerAction;
@@ -490,8 +493,12 @@ public class BattleWindow : UIWindow
         CloseAllSubPanels();
         if (skillPanel != null)
         {
-            skillPanel.Open(_battleManager, _currentUnit, OnSkillSelected, hoverDetail: ShowDetail);
+            _currentPanelDetail = DetailViolence;
+            skillPanel.Open(_battleManager, _currentUnit, OnSkillSelected);
+            ShowDetail(_currentPanelDetail);
             if (subPanelContainer != null) subPanelContainer.SetActive(true);
+            if (btnViolence != null) btnViolence.SetIsOnWithoutNotify(true);
+            ShowActionHighlight(btnViolence);
         }
     }
 
@@ -502,8 +509,12 @@ public class BattleWindow : UIWindow
         CloseAllSubPanels();
         if (talkPanel != null)
         {
+            _currentPanelDetail = DetailTalk;
             talkPanel.Open(_battleManager, OnTalkSelected);
+            ShowDetail(_currentPanelDetail);
             if (subPanelContainer != null) subPanelContainer.SetActive(true);
+            if (btnTalk != null) btnTalk.SetIsOnWithoutNotify(true);
+            ShowActionHighlight(btnTalk);
         }
     }
 
@@ -514,16 +525,26 @@ public class BattleWindow : UIWindow
         CloseAllSubPanels();
         if (itemPanel != null)
         {
+            _currentPanelDetail = DetailItem;
             itemPanel.Open(_battleManager, OnItemSelected);
+            ShowDetail(_currentPanelDetail);
             if (subPanelContainer != null) subPanelContainer.SetActive(true);
+            if (btnItem != null) btnItem.SetIsOnWithoutNotify(true);
+            ShowActionHighlight(btnItem);
         }
     }
 
-    /// <summary> 正在发呆 → 后移回合（排到队尾，下一位先行） </summary>
+    /// <summary> 正在发呆 → 后移回合（排到队尾，下一位先行）；直接行动，不保持常亮 </summary>
     private void OnIdleClicked()
     {
-        if (!CanOperate()) return;
+        if (!CanOperate())
+        {
+            if (btnIdle != null) btnIdle.SetIsOnWithoutNotify(false);
+            return;
+        }
+        CloseAllSubPanels();
         _battleManager.PlayerDeferTurn();
+        if (btnIdle != null) btnIdle.SetIsOnWithoutNotify(false);
     }
 
     /// <summary> 右上角逃跑 → 战斗按失败结算（能否逃跑由战斗配置 Canflee 决定） </summary>
@@ -558,11 +579,15 @@ public class BattleWindow : UIWindow
     private void OnSkillSelected(int skillId)
     {
         _selectedSkillId = skillId;
+        Debug.Log($"[BattleWindow] OnSkillSelected: skillId={skillId} _currentUnit={_currentUnit} " +
+                  $"冷却={skillId > 0 && _currentUnit != null && _currentUnit.IsSkillOnCooldown(skillId)} " +
+                  $"剩余AP={_currentUnit?.CurrentActionPoints}");
 
         // 冷却中：给出提示，面板保持打开
         if (skillId > 0 && _currentUnit != null && _currentUnit.IsSkillOnCooldown(skillId))
         {
             _currentUnit.SkillCooldowns.TryGetValue(skillId, out int cd);
+            Debug.Log($"[BattleWindow] 冷却中分支: cd={cd}");
             if (logPanel != null)
                 logPanel.AddLog($"技能冷却中，还需{cd}回合");
             ShowToast($"技能冷却中，还需{cd}回合");
@@ -580,6 +605,7 @@ public class BattleWindow : UIWindow
             }
             if (_currentUnit.CurrentActionPoints < apCost)
             {
+                Debug.Log($"[BattleWindow] 行动点不足分支: 需要{apCost} 剩余{_currentUnit.CurrentActionPoints}");
                 if (logPanel != null)
                     logPanel.AddLog($"行动点不足，无法使用（需要{apCost}点）");
                 ShowToast($"行动点不足，无法使用（需要{apCost}点）");
@@ -594,12 +620,14 @@ public class BattleWindow : UIWindow
             if (skillCfg != null && (TargetType)skillCfg.Targettype == TargetType.Self
                 && _currentUnit != null)
             {
+                Debug.Log($"[BattleWindow] Self技能分支: skillId={skillId} 直接释放");
                 CloseAllSubPanels();
                 _battleManager.PlayerUseSkill(skillId, _currentUnit.SlotIndex);
                 return;
             }
         }
 
+        Debug.Log($"[BattleWindow] 进入目标选择");
         // 先选技能 → 进入目标选择模式（再选目标）
         StartTargetSelection();
     }
@@ -626,12 +654,11 @@ public class BattleWindow : UIWindow
 
     private void StartTargetSelection()
     {
-        // 关闭技能面板（已选技能，现在进入选目标）
-        if (skillPanel != null) skillPanel.Close();
-        if (subPanelContainer != null) subPanelContainer.SetActive(false);
-
-        // 默认选中第一个有效目标
+        // 先检查有无有效目标；无则提示并保持面板打开（可反复点击提示原因）
         var defaultTarget = FindDefaultTarget();
+        Debug.Log($"[BattleWindow] StartTargetSelection: _selectedSkillId={_selectedSkillId} " +
+                  $"默认目标={(defaultTarget != null ? GetUnitName(defaultTarget) : "NULL")} " +
+                  $"有效目标数={GetValidTargets().Count}");
         if (defaultTarget == null)
         {
             if (logPanel != null)
@@ -639,6 +666,12 @@ public class BattleWindow : UIWindow
             ShowToast("无有效目标，无法释放该技能");
             return;
         }
+
+        // 关闭技能面板（已选技能，现在进入选目标）
+        if (skillPanel != null) skillPanel.Close();
+        if (subPanelContainer != null) subPanelContainer.SetActive(false);
+        _currentPanelDetail = null;
+        ClearDetail();
 
         _isSelectingTarget = true;
         _currentCursorTarget = defaultTarget;
@@ -815,7 +848,7 @@ public class BattleWindow : UIWindow
     #region UI控制
 
     /// <summary>
-    /// 给目标按钮绑定悬浮显示描述（PointerEnter 显示，PointerExit 清空）
+    /// 给目标按钮绑定悬浮显示描述（PointerEnter 显示，PointerExit 恢复当前面板描述）
     /// </summary>
     private void BindHoverDetail(Component target, string enterText)
     {
@@ -828,23 +861,34 @@ public class BattleWindow : UIWindow
         enter.callback.AddListener(_ => ShowDetail(text));
         trigger.triggers.Add(enter);
 
+        // 移出时恢复当前打开子面板的功能描述（无面板打开则清空）
         var exit = new EventTrigger.Entry { eventID = EventTriggerType.PointerExit };
-        exit.callback.AddListener(_ => ClearDetail());
+        exit.callback.AddListener(_ => ShowDetail(_currentPanelDetail));
         trigger.triggers.Add(exit);
     }
 
     /// <summary>
-    /// 绑定操作按钮（Toggle）：onValueChanged=true 时执行操作，执行后自动复位为未选中
+    /// 绑定操作按钮（Toggle）：选中时打开对应功能并保持常亮；再次点击取消选中关闭面板。
+    /// 解除 ToggleGroup 互斥，由代码统一管理唯一常亮，避免组内切换时序冲突。
     /// </summary>
     private void BindActionToggle(Toggle toggle, string detail, System.Action onClick)
     {
         if (toggle == null) return;
 
+        // 解除 ToggleGroup 互斥，由代码统一管理唯一常亮，避免组内切换时序冲突
+        toggle.group = null;
+
+        // 选中态改为明显高亮（原 SelectedColor 与 NormalColor 几乎相同，无法辨别常亮）
+        var colors = toggle.colors;
+        colors.selectedColor = new Color(1f, 0.85f, 0.5f);
+        toggle.colors = colors;
+
         toggle.onValueChanged.AddListener(isOn =>
         {
-            if (isOn) onClick();
-            // 点击即执行，执行后复位，避免 toggle 保持选中态
-            toggle.SetIsOnWithoutNotify(false);
+            if (isOn)
+                onClick();          // 打开对应功能，按钮保持选中常亮
+            else
+                CloseAllSubPanels(); // 取消选中：关闭子面板
         });
 
         BindHoverDetail(toggle, detail);
@@ -894,11 +938,43 @@ public class BattleWindow : UIWindow
 
     private void CloseAllSubPanels()
     {
+        _currentPanelDetail = null;
+        ResetActionToggles();
         if (skillPanel != null) skillPanel.Close();
         if (itemPanel != null) itemPanel.Close();
         if (talkPanel != null) talkPanel.Close();
         if (subPanelContainer != null) subPanelContainer.SetActive(false);
         ClearDetail();
+    }
+
+    /// <summary> 复位四个操作按钮为未选中（关闭面板时熄灭常亮）并隐藏高亮图片 </summary>
+    private void ResetActionToggles()
+    {
+        if (btnViolence != null) btnViolence.SetIsOnWithoutNotify(false);
+        if (btnTalk != null) btnTalk.SetIsOnWithoutNotify(false);
+        if (btnItem != null) btnItem.SetIsOnWithoutNotify(false);
+        if (btnIdle != null) btnIdle.SetIsOnWithoutNotify(false);
+        SetActionHighlight(btnViolence, false);
+        SetActionHighlight(btnTalk, false);
+        SetActionHighlight(btnItem, false);
+        SetActionHighlight(btnIdle, false);
+    }
+
+    /// <summary> 打开功能时：显示对应按钮下的高亮图片（hl），隐藏其它 </summary>
+    private void ShowActionHighlight(Toggle activeToggle)
+    {
+        SetActionHighlight(btnViolence, activeToggle == btnViolence);
+        SetActionHighlight(btnTalk, activeToggle == btnTalk);
+        SetActionHighlight(btnItem, activeToggle == btnItem);
+        SetActionHighlight(btnIdle, activeToggle == btnIdle);
+    }
+
+    /// <summary> 设置按钮下名为 "hl" 的高亮图片显隐 </summary>
+    private void SetActionHighlight(Toggle btn, bool show)
+    {
+        if (btn == null) return;
+        var hl = btn.transform.Find("hl");
+        if (hl != null) hl.gameObject.SetActive(show);
     }
 
     /// <summary>
@@ -938,6 +1014,7 @@ public class BattleWindow : UIWindow
 
         var bg = go.GetComponent<Image>();
         bg.color = new Color(0f, 0f, 0f, 0.82f);
+        bg.raycastTarget = false;  // 提示弹窗不拦截点击，避免挡住技能/按钮操作
 
         var textGo = new GameObject("Text", typeof(RectTransform), typeof(TextMeshProUGUI));
         textGo.transform.SetParent(go.transform, false);
@@ -951,6 +1028,7 @@ public class BattleWindow : UIWindow
         _toastText.font = TMP_Settings.defaultFontAsset;
         _toastText.fontSize = 26f;
         _toastText.alignment = TextAlignmentOptions.Center;
+        _toastText.raycastTarget = false;
         _toastText.color = Color.white;
 
         _toastGo = go;
