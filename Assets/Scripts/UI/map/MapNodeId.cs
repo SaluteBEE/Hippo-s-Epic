@@ -13,4 +13,5 @@ public enum MapNodeId
     BodyHouse = 8,
     InnerHospital = 9,
     BehindMoon = 10,
+    OutSideGym = 11,
 }

@@ -19,6 +19,7 @@ public enum SceneMapId
     SewerSurface, // Sewer_Surface
 
     // --- Scene_Staff_Lounge ---
+    OutSideGym, // Out_Side_Gym
     StaffLounge, // Staff Lounge
     UndergroundBoxingGym, // Underground Boxing Gym
 
@@ -37,6 +38,7 @@ public static class SceneMapIdExtensions
         { SceneMapId.OuterCityGround, "Outer_City_Ground" },
         { SceneMapId.PunkCityGround, "Punk_City_Ground" },
         { SceneMapId.SewerSurface, "Sewer_Surface" },
+        { SceneMapId.OutSideGym, "Out_Side_Gym" },
         { SceneMapId.StaffLounge, "Staff Lounge" },
         { SceneMapId.UndergroundBoxingGym, "Underground Boxing Gym" },
         { SceneMapId.Temple, "temple" },
@@ -51,6 +53,7 @@ public static class SceneMapIdExtensions
         { SceneMapId.OuterCityGround, "Scene_Outer_City" },
         { SceneMapId.PunkCityGround, "Scene_Punk_City" },
         { SceneMapId.SewerSurface, "Scene_Sewer" },
+        { SceneMapId.OutSideGym, "Scene_Staff_Lounge" },
         { SceneMapId.StaffLounge, "Scene_Staff_Lounge" },
         { SceneMapId.UndergroundBoxingGym, "Scene_Staff_Lounge" },
         { SceneMapId.Temple, "Temple" },
@@ -65,6 +68,7 @@ public static class SceneMapIdExtensions
         { "Outer_City_Ground", SceneMapId.OuterCityGround },
         { "Punk_City_Ground", SceneMapId.PunkCityGround },
         { "Sewer_Surface", SceneMapId.SewerSurface },
+        { "Out_Side_Gym", SceneMapId.OutSideGym },
         { "Staff Lounge", SceneMapId.StaffLounge },
         { "Underground Boxing Gym", SceneMapId.UndergroundBoxingGym },
         { "temple", SceneMapId.Temple },
