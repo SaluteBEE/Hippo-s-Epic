@@ -74,8 +74,9 @@ public class BattleItemPanel : BattleSubPanel
             var itemCfg = tables?.TbItem.GetOrDefault(entry.itemId);
             if (itemCfg == null) continue;
 
-            // 只显示消耗品（Type=1 或其他可使用类型）
-            // 目前显示所有物品，后续按类型过滤
+            // 战斗时只显示 Type=6 的战斗道具（战斗中可装备/使用的道具）
+            if (itemCfg.Type != 6) continue;
+
             string name = itemCfg.Name;
             string detail = !string.IsNullOrEmpty(itemCfg.Battletip) ? itemCfg.Battletip : itemCfg.Tip;
             AddItem(entry.itemId, $"{name} x{entry.count}", detail, itemCfg.Icon);
