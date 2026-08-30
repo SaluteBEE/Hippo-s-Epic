@@ -3328,7 +3328,8 @@ MonoBehaviour:
   panelRoot: {fileID: 5169137576803890385}
   btnClose: {fileID: 1546309134354458750}
   itemContainer: {fileID: 250526917775591917}
-  itemButtonPrefab: {fileID: 7212553667438340112}
+  itemButtonPrefab: {fileID: 1430509115302028364}
+  itemIconPathFormat: Assets/Art/Sprites/UI/Item/{0}
 --- !u!1 &5782831768035707665
 GameObject:
   m_ObjectHideFlags: 0

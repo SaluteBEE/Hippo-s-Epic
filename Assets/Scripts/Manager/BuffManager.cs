@@ -287,7 +287,7 @@ public class BuffManager
 
     private void ApplyBuffEffects(cfg.cfg.buff.Buff buffCfg)
     {
-        var funcType = (BuffFuncType)buffCfg.Func;
+        var funcType = MapBuffFunc(buffCfg.Func);
         int param = buffCfg.Param1;
 
         if (_targetStats != null)
@@ -343,7 +343,7 @@ public class BuffManager
 
     private void RemoveBuffEffects(cfg.cfg.buff.Buff buffCfg)
     {
-        var funcType = (BuffFuncType)buffCfg.Func;
+        var funcType = MapBuffFunc(buffCfg.Func);
         int param = buffCfg.Param1;
 
         if (_targetStats != null)
@@ -529,6 +529,22 @@ public class BuffManager
         return damage - remaining;
     }
 
+    /// <summary>
+    /// 将 buff 表 func 字段映射到 BuffFuncType 枚举。
+    /// 策划功能编号：1=掉落/2=受伤提升/3=每回合AOE/4=自我维持/5=创作者意志/6=眩晕；
+    /// 与旧枚举仅 func=6 冲突（旧枚举 6=SelfmatainPerUp），这里统一映射。
+    /// </summary>
+    public static BuffFuncType MapBuffFunc(int func)
+    {
+        switch (func)
+        {
+            case 6: return BuffFuncType.Stun;
+            case 13: return BuffFuncType.Stun;   // 兼容旧枚举值
+            case 14: return BuffFuncType.Freeze; // 兼容旧枚举值
+            default: return (BuffFuncType)func;
+        }
+    }
+
     public bool HasStatus(BuffFuncType statusType)
     {
         return _playerBuffs.Any(b =>
@@ -536,7 +552,7 @@ public class BuffManager
             var tables = GetTables();
             if (tables == null) return false;
             var cfg = tables.TbBuff.GetOrDefault(b.BuffId);
-            return cfg != null && cfg.Func == (int)statusType;
+            return cfg != null && MapBuffFunc(cfg.Func) == statusType;
         });
     }
 
@@ -563,6 +579,17 @@ public class BuffManager
         if (int.TryParse(param1, out int id) && id > 0)
             return id;
         return 0;
+    }
+
+    /// <summary>
+    /// 解析物品表 Param1（List&lt;int&gt;）中的装备 BUFF id，取第一个有效值
+    /// </summary>
+    public static int ParseBuffId(List<int> param1)
+    {
+        if (param1 == null || param1.Count == 0)
+            return 0;
+        int id = param1[0];
+        return id > 0 ? id : 0;
     }
 
     private cfg.Tables GetTables()

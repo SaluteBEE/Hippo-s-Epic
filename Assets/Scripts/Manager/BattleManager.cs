@@ -510,7 +510,7 @@ public class BattleManager
             var cfg = tables.TbBuff.GetOrDefault(buff.BuffId);
             if (cfg == null) continue;
 
-            var funcType = (BuffFuncType)cfg.Func;
+            var funcType = BuffManager.MapBuffFunc(cfg.Func);
             if (funcType == BuffFuncType.Heal)
             {
                 BattleLogger.Log($"   P{unit.PersonId} TurnStart Buff恢复HP+{cfg.Param1}");
@@ -770,10 +770,88 @@ public class BattleManager
     {
         if (!IsWaitingForPlayerAction || CurrentUnit == null) return;
 
-        var targets = GetTargetsBySide(TargetType.Ally, CurrentUnit, new List<int> { targetSlotIndex });
-        var action = new BattleAction(CurrentUnit, ActionType.Item, itemId,
-            targets.Select(t => t.SlotIndex).ToList(), TargetType.Ally);
+        var tables = GetTables();
+        var itemCfg = tables?.TbItem.GetOrDefault(itemId);
+        if (itemCfg == null) return;
+
+        // func：1=战斗内对己方使用 → Ally，2=战斗内对敌方使用 → Enemy
+        int func = itemCfg.Func != null && itemCfg.Func.Count > 0 ? itemCfg.Func[0] : 0;
+        if (func != 1 && func != 2)
+        {
+            BattleLogger.LogWarning($"[BattleManager] 物品 {itemId} 无战斗功能(func={func})，无法使用");
+            return;
+        }
+        var targetType = func == 1 ? TargetType.Ally : TargetType.Enemy;
+
+        // param2：小键盘范围（键5=本体中心），以选中槽位为落点中心展开命中槽位
+        var hitSlots = SkillCombatUtil.ExpandRangeSlots(targetSlotIndex, itemCfg.Param2);
+        if (hitSlots.Count == 0)
+            hitSlots.Add(targetSlotIndex);
+
+        var targets = GetTargetsBySide(targetType, CurrentUnit, hitSlots);
+        if (targets.Count == 0)
+        {
+            BattleLogger.Log($"   P{CurrentUnit.PersonId} 物品{itemCfg.Name}范围内无有效目标");
+            return;
+        }
+
+        if (CurrentUnit.CurrentActionPoints < 1)
+        {
+            BattleLogger.Log($"   P{CurrentUnit.PersonId} 行动点不足，无法使用物品");
+            return;
+        }
+        CurrentUnit.CurrentActionPoints -= 1;  // 物品使用固定消耗 1 行动点
+
+        var action = new BattleAction(CurrentUnit, ActionType.Item, itemId, hitSlots, targetType);
         ExecuteAction(action);
+    }
+
+    /// <summary>
+    /// 物品可作落点的有效单位列表（func 决定阵营：1=对己方/2=对敌方；全部存活单位均可作范围中心）
+    /// </summary>
+    public List<BattleUnit> GetAvailableTargetsForItem(BattleUnit actor, int itemId)
+    {
+        var result = new List<BattleUnit>();
+        var tables = GetTables();
+        var itemCfg = tables?.TbItem.GetOrDefault(itemId);
+        if (itemCfg == null || actor == null) return result;
+
+        int func = itemCfg.Func != null && itemCfg.Func.Count > 0 ? itemCfg.Func[0] : 0;
+        if (func != 1 && func != 2) return result;
+
+        bool targetSide = func == 1 ? actor.IsPlayerSide : !actor.IsPlayerSide;
+        var list = targetSide ? PlayerUnits : EnemyUnits;
+        foreach (var unit in list)
+        {
+            if (unit.IsAlive)
+                result.Add(unit);
+        }
+        return result;
+    }
+
+    /// <summary>
+    /// 背包中是否存在可用战斗道具（func 含 1=战斗内对己方 / 2=战斗内对敌方）
+    /// </summary>
+    public bool HasUsableBattleItems()
+    {
+        var bagManager = BagManager.Instance;
+        if (bagManager == null) return false;
+
+        var tables = GetTables();
+        if (tables == null) return false;
+
+        foreach (var entry in bagManager.AllItems)
+        {
+            if (entry.count <= 0) continue;
+
+            var itemCfg = tables.TbItem.GetOrDefault(entry.itemId);
+            if (itemCfg == null) continue;
+
+            if (itemCfg.Func != null && (itemCfg.Func.Contains(1) || itemCfg.Func.Contains(2)))
+                return true;
+        }
+
+        return false;
     }
 
     /// <summary>
@@ -884,16 +962,38 @@ public class BattleManager
         var itemCfg = tables.TbItem.GetOrDefault(itemId);
         if (itemCfg == null) return;
 
-        int buffId = BuffManager.ParseBuffId(itemCfg.Param1);
+        // 物品战斗效果：param1=效果类型列表，param3=对应数值/buff id（一一对应）
+        //   1=一次性治疗（param3=治疗量）  2=一次性物理伤害（param3=伤害量）  3=给目标加BUFF（param3=buff id）
+        var effects = itemCfg.Param1;
+        var values = itemCfg.Param3;
 
         foreach (var target in targets)
         {
             if (!target.IsAlive) continue;
 
-            if (buffId > 0)
+            for (int i = 0; i < effects.Count; i++)
             {
-                target.UnitBuffs.ApplyBuff(buffId);
-                OnBuffApplied?.Invoke(target, buffId, 0);
+                int value = (values != null && i < values.Count) ? values[i] : 0;
+                switch (effects[i])
+                {
+                    case 1: // 治疗
+                        ApplyHeal(actor, target, value);
+                        break;
+                    case 2: // 物理伤害
+                        ApplyDamage(actor, target, value);
+                        break;
+                    case 3: // 加BUFF
+                        if (value > 0)
+                        {
+                            target.UnitBuffs.ApplyBuff(value);
+                            OnBuffApplied?.Invoke(target, value, 0);
+                            BattleLogger.Log($"   P{target.PersonId} 获得Buff id={value}");
+                        }
+                        break;
+                    default:
+                        BattleLogger.LogWarning($"   未知物品效果类型 {effects[i]}");
+                        break;
+                }
             }
         }
 
@@ -1110,11 +1210,25 @@ public class BattleManager
             var cfg = tables.TbBuff.GetOrDefault(buff.BuffId);
             if (cfg == null) continue;
 
-            var funcType = (BuffFuncType)cfg.Func;
+            var funcType = BuffManager.MapBuffFunc(cfg.Func);
             switch (funcType)
             {
                 case BuffFuncType.Heal:
                     ApplyHeal(unit, unit, cfg.Param1);
+                    break;
+                case BuffFuncType.AoeDamage:
+                    // 回合结束随机对一个存活敌人造成伤害（如「尿了」buff）
+                    if (trigger == BuffTrigger.TurnEnd)
+                    {
+                        var enemies = unit.IsPlayerSide ? EnemyUnits : PlayerUnits;
+                        var aliveEnemies = enemies.FindAll(u => u.IsAlive);
+                        if (aliveEnemies.Count > 0)
+                        {
+                            var victim = aliveEnemies[UnityEngine.Random.Range(0, aliveEnemies.Count)];
+                            BattleLogger.Log($"   P{unit.PersonId} 回合结束AOE 对 P{victim.PersonId} 造成 {cfg.Param1} 伤害");
+                            ApplyDamage(unit, victim, cfg.Param1);
+                        }
+                    }
                     break;
                 case BuffFuncType.CounterDamage:
                     if (trigger == BuffTrigger.OnHit && CurrentUnit != null && CurrentUnit != unit)

@@ -57,6 +57,7 @@ public class BattleWindow : UIWindow
     private BattleStageManager _stageManager;
     private bool _isSelectingTarget;
     private int _selectedSkillId;
+    private int _selectedItemId;
     private Camera _mainCamera;
     private BattleUnit _currentCursorTarget;
 
@@ -518,11 +519,22 @@ public class BattleWindow : UIWindow
         }
     }
 
-    /// <summary> 翻找工具 → 打开物品列表 </summary>
+    /// <summary> 翻找工具 → 打开物品列表；没有可用战斗道具时直接提示，不打开面板 </summary>
     private void OnItemClicked()
     {
         if (!CanOperate()) return;
         CloseAllSubPanels();
+
+        if (itemPanel != null && !itemPanel.HasUsableItems(_battleManager))
+        {
+            if (logPanel != null) logPanel.AddLog("没有可用物品");
+            ShowToast("没有可用物品");
+            // 复位按钮为未选中，不点亮高亮
+            if (btnItem != null) btnItem.SetIsOnWithoutNotify(false);
+            SetActionHighlight(btnItem, false);
+            return;
+        }
+
         if (itemPanel != null)
         {
             _currentPanelDetail = DetailItem;
@@ -644,8 +656,9 @@ public class BattleWindow : UIWindow
     private void OnItemSelected(int itemId)
     {
         CloseAllSubPanels();
-        // TODO: 物品使用
-        Debug.Log($"[BattleWindow] 使用物品: {itemId}");
+        _selectedSkillId = 0;
+        _selectedItemId = itemId;
+        StartTargetSelection();
     }
 
     #endregion
@@ -697,6 +710,9 @@ public class BattleWindow : UIWindow
     {
         if (_battleManager == null || _currentUnit == null) return new List<BattleUnit>();
 
+        if (_selectedItemId > 0)
+            return _battleManager.GetAvailableTargetsForItem(_currentUnit, _selectedItemId);
+
         if (_selectedSkillId == 0)
             return _enemyUnits.FindAll(u => u.IsAlive);
 
@@ -731,11 +747,17 @@ public class BattleWindow : UIWindow
         var unit = FindUnitByGameObject(hit.gameObject);
         if (unit == null || !unit.IsAlive) return;
 
-        // 只接受有效目标（落在技能九宫格有效范围内）
-        if (!IsTargetValidForSkill(unit, _selectedSkillId)) return;
-
-        // 执行技能
-        _battleManager.PlayerUseSkill(_selectedSkillId, unit.SlotIndex);
+        // 只接受有效目标（物品→按物品 func 阵营+param2 范围；技能→九宫格有效范围）
+        if (_selectedItemId > 0)
+        {
+            if (!IsTargetValidForItem(unit, _selectedItemId)) return;
+            _battleManager.PlayerUseItem(_selectedItemId, unit.SlotIndex);
+        }
+        else
+        {
+            if (!IsTargetValidForSkill(unit, _selectedSkillId)) return;
+            _battleManager.PlayerUseSkill(_selectedSkillId, unit.SlotIndex);
+        }
 
         // 显示目标选中标签
         if (_stageManager != null)
@@ -793,6 +815,31 @@ public class BattleWindow : UIWindow
         return _battleManager.GetSkillTargets(_currentUnit, skillCfg, target.SlotIndex).Count > 0;
     }
 
+    /// <summary>
+    /// 当前选中目标对该物品是否为有效目标：由物品 func（阵营）与 param2（范围）决定。
+    /// func 1=对己方 / 2=对敌方；以选中目标所在槽位为落点中心，范围展开后至少命中一个存活单位才算有效。
+    /// </summary>
+    private bool IsTargetValidForItem(BattleUnit target, int itemId)
+    {
+        if (target == null || !target.IsAlive) return false;
+        if (_battleManager == null || _currentUnit == null) return false;
+
+        var itemCfg = _battleManager.GetTables()?.TbItem.GetOrDefault(itemId);
+        if (itemCfg == null) return false;
+
+        int func = itemCfg.Func != null && itemCfg.Func.Count > 0 ? itemCfg.Func[0] : 0;
+        if (func != 1 && func != 2) return false;
+
+        // 阵营校验：func 1=己方，2=敌方
+        bool expectedSide = func == 1 ? _currentUnit.IsPlayerSide : !_currentUnit.IsPlayerSide;
+        if (target.IsPlayerSide != expectedSide) return false;
+
+        // 范围校验：以选中目标为落点中心，param2 展开后至少命中一个存活目标
+        var targetType = func == 1 ? TargetType.Ally : TargetType.Enemy;
+        var hitSlots = SkillCombatUtil.ExpandRangeSlots(target.SlotIndex, itemCfg.Param2);
+        return _battleManager.GetTargetsBySide(targetType, _currentUnit, hitSlots).Count > 0;
+    }
+
     /// <summary> 键盘游标在当前有效目标基础上按行列偏移切换（左右循环，上下换行） </summary>
     private void CycleTarget(int colDelta, int rowDelta)
     {
@@ -831,9 +878,17 @@ public class BattleWindow : UIWindow
         if (_currentCursorTarget == null) return;
         var unit = _currentCursorTarget;
         if (!unit.IsAlive) return;
-        if (!IsTargetValidForSkill(unit, _selectedSkillId)) return;
 
-        _battleManager.PlayerUseSkill(_selectedSkillId, unit.SlotIndex);
+        if (_selectedItemId > 0)
+        {
+            if (!IsTargetValidForItem(unit, _selectedItemId)) return;
+            _battleManager.PlayerUseItem(_selectedItemId, unit.SlotIndex);
+        }
+        else
+        {
+            if (!IsTargetValidForSkill(unit, _selectedSkillId)) return;
+            _battleManager.PlayerUseSkill(_selectedSkillId, unit.SlotIndex);
+        }
 
         if (_stageManager != null)
             _stageManager.ShowTargetSelected(unit);

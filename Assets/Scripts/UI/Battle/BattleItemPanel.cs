@@ -43,6 +43,14 @@ public class BattleItemPanel : BattleSubPanel
         RefreshItemList();
     }
 
+    /// <summary>
+    /// 背包中是否存在可用战斗道具（func 含 1=对己方 / 2=对敌方）
+    /// </summary>
+    public bool HasUsableItems(BattleManager battleManager)
+    {
+        return battleManager != null && battleManager.HasUsableBattleItems();
+    }
+
     private void RefreshItemList()
     {
         if (itemContainer == null || itemButtonPrefab == null) return;
@@ -74,8 +82,8 @@ public class BattleItemPanel : BattleSubPanel
             var itemCfg = tables?.TbItem.GetOrDefault(entry.itemId);
             if (itemCfg == null) continue;
 
-            // 战斗时只显示 Type=6 的战斗道具（战斗中可装备/使用的道具）
-            if (itemCfg.Type != 6) continue;
+            // 战斗时只显示战斗道具（func 含 1=战斗内对己方使用 / 2=战斗内对敌方使用）
+            if (itemCfg.Func == null || (!itemCfg.Func.Contains(1) && !itemCfg.Func.Contains(2))) continue;
 
             string name = itemCfg.Name;
             string detail = !string.IsNullOrEmpty(itemCfg.Battletip) ? itemCfg.Battletip : itemCfg.Tip;

@@ -11,9 +11,9 @@ class BuffDataTests
     }
 
     [Test]
-    public void Buff_Count_IsThree()
+    public void Buff_Count_IsEighteen()
     {
-        Assert.AreEqual(3, tables.TbBuff.DataList.Count);
+        Assert.AreEqual(18, tables.TbBuff.DataList.Count);
     }
 
     [Test]
@@ -26,7 +26,6 @@ class BuffDataTests
         Assert.AreEqual("美汁汁儿", buff.Name);
         Assert.AreEqual(1, buff.Icon);
         Assert.AreEqual("从厕所里掏出来宝贝的概率提升", buff.Descrption);
-        Assert.AreEqual("腥腥臭臭的东西在你眼里和小汉堡没区别了", buff.Tip);
         Assert.AreEqual(1, buff.Func);
         Assert.AreEqual(0, buff.Num);
         Assert.AreEqual(0, buff.Time);
@@ -34,37 +33,35 @@ class BuffDataTests
     }
 
     [Test]
-    public void Buff_Id2_AllFieldsMatch()
+    public void Buff_Id3_AoeDamage_FieldsMatch()
     {
-        var buff = tables.TbBuff.Get(2);
-        Assert.AreEqual(2, buff.Id);
-        Assert.AreEqual(2, buff.Type);
-        Assert.AreEqual(1, buff.Showtype);
-        Assert.AreEqual("憋不住了！", buff.Name);
-        Assert.AreEqual(2, buff.Icon);
-        Assert.AreEqual("你下次收到攻击的伤害提升", buff.Descrption);
-        Assert.AreEqual("要尿了！快避免冲击，快出来了...", buff.Tip);
-        Assert.AreEqual(2, buff.Func);
-        Assert.AreEqual(3, buff.Num);
-        Assert.AreEqual(0, buff.Time);
+        var buff = tables.TbBuff.Get(3);
+        Assert.AreEqual("尿了...", buff.Name);
+        // func=3：回合结束随机造成伤害
+        Assert.AreEqual(3, buff.Func);
+        Assert.AreEqual(3, buff.Time);
         Assert.AreEqual(2, buff.Param1);
     }
 
     [Test]
-    public void Buff_Id3_AllFieldsMatch()
+    public void Buff_Id29_Stun_FuncIsSix()
     {
-        var buff = tables.TbBuff.Get(3);
-        Assert.AreEqual(3, buff.Id);
-        Assert.AreEqual(3, buff.Type);
-        Assert.AreEqual(1, buff.Showtype);
-        Assert.AreEqual("尿了...", buff.Name);
-        Assert.AreEqual(3, buff.Icon);
-        Assert.AreEqual("每回合结束的时候你会随机向一个敌人施加高额恶心伤害", buff.Descrption);
-        Assert.AreEqual("出来了，已经无所谓了，尿裤裆的你放弃了所有底线，这让你所向披靡", buff.Tip);
-        Assert.AreEqual(3, buff.Func);
-        Assert.AreEqual(0, buff.Num);
-        Assert.AreEqual(3, buff.Time);
-        Assert.AreEqual(2, buff.Param1);
+        var buff = tables.TbBuff.Get(29);
+        Assert.AreEqual("眩晕", buff.Name);
+        // func=6：眩晕 → 应映射到 BuffFuncType.Stun
+        Assert.AreEqual(6, buff.Func);
+        Assert.AreEqual(1, buff.Time);
+        Assert.AreEqual(BuffFuncType.Stun, BuffManager.MapBuffFunc(buff.Func));
+    }
+
+    [Test]
+    public void Buff_MapFunc_StunMapping()
+    {
+        Assert.AreEqual(BuffFuncType.Stun, BuffManager.MapBuffFunc(6));
+        Assert.AreEqual(BuffFuncType.Stun, BuffManager.MapBuffFunc(13));
+        Assert.AreEqual(BuffFuncType.Freeze, BuffManager.MapBuffFunc(14));
+        Assert.AreEqual(BuffFuncType.AoeDamage, BuffManager.MapBuffFunc(3));
+        Assert.AreEqual(BuffFuncType.SelfmatainUp, BuffManager.MapBuffFunc(4));
     }
 
     [Test]

@@ -62,7 +62,9 @@ public static class ManagerRegistry
         if (mgr != null) return mgr;
 
         var go = new GameObject($"[{typeof(T).Name}]");
-        UnityEngine.Object.DontDestroyOnLoad(go);
+        // DontDestroyOnLoad 仅允许在 Play Mode 使用（EditMode 测试中会抛异常），运行时才需要跨场景存活
+        if (Application.isPlaying)
+            UnityEngine.Object.DontDestroyOnLoad(go);
         mgr = go.AddComponent<T>();
         _managers[typeof(T)] = mgr;
         Debug.Log($"[ManagerRegistry] 自动创建: {typeof(T).Name}");

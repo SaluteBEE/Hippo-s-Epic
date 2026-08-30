@@ -244,12 +244,12 @@ public class SceneEntityTablesTests
 
     private const string TestMapName = "TestMap";
 
-    private static GameObject EnsureTestMap()
+    private static Map EnsureTestMap()
     {
         var existing = GameObject.Find("[Test] " + TestMapName);
-        if (existing != null) return existing;
-        var map = new GameObject("[Test] " + TestMapName);
-        return map;
+        if (existing != null) return existing.GetComponent<Map>();
+        var go = new GameObject("[Test] " + TestMapName);
+        return go.AddComponent<Map>();
     }
 
     private static void WriteButtonProperty(SerializedProperty buttonsProp, int index, ButtonOption btn)
@@ -298,6 +298,9 @@ public class SceneEntityTablesTests
         }
 
         so.ApplyModifiedProperties();
+
+        // 收集到 Map 的 InteractableList，使 InteractableManager.InitializeScene 能初始化该交互节点
+        map.CollectInteractables();
         return interactable;
     }
 
