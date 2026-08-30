@@ -25,7 +25,9 @@ public sealed partial class Item : Luban.BeanBase
         Stackable = _buf.ReadBool();
         Tip = _buf.ReadString();
         {int n0 = _buf.ReadSize(); Func = new System.Collections.Generic.List<int>(n0);for(var i0 = 0 ; i0 < n0 ; i0++) { int _e0;  _e0 = _buf.ReadInt(); Func.Add(_e0);}}
-        Param1 = _buf.ReadString();
+        {int n0 = _buf.ReadSize(); Param1 = new System.Collections.Generic.List<int>(n0);for(var i0 = 0 ; i0 < n0 ; i0++) { int _e0;  _e0 = _buf.ReadInt(); Param1.Add(_e0);}}
+        {int n0 = _buf.ReadSize(); Param2 = new System.Collections.Generic.List<int>(n0);for(var i0 = 0 ; i0 < n0 ; i0++) { int _e0;  _e0 = _buf.ReadInt(); Param2.Add(_e0);}}
+        {int n0 = _buf.ReadSize(); Param3 = new System.Collections.Generic.List<int>(n0);for(var i0 = 0 ; i0 < n0 ; i0++) { int _e0;  _e0 = _buf.ReadInt(); Param3.Add(_e0);}}
         Battletip = _buf.ReadString();
     }
 
@@ -73,7 +75,15 @@ public sealed partial class Item : Luban.BeanBase
     /// <summary>
     /// 参数1
     /// </summary>
-    public readonly string Param1;
+    public readonly System.Collections.Generic.List<int> Param1;
+    /// <summary>
+    /// 参数2
+    /// </summary>
+    public readonly System.Collections.Generic.List<int> Param2;
+    /// <summary>
+    /// 参数3
+    /// </summary>
+    public readonly System.Collections.Generic.List<int> Param3;
     /// <summary>
     /// 物品战斗使用时详情
     /// </summary>
@@ -98,7 +108,9 @@ public sealed partial class Item : Luban.BeanBase
         + "stackable:" + Stackable + ","
         + "tip:" + Tip + ","
         + "func:" + Luban.StringUtil.CollectionToString(Func) + ","
-        + "param1:" + Param1 + ","
+        + "param1:" + Luban.StringUtil.CollectionToString(Param1) + ","
+        + "param2:" + Luban.StringUtil.CollectionToString(Param2) + ","
+        + "param3:" + Luban.StringUtil.CollectionToString(Param3) + ","
         + "battletip:" + Battletip + ","
         + "}";
     }

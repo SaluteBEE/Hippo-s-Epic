@@ -9,7 +9,9 @@
     "stackable": true,
     "tip": "金闪闪",
     "func": [],
-    "param1": "",
+    "param1": [],
+    "param2": [],
+    "param3": [],
     "battletip": "战斗详情：待配置"
   },
   {
@@ -22,7 +24,9 @@
     "stackable": false,
     "tip": "从厕所里掏出来的东西，一般认为这是一把钥匙，至于它<color=red>真的是什么</color>，谁在乎呢？",
     "func": [],
-    "param1": "",
+    "param1": [],
+    "param2": [],
+    "param3": [],
     "battletip": "战斗详情：待配置"
   },
   {
@@ -35,7 +39,11 @@
     "stackable": false,
     "tip": "一套普通的牙，咬啤酒瓶弄掉过几个角，整体黄不拉几的，不过没人能否认这确实是一套牙。",
     "func": [],
-    "param1": "10",
+    "param1": [
+      10
+    ],
+    "param2": [],
+    "param3": [],
     "battletip": "战斗详情：待配置"
   },
   {
@@ -48,7 +56,11 @@
     "stackable": false,
     "tip": "普通的拳套，只存在象征性的意义，不要想拳套能为你做些什么，要问你能为拳套<color=red>做些什么</color>。",
     "func": [],
-    "param1": "11",
+    "param1": [
+      11
+    ],
+    "param2": [],
+    "param3": [],
     "battletip": "战斗详情：待配置"
   },
   {
@@ -61,12 +73,16 @@
     "stackable": false,
     "tip": "一口好牙，一位伟大的拳王曾经用它咬掉过很多人的耳朵。",
     "func": [],
-    "param1": "12",
+    "param1": [
+      12
+    ],
+    "param2": [],
+    "param3": [],
     "battletip": "战斗详情：待配置"
   },
   {
     "id": 6,
-    "type": 6,
+    "type": 4,
     "childtype": 3,
     "name": "石膏拳套",
     "icon": 6,
@@ -74,7 +90,11 @@
     "stackable": false,
     "tip": "砸在脸上的感觉像是大卡车的冲撞，在他的抚摸下下没有人能够不被<color=red>哄睡</color>。",
     "func": [],
-    "param1": "13",
+    "param1": [
+      13
+    ],
+    "param2": [],
+    "param3": [],
     "battletip": "每一拳砸下去，飞溅的水珠都像在替对手喊疼，而你自己也分不清，那是汗水、自来水，还是昨夜梦见自己输掉比赛时偷流的眼泪。\\n他妈的耍赖，他妈的用力打每一个人！"
   },
   {
@@ -87,7 +107,11 @@
     "stackable": false,
     "tip": "疑似牙齿的东西，它已经太老以至于跟不上时代了，就连蛀虫都嫌弃这是套老破小。",
     "func": [],
-    "param1": "14",
+    "param1": [
+      14
+    ],
+    "param2": [],
+    "param3": [],
     "battletip": "战斗详情：待配置"
   },
   {
@@ -100,12 +124,14 @@
     "stackable": true,
     "tip": "",
     "func": [],
-    "param1": "",
+    "param1": [],
+    "param2": [],
+    "param3": [],
     "battletip": "战斗详情：待配置"
   },
   {
     "id": 11,
-    "type": 6,
+    "type": 2,
     "childtype": 0,
     "name": "套狗队电话号码",
     "icon": 2,
@@ -113,33 +139,61 @@
     "stackable": false,
     "tip": "套狗队的联系方式，朋克城外一切动物的克星。",
     "func": [],
-    "param1": "11",
+    "param1": [
+      11
+    ],
+    "param2": [],
+    "param3": [],
     "battletip": "又遇到猫了？没问题！遇到狗了？没问题！遇到变异动物了？那更没问题了！我们天生就是他妈干这个的！马上到那野狗楼下！我爱生活！\\n战斗中为你解决字面意义上的野狗敌人"
   },
   {
     "id": 12,
-    "type": 6,
+    "type": 2,
     "childtype": 0,
     "name": "鞭炮",
     "icon": 2,
     "price": 0,
     "stackable": false,
     "tip": "爆炸！爆炸！",
-    "func": [],
-    "param1": "11",
+    "func": [
+      2
+    ],
+    "param1": [
+      2,
+      3
+    ],
+    "param2": [
+      5
+    ],
+    "param3": [
+      5,
+      29
+    ],
     "battletip": "炸毁一切！\\n炸掉敌人10点生命值"
   },
   {
     "id": 13,
-    "type": 6,
+    "type": 2,
     "childtype": 0,
     "name": "绷带",
     "icon": 2,
     "price": 0,
     "stackable": false,
     "tip": "治疗！治疗！",
-    "func": [],
-    "param1": "11",
+    "func": [
+      1
+    ],
+    "param1": [
+      1
+    ],
+    "param2": [
+      2,
+      5,
+      8
+    ],
+    "param3": [
+      10
+    ],
     "battletip": "包扎伤口\\n为选中的友方单位回复10点生命值"
   }
 ]

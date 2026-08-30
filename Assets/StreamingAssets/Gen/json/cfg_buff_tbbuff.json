@@ -253,5 +253,20 @@
     "param1": 3,
     "trigger": 0,
     "param2": 0
+  },
+  {
+    "id": 29,
+    "type": 5,
+    "showtype": 0,
+    "name": "眩晕",
+    "icon": 0,
+    "descrption": "被干晕了！这回合动不了！",
+    "tip": "晕了！晕了！",
+    "func": 6,
+    "num": 0,
+    "time": 1,
+    "param1": 0,
+    "trigger": 0,
+    "param2": 0
   }
 ]
