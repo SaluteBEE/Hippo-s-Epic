@@ -41,7 +41,7 @@ public sealed partial class Item : Luban.BeanBase
     /// </summary>
     public readonly int Id;
     /// <summary>
-    /// 物品类型
+    /// 物品类型<br/>1-100为虚拟道具和测试道具<br/>1000-1999是第一章道具
     /// </summary>
     public readonly int Type;
     /// <summary>
