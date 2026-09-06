@@ -17,7 +17,9 @@
     ],
     "selectable": [],
     "cooldown": 0,
-    "hitdelay": 0
+    "hitdelay": 0,
+    "movekind": 0,
+    "animname": "skill"
   },
   {
     "id": 2,
@@ -37,7 +39,9 @@
     ],
     "selectable": [],
     "cooldown": 0,
-    "hitdelay": 0
+    "hitdelay": 0,
+    "movekind": 0,
+    "animname": "skill"
   },
   {
     "id": 3,
@@ -57,7 +61,9 @@
     ],
     "selectable": [],
     "cooldown": 0,
-    "hitdelay": 0
+    "hitdelay": 0,
+    "movekind": 0,
+    "animname": "skill"
   },
   {
     "id": 4,
@@ -77,7 +83,9 @@
     ],
     "selectable": [],
     "cooldown": 0,
-    "hitdelay": 0
+    "hitdelay": 0,
+    "movekind": 1,
+    "animname": "attack"
   },
   {
     "id": 5,
@@ -97,7 +105,9 @@
     ],
     "selectable": [],
     "cooldown": 0,
-    "hitdelay": 0
+    "hitdelay": 0,
+    "movekind": 1,
+    "animname": "attack"
   },
   {
     "id": 6,
@@ -124,6 +134,8 @@
       7
     ],
     "cooldown": 0,
-    "hitdelay": 0
+    "hitdelay": 0,
+    "movekind": 0,
+    "animname": "attack3"
   }
 ]

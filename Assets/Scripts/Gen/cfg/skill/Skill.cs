@@ -30,6 +30,8 @@ public sealed partial class Skill : Luban.BeanBase
         {int n0 = _buf.ReadSize(); Selectable = new System.Collections.Generic.List<int>(n0);for(var i0 = 0 ; i0 < n0 ; i0++) { int _e0;  _e0 = _buf.ReadInt(); Selectable.Add(_e0);}}
         Cooldown = _buf.ReadInt();
         Hitdelay = _buf.ReadFloat();
+        Movekind = _buf.ReadInt();
+        Animname = _buf.ReadString();
     }
 
     public static Skill DeserializeSkill(ByteBuf _buf)
@@ -93,6 +95,14 @@ public sealed partial class Skill : Luban.BeanBase
     /// 出伤延迟秒数<br/>0=打击时刻立即结算<br/>&gt;0=命中后延迟该秒数再扣血<br/>(spine关键帧作为后续扩展)
     /// </summary>
     public readonly float Hitdelay;
+    /// <summary>
+    /// 演出方式<br/>0=原地播动画<br/>1=移动到选中目标中心后播动画
+    /// </summary>
+    public readonly int Movekind;
+    /// <summary>
+    /// 释放攻击动画组合名（CompositionName 枚举，如 attack/attack2/attack3/skill/throw；空则默认用 attack 组合）
+    /// </summary>
+    public readonly string Animname;
    
     public const int __ID__ = 1539215818;
     public override int GetTypeId() => __ID__;
@@ -118,6 +128,8 @@ public sealed partial class Skill : Luban.BeanBase
         + "selectable:" + Luban.StringUtil.CollectionToString(Selectable) + ","
         + "cooldown:" + Cooldown + ","
         + "hitdelay:" + Hitdelay + ","
+        + "movekind:" + Movekind + ","
+        + "animname:" + Animname + ","
         + "}";
     }
 }

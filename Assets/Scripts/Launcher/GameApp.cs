@@ -449,6 +449,7 @@ public partial class GameApp : MonoBehaviour
         BattleManager = new BattleManager();
         ManagerRegistry.Register(BattleManager);
         BattleManager.UnlockAllSkillsForTest = IsBattleTestEnabled;
+        BattleManager.ForceNormalAttackOnly = IsBattleTestEnabled;
         BattleManager.OnBattleEnd += result => OnBattleFinished(battleId, result);
         BattleManager.InitBattle(battleId);
 

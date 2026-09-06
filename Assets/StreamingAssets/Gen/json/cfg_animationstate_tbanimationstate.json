@@ -355,5 +355,68 @@
     "statename": "walk",
     "prefabtype": 1,
     "slotstateid": 0
+  },
+  {
+    "id": 2003,
+    "personid": 2,
+    "statename": "idle",
+    "prefabtype": 2,
+    "slotstateid": 0
+  },
+  {
+    "id": 2004,
+    "personid": 2,
+    "statename": "walk",
+    "prefabtype": 2,
+    "slotstateid": 0
+  },
+  {
+    "id": 2005,
+    "personid": 2,
+    "statename": "attack",
+    "prefabtype": 2,
+    "slotstateid": 0
+  },
+  {
+    "id": 2006,
+    "personid": 2,
+    "statename": "die",
+    "prefabtype": 2,
+    "slotstateid": 0
+  },
+  {
+    "id": 3003,
+    "personid": 3,
+    "statename": "idle",
+    "prefabtype": 2,
+    "slotstateid": 0
+  },
+  {
+    "id": 3004,
+    "personid": 3,
+    "statename": "walk",
+    "prefabtype": 2,
+    "slotstateid": 0
+  },
+  {
+    "id": 3005,
+    "personid": 3,
+    "statename": "attack",
+    "prefabtype": 2,
+    "slotstateid": 0
+  },
+  {
+    "id": 3006,
+    "personid": 3,
+    "statename": "hurt",
+    "prefabtype": 2,
+    "slotstateid": 0
+  },
+  {
+    "id": 3007,
+    "personid": 3,
+    "statename": "die",
+    "prefabtype": 2,
+    "slotstateid": 0
   }
 ]

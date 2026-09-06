@@ -11,6 +11,18 @@ public static class BattleAI
     {
         var enemyUnits = battle.GetAllAliveUnits(!unit.IsPlayerSide);
 
+        // 测试模式：AI 只用普通攻击（便于观察普攻走位/攻击演出）
+        if (battle.ForceNormalAttackOnly)
+        {
+            if (enemyUnits.Count > 0)
+            {
+                var target = FindBestTarget(enemyUnits);
+                return new BattleAction(unit, ActionType.Skill, 0,
+                    new List<int> { target.SlotIndex }, TargetType.Enemy);
+            }
+            return null;
+        }
+
         if (ShouldHeal(unit, battle))
         {
             var healSkill = FindBestHealSkill(unit, battle);

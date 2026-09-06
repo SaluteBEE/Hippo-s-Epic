@@ -88,6 +88,11 @@ public class BattleManager
     /// </summary>
     public bool UnlockAllSkillsForTest;
 
+    /// <summary>
+    /// 测试模式：AI 只用普通攻击（不释放技能），便于观察普攻走位/攻击演出
+    /// </summary>
+    public bool ForceNormalAttackOnly;
+
     #region 待结算命中（受击表现与伤害逻辑分离）
 
     /// <summary>

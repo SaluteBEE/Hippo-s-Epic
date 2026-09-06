@@ -122,13 +122,13 @@ public class AnimationController : MonoBehaviour
             // 初始化层级
             InitializeLayers();
             
+            isInitialized = true;
+            
             // 播放默认组合
             if (config.HasComposition(config.defaultComposition))
             {
                 PlayComposition(config.defaultComposition);
             }
-            
-            isInitialized = true;
             
             if (debugLog)
             {
@@ -203,25 +203,30 @@ public class AnimationController : MonoBehaviour
     
     public void PlayClip(string layerName, string clipName, float transitionTime = -1f)
     {
+        PlayClipInternal(layerName, clipName, transitionTime, null);
+    }
+
+    private void PlayClipInternal(string layerName, string clipName, float transitionTime, bool? loopOverride)
+    {
         if (!isInitialized)
         {
             Debug.LogWarning("AnimationController not initialized. Call Initialize() first.");
             return;
         }
-        
+
         if (debugLog)
         {
             Debug.Log($"尝试播放动画: 层级={layerName}, 动画={clipName}, 过渡时间={transitionTime}");
             Debug.Log($"可用层级: {string.Join(", ", layers.Keys)}");
         }
-        
+
         if (layers.TryGetValue(layerName, out var layer))
         {
             if (transitionTime < 0)
                 transitionTime = config != null ? config.defaultTransitionTime : 0.1f;
-                
-            layer.PlayClip(clipName, transitionTime);
-            
+
+            layer.PlayClip(clipName, transitionTime, loopOverride);
+
             if (debugLog)
             {
                 Debug.Log($"Playing clip: {clipName} on layer: {layerName} (transition: {transitionTime}s)");
@@ -235,6 +240,17 @@ public class AnimationController : MonoBehaviour
     }
     
     public void PlayComposition(CompositionName compositionName)
+    {
+        PlayCompositionInternal(compositionName, null);
+    }
+
+    /// <summary> 播放一次组合动画（强制非循环，播完停在末帧），用于攻击/受击等一次性动作 </summary>
+    public void PlayCompositionOnce(CompositionName compositionName)
+    {
+        PlayCompositionInternal(compositionName, false);
+    }
+
+    private void PlayCompositionInternal(CompositionName compositionName, bool? loopOverride)
     {
         if (!isInitialized)
         {
@@ -257,7 +273,7 @@ public class AnimationController : MonoBehaviour
                     Debug.Log($"  组合层: {compLayer.layerName} -> {compLayer.clipName} (权重: {compLayer.weight}, 过渡: {compLayer.transitionTime}s)");
                 }
                 
-                PlayClip(compLayer.layerName, compLayer.clipName, compLayer.transitionTime);
+                PlayClipInternal(compLayer.layerName, compLayer.clipName, compLayer.transitionTime, loopOverride);
                 
                 if (compLayer.delay > 0)
                 {
@@ -485,7 +501,7 @@ public class AnimationController : MonoBehaviour
             this.currentWeight = config != null ? config.defaultWeight : 1.0f;
         }
         
-        public void PlayClip(string clipName, float transitionTime)
+        public void PlayClip(string clipName, float transitionTime, bool? loopOverride = null)
         {
             // 编辑器模式下提前返回
             if (animationState == null)
@@ -497,14 +513,12 @@ public class AnimationController : MonoBehaviour
             // 尝试从配置获取动画
             var clip = animationConfig.GetClip(clipName);
             Spine.Animation animation = null;
-            bool loop = true;
             float speed = 1.0f;
             
             if (clip != null && clip.animation != null)
             {
                 // 使用配置的动画
                 animation = clip.animation.Animation;
-                loop = clip.loop;
                 speed = clip.speed;
                 
                 // 检查动画是否可用于此层级
@@ -545,6 +559,8 @@ public class AnimationController : MonoBehaviour
                 // Debug.Log($"播放动画(直接查找): {clipName} (循环: {loop}, 速度: {speed}, 轨道: {config.trackIndex})");
             }
             
+            bool loop = loopOverride ?? (clip != null ? clip.loop : true);
+
             if (animation != null)
             {
                 // 调试信息：动画时长

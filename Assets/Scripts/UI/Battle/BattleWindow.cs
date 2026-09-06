@@ -25,6 +25,8 @@ public class BattleWindow : UIWindow
 
     [Header("右上角按钮")]
     [SerializeField] private Button btnRun;         // common btn：逃跑按钮 → 战斗按失败结算
+    [SerializeField] private Button btnSpeed;       // 二倍速切换按钮
+    [SerializeField] private TextMeshProUGUI btnSpeedText; // 显示当前速度 1x/2x
 
     [Header("右侧内容区")]
     [SerializeField] private BattleLogPanel logPanel;          // 战斗记录
@@ -94,6 +96,9 @@ public class BattleWindow : UIWindow
         if (btnRun != null) btnRun.onClick.AddListener(OnRunClicked);
         BindHoverDetail(btnRun, DetailRun);
 
+        // 二倍速切换按钮
+        if (btnSpeed != null) btnSpeed.onClick.AddListener(OnSpeedClicked);
+
         CloseAllSubPanels();
 
         _mainCamera = Camera.main;
@@ -118,6 +123,8 @@ public class BattleWindow : UIWindow
         CloseAllSubPanels();
 
         if (logPanel != null) logPanel.ClearLogs();
+
+        RefreshSpeedButton();
 
         // 严格 MVC：请求管理器推送当前状态快照（由事件回调更新缓存，不主动读取）
         // 若战斗已处于玩家等待，OnPlayerActionWaitChanged(true) 回调会自动显示按钮并选中目标
@@ -575,6 +582,23 @@ public class BattleWindow : UIWindow
         }
 
         _battleManager.PlayerFlee();
+    }
+
+    /// <summary> 切换正常/二倍速播放（动画、等待、位移同步加速） </summary>
+    private void OnSpeedClicked()
+    {
+        var presenter = BattlePresenter.Instance;
+        if (presenter == null) return;
+
+        presenter.SetDoubleSpeed(!presenter.DoubleSpeed);
+        RefreshSpeedButton();
+    }
+
+    private void RefreshSpeedButton()
+    {
+        if (btnSpeedText == null) return;
+        var presenter = BattlePresenter.Instance;
+        btnSpeedText.text = presenter != null && presenter.DoubleSpeed ? "2x" : "1x";
     }
 
     private bool CanOperate()
