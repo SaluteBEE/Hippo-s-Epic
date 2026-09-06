@@ -336,6 +336,11 @@ MonoBehaviour:
     m_SerializedLabels:
     - icon
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 45794f357521ec644bf99077f55e17a3
+    m_Address: Assets/Art/Sprites/Battle/bg/battle_bg1
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: dd90b6ecff8020e40aa537a3ddf43594, type: 2}
   m_SchemaSet:

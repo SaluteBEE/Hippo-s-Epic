@@ -71,7 +71,7 @@ public static class IconLoader
         {
             if (_cache.ContainsKey(id)) continue;
 
-            string address = $"icon/item/{id}";
+            string address = $"Assets/Art/Sprites/UI/Item/{id}";
             if (!KeyExists(address))
             {
                 _missing.Add(id);
@@ -130,7 +130,7 @@ public static class IconLoader
     public static void PreloadIcon(MonoBehaviour host, int iconId)
     {
         if (iconId <= 0 || _cache.ContainsKey(iconId) || _loading.Contains(iconId) || _missing.Contains(iconId)) return;
-        string address = $"icon/item/{iconId}";
+        string address = $"Assets/Art/Sprites/UI/Item/{iconId}";
         if (!KeyExists(address))
         {
             _missing.Add(iconId);

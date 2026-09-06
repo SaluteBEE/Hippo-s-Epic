@@ -32,7 +32,7 @@
     "currencyreward": 5,
     "canflee": true,
     "comment": "3v3多人测试战斗(河马+教练)",
-    "bg": "default"
+    "bg": "battle_bg1"
   },
   {
     "id": 2,
