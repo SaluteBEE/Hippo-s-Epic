@@ -270,6 +270,72 @@ MonoBehaviour:
     m_SerializedLabels:
     - ui_prefab
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 4c62c9735948d48469f7c9e118033b50
+    m_Address: Assets/Art/Sprites/UI/Item/1001
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - icon
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a81f4dc42d5d3594888f43e8e61017c4
+    m_Address: Assets/Art/Sprites/UI/Item/1002
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - icon
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 04e37a84e1a945441b60d28367f6b4d1
+    m_Address: Assets/Art/Sprites/UI/Item/1003
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - icon
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ea02cb09e7beef54ebe06afa743a3f84
+    m_Address: Assets/Art/Sprites/UI/Item/1004
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - icon
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a111aab966876194fa3128eec7339641
+    m_Address: Assets/Art/Sprites/UI/Item/1005
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - icon
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5fa4c69edb89a204cadbd04f94779e26
+    m_Address: Assets/Art/Sprites/UI/Item/1006
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - icon
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 37d7b0287c22a5443ba3c1a49e7979c5
+    m_Address: Assets/Art/Sprites/UI/Item/1007
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - icon
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f9c07e110f7c8f74f8c9c7a2118313f6
+    m_Address: Assets/Art/Sprites/UI/Item/1008
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - icon
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b104a3d5a21ba6b4c9d1a106a3c7e0e3
+    m_Address: Assets/Art/Sprites/UI/Item/1009
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - icon
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 24d856213ff42584a80d03ea13f228db
+    m_Address: Assets/Art/Sprites/UI/Item/1010
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - icon
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c8405aa5965052f46898baf9463fc5c7
+    m_Address: Assets/Art/Sprites/UI/Item/1011
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - icon
+    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: dd90b6ecff8020e40aa537a3ddf43594, type: 2}
   m_SchemaSet:
