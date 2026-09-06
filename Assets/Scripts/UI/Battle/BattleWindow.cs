@@ -41,6 +41,10 @@ public class BattleWindow : UIWindow
     [Tooltip("底部按钮或技能悬浮时显示描述的文字")]
     [SerializeField] private TextMeshProUGUI btnDetailText;
 
+    [Header("技能点指示")]
+    [Tooltip("技能点根容器（子节点 movepoint1~4，每个含 icon=可用图标 / cha=已使用遮罩）")]
+    [SerializeField] private RectTransform movePointRoot;
+
     #endregion
 
     #region 按钮描述常量
@@ -76,6 +80,11 @@ public class BattleWindow : UIWindow
     private bool _isWaitingForPlayerAction;
     private List<BattleUnit> _playerUnits = new List<BattleUnit>();
     private List<BattleUnit> _enemyUnits = new List<BattleUnit>();
+
+    /// <summary> 技能点槽缓存：movepoint1~4 的槽位节点 + 各自的 cha(已消耗遮罩) </summary>
+    private readonly List<GameObject> _movePointSlots = new List<GameObject>();
+    private readonly List<GameObject> _movePointChas = new List<GameObject>();
+    private bool _movePointCached;
 
     #endregion
 
@@ -264,6 +273,7 @@ public class BattleWindow : UIWindow
         {
             if (_currentUnit == null) return;
             SetActionButtonsVisible(true);
+            RefreshMovePointSlots(_currentUnit);
             // 新流程：进入玩家回合不预选目标，等玩家先选技能再选目标
             _selectedSkillId = 0;
             _currentCursorTarget = null;
@@ -280,6 +290,7 @@ public class BattleWindow : UIWindow
             SetActionButtonsVisible(false);
             CloseAllSubPanels();
             CancelTargetSelection();
+            HideMovePoints();
             // 执行/不可操作时不显示行动指示器
             if (_stageManager != null)
                 _stageManager.ClearHighlight();
@@ -492,6 +503,137 @@ public class BattleWindow : UIWindow
 
     #endregion
 
+    #region 技能点指示（movepoint）
+
+    /// <summary> 技能点槽最多四个 </summary>
+    private const int MovePointCount = 4;
+
+    /// <summary> 懒缓存 movepoint1~4 槽位节点 + 各自 cha 子节点 </summary>
+    private void CacheMovePoints()
+    {
+        if (_movePointCached) return;
+        _movePointCached = true;
+
+        _movePointSlots.Clear();
+        _movePointChas.Clear();
+
+        Transform root = movePointRoot != null ? movePointRoot : transform;
+        for (int i = 1; i <= MovePointCount; i++)
+        {
+            var t = root.Find($"movepoint{i}");
+            if (t == null)
+            {
+                _movePointSlots.Add(null);
+                _movePointChas.Add(null);
+                continue;
+            }
+
+            var cha = t.Find("cha");
+            _movePointSlots.Add(t.gameObject);
+            _movePointChas.Add(cha != null ? cha.gameObject : null);
+        }
+    }
+
+    /// <summary>
+    /// 刷新技能点槽位：上限 ActionPoint 个，显示序号大的槽位；行动点扣除后对应槽位整体隐藏。
+    /// cha 仅作"选中技能消耗预览"用，此方法只处理槽位显隐，不驱动 cha。
+    /// </summary>
+    private void RefreshMovePointSlots(BattleUnit unit)
+    {
+        if (unit == null) return;
+        CacheMovePoints();
+
+        int max = unit.Stats != null ? unit.Stats.ActionPoint : 0;
+        if (max > MovePointCount) max = MovePointCount;
+
+        // 剩余行动点决定还有几个槽位存活：剩余 remaining 个 → 显示序号最小的 remaining 个（序号大的先被消耗并隐藏）
+        int remaining = unit.CurrentActionPoints;
+        if (remaining < 0) remaining = 0;
+        if (remaining > max) remaining = max;
+
+        for (int i = 0; i < MovePointCount; i++)
+        {
+            // 有效槽位区间：上限 max 显示序号大的 max 个（max=4 → 0..3；max=3 → 1..3）
+            bool withinMax = i >= (MovePointCount - max);
+
+            // 已消耗（释放后隐藏）：序号大的先耗掉（4 → 3 → 2 → 1）
+            bool alive = withinMax && (MovePointCount - 1 - i) < remaining;
+
+            var slot = i < _movePointSlots.Count ? _movePointSlots[i] : null;
+            if (slot != null) slot.SetActive(alive);
+
+            // cha 预览由 PreviewSkillCost/ClearCostPreview 单独控制，此处重置
+            var cha = i < _movePointChas.Count ? _movePointChas[i] : null;
+            if (cha != null) cha.SetActive(false);
+        }
+    }
+
+    /// <summary>
+    /// 选中技能时预览将消耗的技能点：从有效槽位的最后（序号大，即从下）往上点亮 cost 个 cha。
+    /// </summary>
+    private void PreviewSkillCost(int skillId)
+    {
+        CacheMovePoints();
+        if (_currentUnit == null) return;
+
+        int cost = 1;
+        if (skillId > 0)
+        {
+            var cfg = _battleManager?.GetTables()?.TbSkill.GetOrDefault(skillId);
+            if (cfg != null) cost = cfg.Cost;
+        }
+
+        int max = _currentUnit.Stats != null ? _currentUnit.Stats.ActionPoint : 0;
+        if (max > MovePointCount) max = MovePointCount;
+        int remaining = _currentUnit.CurrentActionPoints;
+        if (remaining > max) remaining = max;
+
+        // 有效存活槽位的 index 集合：上限范围内且未被消耗（序号大的一侧先被消耗隐藏）
+        var aliveIndices = new List<int>();
+        for (int i = MovePointCount - 1; i >= 0; i--)
+        {
+            bool withinMax = i >= (MovePointCount - max);
+            bool alive = withinMax && (MovePointCount - 1 - i) < remaining;
+            if (alive) aliveIndices.Add(i);
+        }
+        // aliveIndices 已按序号从大到小排列（4 → 1），从最末（序号大）开始点亮 cost 个
+        var toLight = new HashSet<int>();
+        for (int k = 0; k < cost && k < aliveIndices.Count; k++)
+            toLight.Add(aliveIndices[k]);
+
+        for (int i = 0; i < MovePointCount; i++)
+        {
+            var cha = i < _movePointChas.Count ? _movePointChas[i] : null;
+            if (cha != null) cha.SetActive(toLight.Contains(i));
+        }
+    }
+
+    /// <summary> 清除消耗预览（取消选中/确认释放后） </summary>
+    private void ClearCostPreview()
+    {
+        CacheMovePoints();
+        for (int i = 0; i < MovePointCount; i++)
+        {
+            var cha = i < _movePointChas.Count ? _movePointChas[i] : null;
+            if (cha != null) cha.SetActive(false);
+        }
+    }
+
+    /// <summary> 隐藏全部技能点槽位 + 清预览（非玩家操作阶段） </summary>
+    private void HideMovePoints()
+    {
+        CacheMovePoints();
+        for (int i = 0; i < MovePointCount; i++)
+        {
+            var slot = i < _movePointSlots.Count ? _movePointSlots[i] : null;
+            var cha = i < _movePointChas.Count ? _movePointChas[i] : null;
+            if (slot != null) slot.SetActive(false);
+            if (cha != null) cha.SetActive(false);
+        }
+    }
+
+    #endregion
+
     #region 玩家操作
 
     /// <summary> 暴力行为 → 打开技能列表 </summary>
@@ -617,9 +759,7 @@ public class BattleWindow : UIWindow
         _selectedSkillId = skillId;
         Debug.Log($"[BattleWindow] OnSkillSelected: skillId={skillId} _currentUnit={_currentUnit} " +
                   $"冷却={skillId > 0 && _currentUnit != null && _currentUnit.IsSkillOnCooldown(skillId)} " +
-                  $"剩余AP={_currentUnit?.CurrentActionPoints}");
-
-        // 冷却中：给出提示，面板保持打开
+                  $"剩余AP={_currentUnit?.CurrentActionPoints}");        // 冷却中：给出提示，面板保持打开
         if (skillId > 0 && _currentUnit != null && _currentUnit.IsSkillOnCooldown(skillId))
         {
             _currentUnit.SkillCooldowns.TryGetValue(skillId, out int cd);
@@ -664,6 +804,8 @@ public class BattleWindow : UIWindow
         }
 
         Debug.Log($"[BattleWindow] 进入目标选择");
+        // 选中技能后：点亮 cha 预览将消耗的技能点
+        PreviewSkillCost(skillId);
         // 先选技能 → 进入目标选择模式（再选目标）
         StartTargetSelection();
     }
@@ -674,6 +816,7 @@ public class BattleWindow : UIWindow
         // TODO: 咄咄逼人对话效果
         // 目前先作为普通攻击处理
         _selectedSkillId = 0;
+        PreviewSkillCost(0); // 普通攻击消耗 1 点
         StartTargetSelection();
     }
 
@@ -682,6 +825,7 @@ public class BattleWindow : UIWindow
         CloseAllSubPanels();
         _selectedSkillId = 0;
         _selectedItemId = itemId;
+        PreviewSkillCost(0); // 物品使用消耗 1 点
         StartTargetSelection();
     }
 
@@ -747,6 +891,7 @@ public class BattleWindow : UIWindow
     {
         _isSelectingTarget = false;
         _currentCursorTarget = null;
+        ClearCostPreview();
     }
 
     /// <summary> 鼠标是否悬停在 UI 上（避免点击角色时误触 UI 按钮） </summary>
