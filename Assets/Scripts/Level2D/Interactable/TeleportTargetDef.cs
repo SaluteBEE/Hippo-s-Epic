@@ -1,6 +1,6 @@
 ﻿// ============================================================
 // 自动生成文件 - 勿手动修改
-// 生成时间: 2026-09-07 22:59:24
+// 生成时间: 2026-09-08 00:41:20
 // 通过 Tools/Map/收集所有场景数据 重新生成
 // ============================================================
 
@@ -21,21 +21,6 @@ public static class TeleportTargetDef
 
     public static readonly SceneEntry[] Scenes = new SceneEntry[]
     {
-        new SceneEntry
-        {
-            sceneName = "Scene_Outer_City",
-            mapNames = new string[] { "Behind_Moon", "Outer_City_Ground" },
-            interactables = new InteractableEntry[]
-            {
-                new InteractableEntry { entityId = "fog (1)_interacteT", mapName = "Outer_City_Ground" },
-                new InteractableEntry { entityId = "fog (2)_interacteT", mapName = "Outer_City_Ground" },
-                new InteractableEntry { entityId = "fog_interacteT", mapName = "Outer_City_Ground" },
-                new InteractableEntry { entityId = "alien_02_alienB", mapName = "Behind_Moon" },
-                new InteractableEntry { entityId = "spaceman_interacteT", mapName = "Outer_City_Ground" },
-                new InteractableEntry { entityId = "alien_01_alienA", mapName = "Behind_Moon" },
-                new InteractableEntry { entityId = "sign_interacteT", mapName = "Outer_City_Ground" }
-            }
-        }
     };
 
     public static string[] AllSceneNames
