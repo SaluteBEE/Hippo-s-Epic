@@ -47,30 +47,6 @@ MonoBehaviour:
     m_SerializedLabels:
     - scene
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 706e71b9ce7891f429ffb7b151840602
-    m_Address: scenes/Test/AnimationSceneTest
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - scene
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 3c89f3a448b79a74a98a390b394cc536
-    m_Address: scenes/Test/CharacterTestScene
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - scene
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: a41349c9f5825e34fa7b48621fb149aa
-    m_Address: scenes/Test/Level2DTest
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - scene
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 8a78d8fa841603948a09769949c67e50
-    m_Address: scenes/Test/UI&TaskTestScene
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - scene
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: d02d3d1892dea5b428a013f105a3c2ae
     m_Address: Assets/Scenes/Scene_Doomed_Hospital
     m_ReadOnly: 0
