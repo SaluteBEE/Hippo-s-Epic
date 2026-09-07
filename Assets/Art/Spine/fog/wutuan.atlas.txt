@@ -1,124 +1,138 @@
 
 wutuan.png
-size: 1957,650
+size: 1416,1027
 format: RGBA8888
 filter: Linear,Linear
 repeat: none
 1_1
   rotate: true
-  xy: 1815, 28
+  xy: 1113, 5
   size: 70, 106
   orig: 70, 106
   offset: 0, 0
   index: -1
 1_2
   rotate: true
-  xy: 1474, 387
+  xy: 650, 296
   size: 261, 306
   orig: 261, 306
   offset: 0, 0
   index: -1
 1_3
   rotate: false
-  xy: 1054, 15
+  xy: 627, 23
   size: 28, 30
   orig: 28, 30
   offset: 0, 0
   index: -1
 1_4
-  rotate: true
-  xy: 2, 2
+  rotate: false
+  xy: 2, 509
   size: 646, 516
   orig: 646, 516
   offset: 0, 0
   index: -1
 2_1
   rotate: true
-  xy: 1633, 12
+  xy: 1255, 413
   size: 154, 94
   orig: 154, 94
   offset: 0, 0
   index: -1
 2_2
-  rotate: true
-  xy: 1821, 198
+  rotate: false
+  xy: 1253, 569
   size: 108, 116
   orig: 108, 116
   offset: 0, 0
   index: -1
 2_3
-  rotate: true
-  xy: 1006, 47
+  rotate: false
+  xy: 650, 559
   size: 601, 466
   orig: 601, 466
   offset: 0, 0
   index: -1
 3_1
-  rotate: true
-  xy: 1724, 336
+  rotate: false
+  xy: 1365, 810
   size: 49, 50
   orig: 49, 50
   offset: 0, 0
   index: -1
 3_2
-  rotate: true
-  xy: 1729, 2
+  rotate: false
+  xy: 1015, 17
   size: 96, 84
   orig: 96, 84
   offset: 0, 0
   index: -1
 3_3
-  rotate: true
-  xy: 520, 25
+  rotate: false
+  xy: 2, 23
   size: 623, 484
   orig: 623, 484
   offset: 0, 0
   index: -1
 jiao
-  rotate: true
-  xy: 1724, 171
+  rotate: false
+  xy: 878, 6
   size: 135, 95
   orig: 135, 95
   offset: 0, 0
   index: -1
 shou1
-  rotate: true
-  xy: 1821, 100
+  rotate: false
+  xy: 1255, 297
   size: 96, 114
   orig: 96, 114
   offset: 0, 0
   index: -1
 shou2
   rotate: true
-  xy: 1474, 3
+  xy: 1253, 862
   size: 163, 157
   orig: 163, 157
   offset: 0, 0
   index: -1
 shou4
-  rotate: true
-  xy: 1782, 538
+  rotate: false
+  xy: 1253, 687
   size: 110, 173
   orig: 110, 173
   offset: 0, 0
   index: -1
-tou1
-  rotate: false
-  xy: 1782, 308
-  size: 172, 228
-  orig: 172, 228
-  offset: 0, 0
+tou3
+  rotate: true
+  xy: 878, 103
+  size: 184, 265
+  orig: 186, 267
+  offset: 1, 1
   index: -1
-tou2
+tou4
   rotate: false
-  xy: 1474, 168
-  size: 248, 217
-  orig: 248, 217
-  offset: 0, 0
+  xy: 958, 289
+  size: 295, 268
+  orig: 297, 270
+  offset: 1, 1
+  index: -1
+tou5
+  rotate: false
+  xy: 1145, 77
+  size: 232, 210
+  orig: 235, 212
+  offset: 2, 1
+  index: -1
+tou6
+  rotate: false
+  xy: 627, 55
+  size: 249, 239
+  orig: 253, 242
+  offset: 1, 2
   index: -1
 ying
   rotate: false
-  xy: 520, 4
+  xy: 2, 2
   size: 532, 19
   orig: 532, 19
   offset: 0, 0
