@@ -1,0 +1,48 @@
+
+宇航员.png
+size: 665,368
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+头
+  rotate: false
+  xy: 348, 125
+  size: 225, 241
+  orig: 227, 241
+  offset: 0, 0
+  index: -1
+影子
+  rotate: false
+  xy: 348, 4
+  size: 277, 24
+  orig: 279, 26
+  offset: 1, 1
+  index: -1
+绑带
+  rotate: true
+  xy: 348, 30
+  size: 93, 155
+  orig: 93, 157
+  offset: 0, 0
+  index: -1
+肩带
+  rotate: false
+  xy: 575, 265
+  size: 88, 101
+  orig: 93, 103
+  offset: 1, 1
+  index: -1
+胳膊
+  rotate: true
+  xy: 505, 34
+  size: 89, 147
+  orig: 89, 148
+  offset: 0, 1
+  index: -1
+身体
+  rotate: false
+  xy: 2, 2
+  size: 344, 364
+  orig: 345, 364
+  offset: 1, 0
+  index: -1
