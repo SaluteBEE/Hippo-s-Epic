@@ -14,9 +14,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   skeletonData: {fileID: 11400000, guid: 2b195658e346ceb4ca775570fc9f7b88, type: 2}
   clips:
-  - name: idle
-    animation: {fileID: 11400000, guid: b7fd1f827df581642aa10e8af6417867, type: 2}
-    animationName: idle
+  - name: idle1
+    animation: {fileID: 11400000, guid: b523c59c6f267cf4c92636925892dfa9, type: 2}
+    animationName: idle1
+    speed: 1
+    loop: 1
+    type: 0
+  - name: idle2
+    animation: {fileID: 11400000, guid: 99d3bf175cc93b1498949e82b24b38b2, type: 2}
+    animationName: idle2
+    speed: 1
+    loop: 1
+    type: 0
+  - name: idle3
+    animation: {fileID: 11400000, guid: da58624c1bd377644ac7017393a59778, type: 2}
+    animationName: idle3
     speed: 1
     loop: 1
     type: 0
@@ -26,8 +38,7 @@ MonoBehaviour:
     defaultWeight: 1
     additive: 0
     slotNames: []
-    availableClipNames:
-    - idle
+    availableClipNames: []
   - name: UpperBody
     trackIndex: 1
     defaultWeight: 1
@@ -41,11 +52,27 @@ MonoBehaviour:
     slotNames: []
     availableClipNames: []
   compositions:
-  - name: 0
+  - name: 1
     description: "\u63CF\u8FF0"
     layers:
     - layerName: Base
-      clipName: idle
+      clipName: idle1
+      weight: 1
+      transitionTime: 0.1
+      delay: 0
+  - name: 2
+    description: "\u63CF\u8FF0"
+    layers:
+    - layerName: Base
+      clipName: idle2
+      weight: 1
+      transitionTime: 0.1
+      delay: 0
+  - name: 3
+    description: "\u63CF\u8FF0"
+    layers:
+    - layerName: Base
+      clipName: idle3
       weight: 1
       transitionTime: 0.1
       delay: 0
