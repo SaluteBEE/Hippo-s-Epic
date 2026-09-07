@@ -67,6 +67,9 @@ public class BattleWindow : UIWindow
     private Camera _mainCamera;
     private BattleUnit _currentCursorTarget;
 
+    /// <summary> 目标选择开始时刻（用于忽略选技能那一下的点击，避免误释放） </summary>
+    private float _targetSelectStartTime;
+
     // 提示弹窗（技能无法使用时居中弹出，自动消失）
     private GameObject _toastGo;
     private TextMeshProUGUI _toastText;
@@ -155,8 +158,11 @@ public class BattleWindow : UIWindow
         // 目标选择模式：先选技能后，点击/方向键选目标，回车/空格确认，Esc 取消
         if (_isSelectingTarget)
         {
-            // 鼠标点击选择（点击有效目标直接释放）
-            if (Input.GetMouseButtonDown(0) && !IsPointerOverUI())
+            // 目标选择刚开始的一小段时间内忽略点击（避免"点击选中技能"这一下的 up 被误判为选目标释放）
+            bool clickAllowed = Time.unscaledTime - _targetSelectStartTime >= 0.1f;
+
+            // 鼠标抬起选择（抬起时 EventSystem 的 hover 状态已稳定，能准确区分点 UI vs 点场景）
+            if (clickAllowed && Input.GetMouseButtonUp(0) && !IsPointerOverUI())
             {
                 TrySelectTargetByClick();
             }
@@ -757,9 +763,9 @@ public class BattleWindow : UIWindow
     private void OnSkillSelected(int skillId)
     {
         _selectedSkillId = skillId;
+        _selectedItemId = 0;  // 选技能即取消之前的物品选择，走技能释放路径
         Debug.Log($"[BattleWindow] OnSkillSelected: skillId={skillId} _currentUnit={_currentUnit} " +
-                  $"冷却={skillId > 0 && _currentUnit != null && _currentUnit.IsSkillOnCooldown(skillId)} " +
-                  $"剩余AP={_currentUnit?.CurrentActionPoints}");        // 冷却中：给出提示，面板保持打开
+                  $"剩余AP={_currentUnit?.CurrentActionPoints}");
         if (skillId > 0 && _currentUnit != null && _currentUnit.IsSkillOnCooldown(skillId))
         {
             _currentUnit.SkillCooldowns.TryGetValue(skillId, out int cd);
@@ -816,6 +822,7 @@ public class BattleWindow : UIWindow
         // TODO: 咄咄逼人对话效果
         // 目前先作为普通攻击处理
         _selectedSkillId = 0;
+        _selectedItemId = 0;
         PreviewSkillCost(0); // 普通攻击消耗 1 点
         StartTargetSelection();
     }
@@ -848,14 +855,10 @@ public class BattleWindow : UIWindow
             return;
         }
 
-        // 关闭技能面板（已选技能，现在进入选目标）
-        if (skillPanel != null) skillPanel.Close();
-        if (subPanelContainer != null) subPanelContainer.SetActive(false);
-        _currentPanelDetail = null;
-        ClearDetail();
-
+        // 进入目标选择模式（不关闭技能面板：技能面板只在左侧功能切换时更换/关闭）
         _isSelectingTarget = true;
         _currentCursorTarget = defaultTarget;
+        _targetSelectStartTime = Time.unscaledTime;
         if (logPanel != null)
             logPanel.AddLog("请选择目标：点击 / 方向键切换 / 回车确认（Esc 取消）");
         if (_stageManager != null)
@@ -897,7 +900,11 @@ public class BattleWindow : UIWindow
     /// <summary> 鼠标是否悬停在 UI 上（避免点击角色时误触 UI 按钮） </summary>
     private bool IsPointerOverUI()
     {
-        return EventSystem.current != null && EventSystem.current.IsPointerOverGameObject();
+        if (EventSystem.current == null) return false;
+        var ped = new PointerEventData(EventSystem.current) { position = Input.mousePosition };
+        var results = new List<RaycastResult>();
+        EventSystem.current.RaycastAll(ped, results);
+        return results.Count > 0;
     }
 
     /// <summary>

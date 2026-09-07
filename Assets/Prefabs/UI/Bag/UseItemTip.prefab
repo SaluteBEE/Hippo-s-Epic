@@ -709,6 +709,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   buttonText: {fileID: 592835743547575987}
+  normalColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
+  disabledColor: {r: 0.5, g: 0.5, b: 0.5, a: 0.5}
 --- !u!1 &4854800280664863348
 GameObject:
   m_ObjectHideFlags: 0
@@ -844,6 +846,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   buttonText: {fileID: 1709871147916988915}
+  normalColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
+  disabledColor: {r: 0.5, g: 0.5, b: 0.5, a: 0.5}
 --- !u!1 &5733524218258407911
 GameObject:
   m_ObjectHideFlags: 0
@@ -1371,6 +1375,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   buttonText: {fileID: 58059750933788110}
+  normalColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
+  disabledColor: {r: 0.5, g: 0.5, b: 0.5, a: 0.5}
 --- !u!1 &9003757311524364762
 GameObject:
   m_ObjectHideFlags: 0
@@ -1506,6 +1512,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   buttonText: {fileID: 8606451875334090433}
+  normalColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
+  disabledColor: {r: 0.5, g: 0.5, b: 0.5, a: 0.5}
 --- !u!1 &9154694142488111407
 GameObject:
   m_ObjectHideFlags: 0
@@ -1641,6 +1649,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   buttonText: {fileID: 1476753371282941719}
+  normalColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
+  disabledColor: {r: 0.5, g: 0.5, b: 0.5, a: 0.5}
 --- !u!1 &9156578431267000738
 GameObject:
   m_ObjectHideFlags: 0

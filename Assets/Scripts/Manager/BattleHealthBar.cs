@@ -1,42 +1,48 @@
-using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
 /// 战斗头顶血条组件（World Space）
-/// 跟随角色头顶，显示HP比例
+/// 用牙齿数量表现血量，跟随角色头顶
 /// </summary>
 public class BattleHealthBar : MonoBehaviour
 {
-    /// <summary>
-    /// 共享白色精灵（UGUI Filled 类型必须有 sprite，fillAmount 才生效；动态创建时未赋 sprite 会导致只变色不缩短）
-    /// </summary>
-    private static Sprite _whiteSprite;
-    public static Sprite WhiteSprite
-    {
-        get
-        {
-            if (_whiteSprite == null)
-            {
-                var tex = new Texture2D(1, 1);
-                tex.SetPixel(0, 0, Color.white);
-                tex.Apply();
-                _whiteSprite = Sprite.Create(tex, new Rect(0, 0, 1, 1), new Vector2(0.5f, 0.5f));
-            }
-            return _whiteSprite;
-        }
-    }
-
     private BattleUnit _unit;
     private Transform _followTarget;
     private Vector3 _offset;
-    private Image _fillImage;
-    private Slider _slider;
-    private Image _ghostImage;
-    private IEnumerator _ghostRoutine;
+
+    #region 牙齿血条字段
+
+    [Header("牙齿血条")]
+    [Tooltip("一颗牙齿代表多少血量")]
+    [SerializeField] private int bloodPerYachi = 4;
+
+    [Tooltip("牙齿排布的目标总宽度")]
+    [SerializeField] private float rootWidth = 320f;
+
+    [Tooltip("牙齿容器（放实例化牙齿的 root 节点，不拖则自动查找子节点 root）")]
+    [SerializeField] private RectTransform yachiRoot;
+
+    [Tooltip("牙齿模板（不拖则自动查找子节点 yachi）")]
+    [SerializeField] private GameObject yachiTemplate;
+
+    /// <summary> 已实例化的牙齿列表 </summary>
+    private readonly List<GameObject> _teeth = new List<GameObject>();
+
+    /// <summary> 牙齿容器上的水平布局组件 </summary>
+    private HorizontalLayoutGroup _layout;
+
+    /// <summary> 牙齿容器上的内容尺寸适配器 </summary>
+    private ContentSizeFitter _fitter;
+
+    /// <summary> 单颗牙齿宽度（取自模板 RectTransform） </summary>
+    private float _toothWidth = 40f;
+
+    #endregion
 
     /// <summary>
-    /// 完整初始化（使用预制体时）
+    /// 初始化：绑定单位、查找牙齿容器与模板
     /// </summary>
     public void Setup(BattleUnit unit, Transform followTarget, Vector3 offset)
     {
@@ -44,45 +50,8 @@ public class BattleHealthBar : MonoBehaviour
         _followTarget = followTarget;
         _offset = offset;
 
-        _slider = GetComponentInChildren<Slider>();
-        if (_slider != null)
-        {
-            _slider.minValue = 0;
-            _slider.maxValue = 1;
-        }
-
-        // 尝试找到填充图
-        if (_fillImage == null)
-        {
-            var fillGo = transform.Find("Background/Fill");
-            if (fillGo != null) _fillImage = fillGo.GetComponent<Image>();
-        }
-
-        EnsureFillSprite();
+        InitTeethBar();
         UpdateHealth();
-    }
-
-    /// <summary>
-    /// 简单初始化（动态创建时）
-    /// </summary>
-    public void SetupSimple(BattleUnit unit, Image fillImage, Transform followTarget, Vector3 offset)
-    {
-        _unit = unit;
-        _fillImage = fillImage;
-        _followTarget = followTarget;
-        _offset = offset;
-        EnsureFillSprite();
-        UpdateHealth();
-    }
-
-    /// <summary>
-    /// UGUI Filled 类型 Image 必须有 sprite，fillAmount 才会在渲染层生效；
-    /// 动态创建时未赋 sprite 的已知坑：血条只变色、不按百分比缩短。
-    /// </summary>
-    private void EnsureFillSprite()
-    {
-        if (_fillImage != null && _fillImage.sprite == null)
-            _fillImage.sprite = WhiteSprite;
     }
 
     private void LateUpdate()
@@ -101,129 +70,97 @@ public class BattleHealthBar : MonoBehaviour
     }
 
     /// <summary>
-    /// 更新血量显示
+    /// 更新血量显示：按血量生成牙齿
     /// </summary>
     public void UpdateHealth()
     {
         if (_unit == null) return;
 
-        float ratio = _unit.Stats.FinalHpMax > 0 ? (float)_unit.Stats.Hp / _unit.Stats.FinalHpMax : 0f;
-
-        if (_slider != null)
-            _slider.value = ratio;
-
-        if (_fillImage != null)
-        {
-            if (_fillImage.type == Image.Type.Filled)
-                _fillImage.fillAmount = ratio;
-            else
-                _fillImage.rectTransform.localScale = new Vector3(ratio, 1, 1);
-            // 颜色固定为创建时的红色，不随血量变色
-        }
+        UpdateTeethBar();
 
         // 阵亡时隐藏
         if (_unit.Stats.Hp <= 0)
             gameObject.SetActive(false);
     }
 
-    #region 延迟血条动画（白条残影）
+    #region 牙齿血条
 
     /// <summary>
-    /// 延迟扣血/回血动画：白色残影条从 beforeHp 缓动到当前 HP（经典 RPG 白条延迟）
+    /// 初始化牙齿血条：查找 root/模板、隐藏模板、禁用水平自适应以便固定总宽
     /// </summary>
-    public void PlayGhostAnimation(int beforeHp, int afterHp)
+    private void InitTeethBar()
     {
-        // 单位已死亡/血条被隐藏时跳过（inactive 对象无法启动协程）
-        if (_unit == null || !gameObject.activeInHierarchy) return;
-        float max = _unit.Stats.FinalHpMax;
-        if (max <= 0f) return;
-
-        float from = Mathf.Clamp01(beforeHp / max);
-        float to = Mathf.Clamp01(afterHp / max);
-
-        if (_ghostRoutine != null)
-            StopCoroutine(_ghostRoutine);
-
-        _ghostRoutine = GhostRoutine(from, to);
-        StartCoroutine(_ghostRoutine);
-    }
-
-    private IEnumerator GhostRoutine(float from, float to)
-    {
-        var ghost = EnsureGhostImage();
-        if (ghost == null)
+        if (yachiRoot == null)
         {
-            _ghostRoutine = null;
-            yield break;
+            var root = transform.Find("root");
+            if (root != null) yachiRoot = root as RectTransform;
         }
 
-        ghost.gameObject.SetActive(true);
-        SetGhostValue(ghost, from);
-
-        float dur = 0.7f;
-        float t = 0f;
-        while (t < dur)
+        if (yachiTemplate == null)
         {
-            t += Time.deltaTime;
-            SetGhostValue(ghost, Mathf.Lerp(from, to, t / dur));
-            yield return null;
+            var tpl = transform.Find("yachi");
+            if (tpl != null) yachiTemplate = tpl.gameObject;
         }
 
-        SetGhostValue(ghost, to);
-        ghost.gameObject.SetActive(false);
-        _ghostRoutine = null;
-    }
+        if (yachiRoot == null || yachiTemplate == null) return;
 
-    private Image EnsureGhostImage()
-    {
-        if (_ghostImage != null) return _ghostImage;
-        if (_fillImage == null) return null;
+        _layout = yachiRoot.GetComponent<HorizontalLayoutGroup>();
+        _fitter = yachiRoot.GetComponent<ContentSizeFitter>();
 
-        var parent = _fillImage.rectTransform.parent;
-        if (parent == null) return null;
-
-        var ghostGo = new GameObject("GhostFill");
-        ghostGo.transform.SetParent(parent, false);
-        var rt = ghostGo.AddComponent<RectTransform>();
-        rt.anchorMin = _fillImage.rectTransform.anchorMin;
-        rt.anchorMax = _fillImage.rectTransform.anchorMax;
-        rt.offsetMin = _fillImage.rectTransform.offsetMin;
-        rt.offsetMax = _fillImage.rectTransform.offsetMax;
-
-        var ghost = ghostGo.AddComponent<Image>();
-        ghost.color = new Color(1f, 1f, 1f, 0.85f);
-        ghost.raycastTarget = false;
-        ghost.sprite = _fillImage.sprite != null ? _fillImage.sprite : WhiteSprite;
-
-        if (_fillImage.type == Image.Type.Filled)
+        var rt = yachiTemplate.GetComponent<RectTransform>();
+        if (rt != null)
         {
-            ghost.type = Image.Type.Filled;
-            ghost.fillMethod = _fillImage.fillMethod;
-            ghost.fillOrigin = _fillImage.fillOrigin;
-            ghost.fillAmount = 1f;
-        }
-        else
-        {
-            ghost.type = Image.Type.Simple;
+            // 模板锚点与预览牙齿保持一致（左下角），确保 HorizontalLayoutGroup 布局不偏移
+            rt.anchorMin = new Vector2(0, 0);
+            rt.anchorMax = new Vector2(0, 0);
+            _toothWidth = rt.rect.width;
         }
 
-        // 渲染在真实血条之上
-        ghostGo.transform.SetSiblingIndex(_fillImage.transform.GetSiblingIndex() + 1);
+        // 模板仅作克隆源，隐藏不显示
+        yachiTemplate.SetActive(false);
 
-        _ghostImage = ghost;
-        return ghost;
+        // 禁用水平自适应，改为固定 rootWidth
+        if (_fitter != null)
+            _fitter.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
     }
 
     /// <summary>
-    /// 设置残影条比例：Filled类型用fillAmount，Simple类型用localScale.x
+    /// 更新牙齿血条：按血量生成对应数量牙齿，并用 spacing 把总宽补/压到 rootWidth
     /// </summary>
-    private static void SetGhostValue(Image ghost, float ratio)
+    private void UpdateTeethBar()
     {
-        if (ghost == null) return;
-        if (ghost.type == Image.Type.Filled)
-            ghost.fillAmount = ratio;
-        else
-            ghost.rectTransform.localScale = new Vector3(ratio, 1f, 1f);
+        if (yachiRoot == null || yachiTemplate == null) return;
+
+        int hp = _unit.Stats.Hp;
+        int toothCount = bloodPerYachi > 0
+            ? Mathf.CeilToInt((float)hp / bloodPerYachi)
+            : (hp > 0 ? 1 : 0);
+        if (toothCount < 0) toothCount = 0;
+
+        // 同步牙齿数量（不足实例化，多余销毁）
+        while (_teeth.Count < toothCount)
+        {
+            var go = Instantiate(yachiTemplate, yachiRoot);
+            go.SetActive(true);
+            _teeth.Add(go);
+        }
+        while (_teeth.Count > toothCount)
+        {
+            var go = _teeth[_teeth.Count - 1];
+            _teeth.RemoveAt(_teeth.Count - 1);
+            if (Application.isPlaying) Destroy(go);
+            else DestroyImmediate(go);
+        }
+
+        // 固定总宽到 rootWidth
+        yachiRoot.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, rootWidth);
+
+        // 用 spacing 补齐/压缩牙齿到 rootWidth：spacing = (rootWidth - n*牙宽) / (n-1)
+        if (_layout != null)
+        {
+            int n = _teeth.Count;
+            _layout.spacing = n > 1 ? (rootWidth - n * _toothWidth) / (n - 1) : 0f;
+        }
     }
 
     #endregion

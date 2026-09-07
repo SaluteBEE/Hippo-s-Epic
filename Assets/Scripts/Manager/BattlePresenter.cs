@@ -237,7 +237,7 @@ public class BattlePresenter : MonoBehaviour
             // ── [1.02s] 喜剧延迟：受击演完停顿一拍，再飘字（WoL 滑稽感关键）──
             yield return W(ComedyDelay);
 
-            // ── 伤害飘字 + 血条延迟动画（白条残影）──
+            // ── 伤害飘字 ──
             foreach (var target in validTargets)
             {
                 var targetGo = GetUnitGo(target);
@@ -258,10 +258,6 @@ public class BattlePresenter : MonoBehaviour
                 {
                     DamageFx.SpawnFloatText(targetGo.transform, "恢复", FloatTextType.Heal);
                 }
-
-                var bar = _stage != null ? _stage.GetHealthBar(target.IsPlayerSide, target.SlotIndex) : null;
-                if (bar != null)
-                    bar.PlayGhostAnimation(before, target.Stats.Hp);
 
                 yield return W(FloatTextStagger);
             }

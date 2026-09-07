@@ -555,12 +555,6 @@ public class BattleStageManager : MonoBehaviour
         return false;
     }
 
-    public BattleHealthBar GetHealthBar(bool isPlayerSide, int slotIndex)
-    {
-        var dict = isPlayerSide ? _playerHealthBars : _enemyHealthBars;
-        return dict.TryGetValue(slotIndex, out var bar) ? bar : null;
-    }
-
     #endregion
 
     #region 清理
