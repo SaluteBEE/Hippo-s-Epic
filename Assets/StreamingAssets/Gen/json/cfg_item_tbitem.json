@@ -12,7 +12,9 @@
     "param1": [],
     "param2": [],
     "param3": [],
-    "battletip": "战斗详情：待配置"
+    "battletip": "战斗详情：待配置",
+    "gethint": "",
+    "getexclaim": ""
   },
   {
     "id": 2,
@@ -27,7 +29,9 @@
     "param1": [],
     "param2": [],
     "param3": [],
-    "battletip": "战斗详情：待配置"
+    "battletip": "战斗详情：待配置",
+    "gethint": "",
+    "getexclaim": ""
   },
   {
     "id": 3,
@@ -44,7 +48,9 @@
     ],
     "param2": [],
     "param3": [],
-    "battletip": "战斗详情：待配置"
+    "battletip": "战斗详情：待配置",
+    "gethint": "",
+    "getexclaim": ""
   },
   {
     "id": 4,
@@ -61,7 +67,9 @@
     ],
     "param2": [],
     "param3": [],
-    "battletip": "战斗详情：待配置"
+    "battletip": "战斗详情：待配置",
+    "gethint": "",
+    "getexclaim": ""
   },
   {
     "id": 5,
@@ -78,7 +86,9 @@
     ],
     "param2": [],
     "param3": [],
-    "battletip": "战斗详情：待配置"
+    "battletip": "战斗详情：待配置",
+    "gethint": "",
+    "getexclaim": ""
   },
   {
     "id": 6,
@@ -95,7 +105,9 @@
     ],
     "param2": [],
     "param3": [],
-    "battletip": "每一拳砸下去，飞溅的水珠都像在替对手喊疼，而你自己也分不清，那是汗水、自来水，还是昨夜梦见自己输掉比赛时偷流的眼泪。\\n他妈的耍赖，他妈的用力打每一个人！"
+    "battletip": "每一拳砸下去，飞溅的水珠都像在替对手喊疼，而你自己也分不清，那是汗水、自来水，还是昨夜梦见自己输掉比赛时偷流的眼泪。\\n他妈的耍赖，他妈的用力打每一个人！",
+    "gethint": "",
+    "getexclaim": ""
   },
   {
     "id": 7,
@@ -112,7 +124,9 @@
     ],
     "param2": [],
     "param3": [],
-    "battletip": "战斗详情：待配置"
+    "battletip": "战斗详情：待配置",
+    "gethint": "",
+    "getexclaim": ""
   },
   {
     "id": 10,
@@ -127,7 +141,9 @@
     "param1": [],
     "param2": [],
     "param3": [],
-    "battletip": "战斗详情：待配置"
+    "battletip": "战斗详情：待配置",
+    "gethint": "",
+    "getexclaim": ""
   },
   {
     "id": 11,
@@ -144,7 +160,9 @@
     ],
     "param2": [],
     "param3": [],
-    "battletip": "又遇到猫了？没问题！遇到狗了？没问题！遇到变异动物了？那更没问题了！我们天生就是他妈干这个的！马上到那野狗楼下！我爱生活！\\n战斗中为你解决字面意义上的野狗敌人"
+    "battletip": "又遇到猫了？没问题！遇到狗了？没问题！遇到变异动物了？那更没问题了！我们天生就是他妈干这个的！马上到那野狗楼下！我爱生活！\\n战斗中为你解决字面意义上的野狗敌人",
+    "gethint": "",
+    "getexclaim": ""
   },
   {
     "id": 12,
@@ -169,7 +187,9 @@
       5,
       29
     ],
-    "battletip": "炸毁一切！\\n炸掉敌人10点生命值"
+    "battletip": "炸毁一切！\\n炸掉敌人10点生命值",
+    "gethint": "",
+    "getexclaim": ""
   },
   {
     "id": 13,
@@ -194,7 +214,9 @@
     "param3": [
       10
     ],
-    "battletip": "包扎伤口\\n为选中的友方单位回复10点生命值"
+    "battletip": "包扎伤口\\n为选中的友方单位回复10点生命值",
+    "gethint": "",
+    "getexclaim": ""
   },
   {
     "id": 100,
@@ -209,7 +231,9 @@
     "param1": [],
     "param2": [],
     "param3": [],
-    "battletip": "战斗详情：待配置"
+    "battletip": "战斗详情：待配置",
+    "gethint": "",
+    "getexclaim": ""
   },
   {
     "id": 1001,
@@ -224,7 +248,9 @@
     "param1": [],
     "param2": [],
     "param3": [],
-    "battletip": ""
+    "battletip": "",
+    "gethint": "",
+    "getexclaim": ""
   },
   {
     "id": 1002,
@@ -239,7 +265,9 @@
     "param1": [],
     "param2": [],
     "param3": [],
-    "battletip": ""
+    "battletip": "",
+    "gethint": "",
+    "getexclaim": ""
   },
   {
     "id": 1003,
@@ -254,7 +282,9 @@
     "param1": [],
     "param2": [],
     "param3": [],
-    "battletip": ""
+    "battletip": "",
+    "gethint": "",
+    "getexclaim": ""
   },
   {
     "id": 1004,
@@ -269,7 +299,9 @@
     "param1": [],
     "param2": [],
     "param3": [],
-    "battletip": ""
+    "battletip": "",
+    "gethint": "",
+    "getexclaim": ""
   },
   {
     "id": 1005,
@@ -284,7 +316,9 @@
     "param1": [],
     "param2": [],
     "param3": [],
-    "battletip": ""
+    "battletip": "",
+    "gethint": "",
+    "getexclaim": ""
   },
   {
     "id": 1006,
@@ -299,7 +333,9 @@
     "param1": [],
     "param2": [],
     "param3": [],
-    "battletip": ""
+    "battletip": "",
+    "gethint": "",
+    "getexclaim": ""
   },
   {
     "id": 1007,
@@ -314,7 +350,9 @@
     "param1": [],
     "param2": [],
     "param3": [],
-    "battletip": ""
+    "battletip": "",
+    "gethint": "",
+    "getexclaim": ""
   },
   {
     "id": 1008,
@@ -329,7 +367,9 @@
     "param1": [],
     "param2": [],
     "param3": [],
-    "battletip": ""
+    "battletip": "",
+    "gethint": "",
+    "getexclaim": ""
   },
   {
     "id": 1009,
@@ -344,7 +384,9 @@
     "param1": [],
     "param2": [],
     "param3": [],
-    "battletip": ""
+    "battletip": "",
+    "gethint": "",
+    "getexclaim": ""
   },
   {
     "id": 1010,
@@ -359,7 +401,9 @@
     "param1": [],
     "param2": [],
     "param3": [],
-    "battletip": ""
+    "battletip": "",
+    "gethint": "",
+    "getexclaim": ""
   },
   {
     "id": 1011,
@@ -374,6 +418,25 @@
     "param1": [],
     "param2": [],
     "param3": [],
-    "battletip": ""
+    "battletip": "",
+    "gethint": "",
+    "getexclaim": ""
+  },
+  {
+    "id": 101,
+    "type": 2,
+    "childtype": 0,
+    "name": "测试物品（SceneTip）",
+    "icon": 2,
+    "price": 0,
+    "stackable": false,
+    "tip": "一块来路不明的砖头，摸上去还挺温的。（本行来自物品表 tip → 左侧详情区）",
+    "func": [],
+    "param1": [],
+    "param2": [],
+    "param3": [],
+    "battletip": "战斗详情：待配置",
+    "gethint": "在楼下的垃圾桶旁边捡到的。（本行来自 gethint → 右上获取方式）",
+    "getexclaim": "嘿嘿，捡到宝了！"
   }
 ]

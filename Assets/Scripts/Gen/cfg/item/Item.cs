@@ -29,6 +29,8 @@ public sealed partial class Item : Luban.BeanBase
         {int n0 = _buf.ReadSize(); Param2 = new System.Collections.Generic.List<int>(n0);for(var i0 = 0 ; i0 < n0 ; i0++) { int _e0;  _e0 = _buf.ReadInt(); Param2.Add(_e0);}}
         {int n0 = _buf.ReadSize(); Param3 = new System.Collections.Generic.List<int>(n0);for(var i0 = 0 ; i0 < n0 ; i0++) { int _e0;  _e0 = _buf.ReadInt(); Param3.Add(_e0);}}
         Battletip = _buf.ReadString();
+        Gethint = _buf.ReadString();
+        Getexclaim = _buf.ReadString();
     }
 
     public static Item DeserializeItem(ByteBuf _buf)
@@ -88,6 +90,14 @@ public sealed partial class Item : Luban.BeanBase
     /// 物品战斗使用时详情
     /// </summary>
     public readonly string Battletip;
+    /// <summary>
+    /// 获取方式
+    /// </summary>
+    public readonly string Gethint;
+    /// <summary>
+    /// 获取感叹
+    /// </summary>
+    public readonly string Getexclaim;
    
     public const int __ID__ = -1740355548;
     public override int GetTypeId() => __ID__;
@@ -112,6 +122,8 @@ public sealed partial class Item : Luban.BeanBase
         + "param2:" + Luban.StringUtil.CollectionToString(Param2) + ","
         + "param3:" + Luban.StringUtil.CollectionToString(Param3) + ","
         + "battletip:" + Battletip + ","
+        + "gethint:" + Gethint + ","
+        + "getexclaim:" + Getexclaim + ","
         + "}";
     }
 }

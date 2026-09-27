@@ -9,6 +9,7 @@ using UnityEngine.ResourceManagement.AsyncOperations;
 public class Interactable : MonoBehaviour
 {
     private const string HintPrefabAddress = "Assets/Prefabs/UI/Interact/InteractHint";
+    private const string TipPrefabAddress = "Assets/Prefabs/UI/Interact/SceneTip";
 
     [Header("Phases")]
     [SerializeField] private List<InteractionPhase> phases = new List<InteractionPhase>();
@@ -18,6 +19,16 @@ public class Interactable : MonoBehaviour
     private static bool _hintLoading;
     private readonly List<InteractHint> _pendingHints = new List<InteractHint>();
     private InteractHint _hint;
+
+    private static GameObject _tipPrefab;
+    private static AsyncOperationHandle<GameObject> _tipPrefabHandle;
+    private static bool _tipLoading;
+    private static readonly List<Action> _tipPendingRequests = new List<Action>();
+    private SceneTip _tip;
+    private bool _itemTipShowing;
+    private int _confirmSuppressFrame = -1;
+    private Action _pendingItemTipConfirm;
+
     private int _currentState;
     private InteractionPhase _currentPhase;
     private bool _playerInside;
@@ -194,6 +205,7 @@ public class Interactable : MonoBehaviour
         _triggerCollider = null;
         if (_hint != null)
             _hint.Hide();
+        ForceFinishItemTip();
 
         if (player.CurrentInteractable == this)
             player.ClearCurrentInteractable();
@@ -224,6 +236,7 @@ public class Interactable : MonoBehaviour
             _triggerCollider = null;
             if (_hint != null)
                 _hint.Hide();
+            ForceFinishItemTip();
 
             var player = FindObjectOfType<PlayerCharacter>();
             if (player != null && player.CurrentInteractable == this)
@@ -271,6 +284,7 @@ public class Interactable : MonoBehaviour
         _playerInside = false;
         if (_hint != null)
             _hint.Hide();
+        ForceFinishItemTip();
     }
 
     public void OnPlayerExecute(int buttonIndex = 0)
@@ -279,6 +293,10 @@ public class Interactable : MonoBehaviour
             return;
         if (_currentPhase == null)
             return;
+        if (_itemTipShowing)
+            return;   // 物品获得提示未确认前冻结交互，避免重复触发
+        if (Time.frameCount == _confirmSuppressFrame)
+            return;   // 确认那一帧交互键还按着：别顺手把下一阶段也执行了
 
         var buttons = _currentPhase.buttons;
         if (buttons == null || buttonIndex < 0 || buttonIndex >= buttons.Count)
@@ -299,12 +317,29 @@ public class Interactable : MonoBehaviour
         if (_hasExecuted && !_currentPhase.canRepeat)
             return;
 
-        ExecuteButtonAction(button);
+        int added = ExecuteButtonAction(button);
 
         _hasExecuted = true;
 
-        bool hideAfterExecute = _currentPhase.hideAfterExecute;
-        bool destroySelf = _currentPhase.destroySelf;
+        var phase = _currentPhase;
+
+        // —— 获取物品劫持：真的拿到物品时，先隐藏原交互 UI，在原位显示物品获得提示（SceneTip）；
+        //    点确认后才继续走原流程的收尾（切阶段 / 销毁 / 隐藏 / 刷新）
+        if (button.type == InteractionType.Pickup && added > 0)
+        {
+            HijackWithItemTip(button, phase);
+            return;
+        }
+
+        CompleteExecute(button, phase);
+    }
+
+    private void CompleteExecute(ButtonOption button, InteractionPhase phase)
+    {
+        if (phase == null) return;
+
+        bool hideAfterExecute = phase.hideAfterExecute;
+        bool destroySelf = phase.destroySelf;
 
         if (button.transitionToState >= 0)
         {
@@ -330,9 +365,142 @@ public class Interactable : MonoBehaviour
         }
     }
 
+    private void HijackWithItemTip(ButtonOption button, InteractionPhase phase)
+    {
+        _itemTipShowing = true;
+
+        if (_hint != null)
+            _hint.Hide();
+
+        Transform parent = transform.Find("UI");
+        if (parent == null) parent = transform;
+
+        var tipParent = parent;
+        Action onConfirmed = () =>
+        {
+            _itemTipShowing = false;
+            _tip = null;
+            _pendingItemTipConfirm = null;
+            _confirmSuppressFrame = Time.frameCount;   // 确认发生在哪一帧
+            CompleteExecute(button, phase);
+        };
+        _pendingItemTipConfirm = onConfirmed;
+
+        if (_tipPrefab != null)
+        {
+            CreateTipInstance(tipParent, button.dataId, onConfirmed);
+            return;
+        }
+
+        _tipPendingRequests.Add(() =>
+        {
+            if (!_itemTipShowing) return;   // 玩家已走开/流程已结束，作废
+            CreateTipInstance(tipParent, button.dataId, onConfirmed);
+        });
+        if (!_tipLoading)
+            StartCoroutine(LoadTipPrefabAsync());
+    }
+
+    private IEnumerator LoadTipPrefabAsync()
+    {
+        _tipLoading = true;
+        _tipPrefabHandle = Addressables.LoadAssetAsync<GameObject>(TipPrefabAddress);
+        yield return _tipPrefabHandle;
+
+        if (_tipPrefabHandle.Status == AsyncOperationStatus.Succeeded)
+        {
+            _tipPrefab = _tipPrefabHandle.Result;
+        }
+        else
+        {
+            Debug.LogWarning($"[Interactable] 加载 SceneTip 预制体失败: {TipPrefabAddress}");
+        }
+        _tipLoading = false;
+
+        var pending = _tipPendingRequests.ToArray();
+        _tipPendingRequests.Clear();
+        for (int i = 0; i < pending.Length; i++)
+        {
+            if (pending[i] != null) pending[i]();
+        }
+    }
+
+    private void CreateTipInstance(Transform parent, int itemId, Action onConfirmed)
+    {
+        // 流程已经结束了（比如预载期间玩家走开触发了强制收尾）：作废这次创建，
+        // 也**不要**再调 onConfirmed —— 它已经在强制收尾时执行过，再调会重复推进
+        if (!_itemTipShowing) return;
+
+        if (this == null || parent == null || _tipPrefab == null)
+        {
+            Debug.LogWarning($"[Interactable] SceneTip 预制体未就绪，跳过物品获得提示");
+            if (onConfirmed != null) onConfirmed();
+            return;
+        }
+
+        GameObject instance = Instantiate(_tipPrefab, parent);
+        instance.name = "SceneTip";
+
+        // 对齐到原交互 UI 的位置
+        if (_hint != null)
+        {
+            instance.transform.localPosition = _hint.transform.localPosition;
+            instance.transform.localRotation = _hint.transform.localRotation;
+        }
+
+        _tip = instance.GetComponent<SceneTip>();
+        if (_tip == null)
+        {
+            Debug.LogWarning("[Interactable] SceneTip 预制体上缺少 SceneTip 组件");
+            Destroy(instance);
+            if (onConfirmed != null) onConfirmed();
+            return;
+        }
+
+        if (!_tip.Show(itemId, onConfirmed))
+        {
+            Debug.LogWarning("[Interactable] SceneTip.Show 失败（表未就绪?），直接继续流程");
+            if (onConfirmed != null) onConfirmed();
+        }
+    }
+
+    /// <summary>玩家没点确认就走开：收起提示框，并按"点了确认"一样继续流程</summary>
+    private void ForceFinishItemTip()
+    {
+        if (!_itemTipShowing) return;
+
+        if (_tip != null)
+        {
+            _tip.gameObject.SetActive(false);
+            Destroy(_tip.gameObject);
+            _tip = null;
+        }
+
+        _tipPendingRequests.Clear();   // 预载中的创建请求一并作废，别等加载完再冒出来
+
+        Action pending = _pendingItemTipConfirm;
+        _pendingItemTipConfirm = null;
+        _itemTipShowing = false;
+
+        if (pending != null) pending();
+
+        // 阶段虽然推进了，但人已经走了：新的提示 UI 不要露出来
+        if (_hint != null)
+            _hint.Hide();
+    }
+
+    public static void ReleaseTipPrefab()
+    {
+        if (_tipPrefabHandle.IsValid())
+            Addressables.Release(_tipPrefabHandle);
+        _tipPrefab = null;
+        _tipPrefabHandle = default;
+        _tipPendingRequests.Clear();
+    }
+
     #endregion
 
-    private void ExecuteButtonAction(ButtonOption button)
+    private int ExecuteButtonAction(ButtonOption button)
     {
         Debug.Log($"[Interactable] {EntityId} 执行 {button.type} (buttonText={button.buttonText}, param1={button.param1}, param2={button.param2})");
 
@@ -346,8 +514,7 @@ public class Interactable : MonoBehaviour
                 break;
 
             case InteractionType.Pickup:
-                ExecutePickup(button);
-                break;
+                return ExecutePickup(button);
 
             case InteractionType.Consume:
                 ExecuteConsume(button);
@@ -357,6 +524,8 @@ public class Interactable : MonoBehaviour
                 ExecuteTeleport(button);
                 break;
         }
+
+        return 0;
     }
 
     private void ExecuteDialogue(ButtonOption button)
@@ -371,7 +540,7 @@ public class Interactable : MonoBehaviour
         }
     }
 
-    private void ExecutePickup(ButtonOption button)
+    private int ExecutePickup(ButtonOption button)
     {
         int itemId = button.dataId;
         int count = 1;
@@ -383,6 +552,7 @@ public class Interactable : MonoBehaviour
             var itemCfg = BagManager.Instance.GetItemConfig(itemId);
             Debug.Log($"获得了道具: {itemCfg?.Name ?? itemId.ToString()} x{added}");
         }
+        return added;
     }
 
     private void ExecuteConsume(ButtonOption button)
@@ -519,6 +689,17 @@ public class Interactable : MonoBehaviour
 
     private void RefreshHint()
     {
+        if (_itemTipShowing)
+            return;   // 物品获得提示显示期间，原交互 UI 保持隐藏
+
+        if (!_playerInside)
+        {
+            // 玩家已经离开：哪怕刚切到新阶段，也别把提示 UI 弹出来
+            if (_hint != null)
+                _hint.Hide();
+            return;
+        }
+
         if (_hint == null || _currentPhase == null)
             return;
 

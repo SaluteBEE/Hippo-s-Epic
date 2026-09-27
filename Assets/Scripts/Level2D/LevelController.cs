@@ -52,6 +52,7 @@ public class LevelController : MonoBehaviour
         if (_playerHandle.IsValid())
             Addressables.Release(_playerHandle);
         Interactable.ReleaseHintPrefab();
+        Interactable.ReleaseTipPrefab();
     }
 
     private void EnsureInputManager()

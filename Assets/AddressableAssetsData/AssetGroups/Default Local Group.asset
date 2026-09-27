@@ -342,6 +342,12 @@ MonoBehaviour:
     m_SerializedLabels:
     - battle_bg
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c2fe22785528616409e5f8b973ceab57
+    m_Address: Assets/Prefabs/UI/Interact/SceneTip
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - ui_prefab
+    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: dd90b6ecff8020e40aa537a3ddf43594, type: 2}
   m_SchemaSet:
