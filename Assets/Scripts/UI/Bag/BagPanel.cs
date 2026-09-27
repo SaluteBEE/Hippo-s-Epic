@@ -60,6 +60,15 @@ public class BagPanel : UIWindow
     private bool _isDragging;
 #pragma warning restore CS0414
 
+    private void OnDestroy()
+    {
+        // 面板销毁时退订，否则 BagManager 的事件里会一直留着已销毁面板的引用
+        if (BagManager.Instance != null)
+            BagManager.Instance.OnItemChanged -= OnItemChanged;
+        if (EquipManager.Instance != null)
+            EquipManager.Instance.OnEquipChanged -= OnEquipChanged;
+    }
+
     public override void OnCreate(object args)
     {
         _equipSlots[EquipSlot.Hand] = equipHand;
@@ -79,7 +88,10 @@ public class BagPanel : UIWindow
             }
         }
 
+        // 先退订再订阅：OnCreate 可能被重复调用，避免重复订阅
+        BagManager.Instance.OnItemChanged -= OnItemChanged;
         BagManager.Instance.OnItemChanged += OnItemChanged;
+        EquipManager.Instance.OnEquipChanged -= OnEquipChanged;
         EquipManager.Instance.OnEquipChanged += OnEquipChanged;
 
         if (toggleGroup != null)
@@ -507,6 +519,7 @@ public class BagPanel : UIWindow
 
     private void OnItemChanged(BagManager.BagChangeType changeType, int itemId)
     {
+        if (this == null) return;   // 面板已销毁：事件里可能残留已销毁引用，别碰 gameObject
         if (!gameObject.activeInHierarchy) return;
         RefreshList();
         if (_selectedItemId == itemId)
