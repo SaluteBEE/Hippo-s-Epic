@@ -1,0 +1,27 @@
+
+sangeyuanwang_changjing.png
+size: 321,113
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+hua
+  rotate: true
+  xy: 2, 15
+  size: 96, 172
+  orig: 104, 172
+  offset: 8, 0
+  index: -1
+huapen
+  rotate: false
+  xy: 176, 11
+  size: 143, 100
+  orig: 143, 100
+  offset: 0, 0
+  index: -1
+ying
+  rotate: false
+  xy: 2, 2
+  size: 158, 11
+  orig: 158, 11
+  offset: 0, 0
+  index: -1
